@@ -55,8 +55,10 @@ final class Reports_List_Table extends \WP_List_Table {
 	public function prepare_items(): void {
 		$this->_column_headers = array( $this->get_columns(), array(), array() );
 
-		$paged  = max( 1, (int) ( $_GET['paged'] ?? 1 ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$status = isset( $_GET['status'] ) ? sanitize_key( (string) $_GET['status'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Read-only list filters, not a state change.
+		$paged  = isset( $_GET['paged'] ) ? max( 1, absint( wp_unslash( $_GET['paged'] ) ) ) : 1;
+		$status = isset( $_GET['status'] ) ? sanitize_key( wp_unslash( $_GET['status'] ) ) : '';
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 		$args = array(
 			'post_type'      => Storage::POST_TYPE,

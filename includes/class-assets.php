@@ -108,29 +108,38 @@ final class Assets {
 
 		$json = wp_json_encode( $config );
 
-		return <<<JS
-(function () {
-	var config = {$json};
-	var api = window.bugbottle;
-	if (!api || typeof api.mount !== "function") return;
-	api.initConsoleBuffer();
-	// Clicks, navigations, submits: the timeline that turns "it broke"
-	// into something reproducible. Older bundles do not have it.
-	if (typeof api.initBreadcrumbs === "function") api.initBreadcrumbs();
-	var options = {
-		endpoint: config.endpoint,
-		headers: { "X-WP-Nonce": config.nonce },
-		locale: api.resolveLocale(config.locale),
-		theme: config.theme,
-		brand: config.brand,
-		credentials: "same-origin"
-	};
-	if (config.extra && Object.keys(config.extra).length > 0) options.extra = config.extra;
-	if (config.trigger) options.trigger = config.trigger;
-	if (config.scrub) options.scrub = api.scrubReport;
-	api.mount(options);
-})();
-JS;
+		// Assembled from single-quoted lines rather than a heredoc: the
+		// WordPress.org Plugin Check forbids heredoc syntax outright, and the
+		// snippet is short enough that the loss of readability is bearable.
+		// The single `%s` is the JSON configuration above.
+		$template = implode(
+			"\n",
+			array(
+				'(function () {',
+				'	var config = %s;',
+				'	var api = window.bugbottle;',
+				'	if (!api || typeof api.mount !== "function") return;',
+				'	api.initConsoleBuffer();',
+				'	// Clicks, navigations, submits: the timeline that turns "it broke"',
+				'	// into something reproducible. Older bundles do not have it.',
+				'	if (typeof api.initBreadcrumbs === "function") api.initBreadcrumbs();',
+				'	var options = {',
+				'		endpoint: config.endpoint,',
+				'		headers: { "X-WP-Nonce": config.nonce },',
+				'		locale: api.resolveLocale(config.locale),',
+				'		theme: config.theme,',
+				'		brand: config.brand,',
+				'		credentials: "same-origin"',
+				'	};',
+				'	if (config.extra && Object.keys(config.extra).length > 0) options.extra = config.extra;',
+				'	if (config.trigger) options.trigger = config.trigger;',
+				'	if (config.scrub) options.scrub = api.scrubReport;',
+				'	api.mount(options);',
+				'})();',
+			)
+		);
+
+		return sprintf( $template, (string) $json );
 	}
 
 	/**

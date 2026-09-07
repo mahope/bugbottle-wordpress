@@ -119,7 +119,7 @@ final class Rest {
 	 * rate limit meaningless.
 	 */
 	private static function client_ip(): string {
-		$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? (string) $_SERVER['REMOTE_ADDR'] : '';
+		$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
 		return filter_var( $ip, FILTER_VALIDATE_IP ) ? $ip : 'unknown';
 	}
 

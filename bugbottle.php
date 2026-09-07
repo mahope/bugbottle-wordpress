@@ -1,17 +1,26 @@
 <?php
 /**
  * Plugin Name:       Bugbottle
- * Plugin URI:        https://github.com/mahope/bugbottle-wordpress
+ * Plugin URI:        https://bugbottle.dev
  * Description:       In-app bug reports that arrive with the evidence attached. Adds the bugbottle panel to the front end and receives the reports as a private post type in wp-admin.
- * Version:           0.1.0
+ * Version:           0.2.0
  * Requires at least: 6.4
  * Requires PHP:      8.1
  * Author:            Mads Holst Jensen
- * Author URI:        https://mahope.dk
- * License:           MIT
- * License URI:       https://opensource.org/licenses/MIT
+ * Author URI:        https://mahoje.dk
+ * License:           GPL-2.0-or-later
+ * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       bugbottle
  * Domain Path:       /languages
+ *
+ * Bugbottle is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free
+ * Software Foundation, either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * The bundled `assets/bugbottle.js` is the unmodified MIT-licensed build of
+ * the bugbottle library; see `assets/LICENSE-bugbottle.txt`. MIT is
+ * GPL-compatible, so the combined work is distributable under the GPL.
  *
  * @package Bugbottle
  */
@@ -24,7 +33,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-const VERSION = '0.1.0';
+const VERSION = '0.2.0';
 
 /**
  * The bugbottle release `assets/bugbottle.js` was copied from. Bump it in the
@@ -62,20 +71,11 @@ spl_autoload_register(
  */
 function bootstrap(): void {
 	add_action( 'init', array( Storage::class, 'register_post_type' ) );
-	add_action( 'init', __NAMESPACE__ . '\\load_textdomain' );
 	add_action( 'rest_api_init', array( Rest::class, 'register_routes' ) );
 	add_action( 'wp_enqueue_scripts', array( Assets::class, 'enqueue' ) );
 	add_action( 'admin_menu', array( Admin::class, 'register_menu' ) );
 	add_action( 'admin_init', array( Settings::class, 'register' ) );
 	add_action( 'admin_post_bugbottle_set_status', array( Admin::class, 'handle_status_change' ) );
-}
-
-/**
- * Loads the shipped translations. `languages/` first, so a site can still
- * override them from `wp-content/languages/plugins/`.
- */
-function load_textdomain(): void {
-	load_plugin_textdomain( 'bugbottle', false, dirname( plugin_basename( BUGBOTTLE_FILE ) ) . '/languages' );
 }
 
 /**

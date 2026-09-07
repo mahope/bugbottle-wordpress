@@ -4,7 +4,7 @@ Tags: bug report, feedback, screenshot, support, qa
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.2.0
+Stable tag: 0.3.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,11 +24,15 @@ The panel speaks Danish, English, Swedish, Norwegian, German, Dutch, French and 
 
 * The URL, the page title and the viewport size.
 * The browser and platform, from the user agent string.
-* Console errors captured from just before the panel was opened.
+* The browser language, the time zone, the screen size, the colour scheme, whether the browser thought it was online, and the connection type - each of them only when the browser had an answer.
+* Console errors captured from just before the panel was opened, with up to ten stack frames on an uncaught error. A frame is a file and a position; no source text is ever read or sent.
+* Requests that failed or were slow, as method, URL, status and duration. Never a body and never a header, in either direction.
 * A CSS selector for the element the reporter pointed at.
 * A short breadcrumb trail: clicks, navigations and form submits.
 * The reporter's own description, and their name and email if they gave them.
 * Optionally a screenshot, only when the reporter ticks the box.
+
+None of the context facts says more about the person than the user agent already does, and nothing beyond that list is collected: no canvas fingerprint, no font enumeration, no device enumeration.
 
 = Screenshots and privacy =
 
@@ -101,6 +105,12 @@ No. Composer is used only to run PHPStan while developing; the shipped plugin is
 
 == Changelog ==
 
+= 0.3.0 =
+* Updated the bundled panel to bugbottle 0.6.0. Reports now carry the browser language, time zone, screen size, colour scheme, online state and connection type; uncaught errors carry up to ten stack frames; and requests that failed or were slow are recorded as their own section. The PHP validator caps every one of them to the same limits the library does.
+* New settings: a keyboard shortcut (`mod+shift+b`, empty for none), opening the panel by itself on an uncaught error (off), an offline queue that keeps a report the browser could not send (on), the network log (on) and breadcrumbs (on).
+* The report detail screen shows the timeline and the requests as tables, next to the Markdown summary.
+* Danish for every new setting and screen.
+
 = 0.2.0 =
 * Relicensed to GPL-2.0-or-later for the WordPress.org plugin directory. The bundled `assets/bugbottle.js` stays MIT; see `assets/LICENSE-bugbottle.txt`.
 * The plugin directory is now `bugbottle`, matching the WordPress.org slug. If you installed 0.1.0 from a GitHub zip it landed in `bugbottle-wordpress`; delete that copy after installing this one, or your reports will be split across two entries in the plugin list.
@@ -111,6 +121,9 @@ No. Composer is used only to run PHPStan while developing; the shipped plugin is
 * First release. REST endpoint, private `bugbottle_report` post type, admin list and detail screens, settings, email via `wp_mail`, screenshots behind an admin-only route, Danish and English.
 
 == Upgrade Notice ==
+
+= 0.3.0 =
+Updates the bundled panel to bugbottle 0.6.0: stack frames, a wider page context, a network log and an offline queue, with settings for each. Existing reports are untouched.
 
 = 0.2.0 =
 Relicensed to GPL-2.0-or-later and renamed to the `bugbottle` directory. If you installed 0.1.0 from a GitHub zip, delete the old `bugbottle-wordpress` copy after updating.

@@ -3,9 +3,10 @@
 The [bugbottle](https://github.com/mahope/bugbottle) panel — see it at
 [bugbottle.dev](https://bugbottle.dev) — and its receiving
 endpoint, in one activation. Reports land as a private post type in wp-admin —
-with the page, the viewport, the recent console errors, the element the
-reporter pointed at, what they did just before, and optionally a picture of
-what they were looking at — and are emailed on if you give it a recipient.
+with the page, the viewport, the recent console errors and their stack frames,
+the requests that failed, the element the reporter pointed at, what they did
+just before, and optionally a picture of what they were looking at — and are
+emailed on if you give it a recipient.
 
 Error trackers catch what throws. They cannot catch what merely looks wrong,
 and they never tell you what the person was doing when it did. *"The save
@@ -50,6 +51,10 @@ database, not in the plugin directory.
 | Position | Which corner the floating button sits in. |
 | Brand name, Logo URL | Shown in the panel header and on the trigger. |
 | Trigger selector | A CSS selector for your own button, e.g. `#report-a-bug`. Empty means the floating button. |
+| Keyboard shortcut | The combination that opens the panel. `mod` is Command on a Mac and Ctrl everywhere else; `mod+shift+b` by default. Empty means no shortcut. |
+| Open on error | Opens the panel by itself when the page throws an uncaught error. Off by default — it shows the panel to whoever is on the page, customers included. |
+| Evidence | Breadcrumbs (clicks, navigations, submits) and the network log (requests that failed or were slow — method, URL, status and duration, never a body or a header). Both on. |
+| Offline queue | Keeps a report the browser could not send and delivers it when the connection is back. Reports wait in the browser for up to seven days. On by default. |
 | Scrubbing | Redacts email addresses, bearer tokens, JWTs, card numbers, IBANs and query values before the report is sent. On by default. |
 | Email recipient | Where reports are emailed, through `wp_mail` — so an SMTP plugin handles delivery. Empty means reports are only stored. |
 | Email on submit | Send the email as soon as a report arrives. |
@@ -84,6 +89,23 @@ bugbottle JSON body, and a logged-in caller identifies itself with the standard
 `includes/class-validator.php`, and `includes/class-markdown.php` is the same
 port of the library's `toMarkdown`, so the summary in wp-admin and in the email
 is the rendering you already know.
+
+## What a report carries
+
+The page, the viewport and the user agent, as before. Since 0.3.0 also the
+browser language, the time zone, the screen size with its pixel ratio, the
+colour scheme, whether the browser believed it was online and the connection
+type — each only when the browser had an answer, and each capped on the way in
+(35, 64, 32 and 16 characters; `dark` or `light` and nothing else). An uncaught
+error carries up to ten stack frames, and a frame is a file and a position:
+no source text is ever read or sent, so resolving one stays with whoever has
+the maps. The network log records requests that failed or were slow as method,
+URL, status and duration — never a body and never a header, in either
+direction, because that is where tokens and personal data live.
+
+None of that says more about the person than the user agent already does, and
+nothing beyond that list is collected: no canvas fingerprint, no font
+enumeration, no device enumeration.
 
 ## Please read this part
 
@@ -125,7 +147,7 @@ yourself when you mean it.
 
 `assets/bugbottle.js` is the official one-script-tag build,
 `dist/bugbottle.js`, copied verbatim from the
-[bugbottle](https://github.com/mahope/bugbottle) package — **bugbottle 0.4.0**
+[bugbottle](https://github.com/mahope/bugbottle) package — **bugbottle 0.6.0**
 at the time of writing. It is not modified here and it is not built here.
 
 When bugbottle publishes a new release, updating the panel is two lines:

@@ -4,6 +4,53 @@ All notable changes to this plugin are documented here and in `readme.txt`
 (which is what wordpress.org shows). This file exists for anyone reading the
 repository directly; keep the two in step.
 
+## 0.3.0 — 2026-09-08
+
+Follows the library to bugbottle 0.6.0, and lets the settings screen turn on
+what 0.6.0 added.
+
+### Added
+
+- Six optional facts on the report context — `language`, `timezone`, `screen`,
+  `colorScheme`, `online` and `connection`. `Validator::context()` clips them
+  to the ceilings the TypeScript `normaliseContext` uses (35, 64, 32 and 16
+  characters), accepts only `dark` or `light` for the colour scheme, and keeps
+  `online: false`, which is an answer rather than a missing value. Anything of
+  the wrong type is dropped rather than stored.
+- `console[].stack`: up to ten `{ file, line, col, fn? }` frames on an uncaught
+  error or a rejection, validated by `Validator::stack()` with the library's
+  `MAX_STACK_FRAMES` and `MAX_STACK_STRING_LENGTH`. A frame without a string
+  `file` is dropped rather than failing the entry. A frame is a position, never
+  source text, and none is accepted if it appears.
+- `Validator::network()`, the port of `normaliseNetwork`: requests that failed
+  or were slow, as `{ ts, method, url, status, ms, error? }`, thirty at most.
+  Stored in its own `_bugbottle_network` meta key and rendered as the
+  **Requests** table.
+- Five settings, each wired into the inline mount config: **Keyboard
+  shortcut** (`mod+shift+b` by default, empty for none, passed as `shortcut`),
+  **Open on error** (off, `openOnError`), **Offline queue** (on,
+  `createQueue({ endpoint, headers })` so a queued report still carries the
+  REST nonce), **Network log** (on, `initNetwork({ endpoint })`) and
+  **Breadcrumbs** (on, `initBreadcrumbs()`). Breadcrumbs and the network log
+  had no switch before; the panel simply started them.
+- The report detail screen shows the timeline and the requests as tables of
+  their own, beside the Markdown summary — the textarea is for pasting, not
+  for reading.
+- Danish for every new setting, label and column.
+
+### Changed
+
+- `assets/bugbottle.js` is the unmodified `dist/bugbottle.js` from bugbottle
+  0.6.0, and `LIB_VERSION` says so.
+- `Markdown::render()` matches the 0.6.0 `toMarkdown` exactly: **Screen**
+  between Viewport and Browser, then **Language**, **Time zone**, **Colour
+  scheme**, **Online** (`yes`/`no`) and **Connection** after it; the
+  **Requests** table between the timeline and the console; and the top three
+  frames of a stack indented under their console entry. Verified by rendering
+  a fixture carrying all of it through both `src/markdown.ts` (with
+  `node --experimental-strip-types`) and the PHP port and diffing the two —
+  byte-identical, as is the validated JSON each side produces.
+
 ## 0.2.0 — 2026-09-07
 
 Ready for the WordPress.org plugin directory.

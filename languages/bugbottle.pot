@@ -1,0 +1,332 @@
+# Copyright (C) 2026 Mads Holst Jensen
+# This file is distributed under the MIT.
+msgid ""
+msgstr ""
+"Project-Id-Version: Bugbottle 0.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/bugbottle-wordpress\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-09-07T10:16:22+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: bugbottle\n"
+
+#. Plugin Name of the plugin
+#: bugbottle.php
+msgid "Bugbottle"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: bugbottle.php
+msgid "https://github.com/mahope/bugbottle-wordpress"
+msgstr ""
+
+#. Description of the plugin
+#: bugbottle.php
+msgid "In-app bug reports that arrive with the evidence attached. Adds the bugbottle panel to the front end and receives the reports as a private post type in wp-admin."
+msgstr ""
+
+#. Author of the plugin
+#: bugbottle.php
+msgid "Mads Holst Jensen"
+msgstr ""
+
+#. Author URI of the plugin
+#: bugbottle.php
+msgid "https://mahope.dk"
+msgstr ""
+
+#: includes/class-admin.php:30
+#: includes/class-admin.php:31
+#: includes/class-admin.php:41
+#: includes/class-admin.php:79
+#: includes/class-storage.php:53
+msgid "Bug reports"
+msgstr ""
+
+#: includes/class-admin.php:42
+#: includes/class-admin.php:127
+msgid "All reports"
+msgstr ""
+
+#: includes/class-admin.php:50
+#: includes/class-settings.php:135
+msgid "Bugbottle settings"
+msgstr ""
+
+#: includes/class-admin.php:51
+#: includes/class-admin.php:87
+msgid "Settings"
+msgstr ""
+
+#: includes/class-admin.php:63
+msgid "You do not have permission to read bug reports."
+msgstr ""
+
+#. translators: %s: link to the settings screen
+#: includes/class-admin.php:85
+#, php-format
+msgid "No email recipient is set, so reports are only stored here. %s"
+msgstr ""
+
+#: includes/class-admin.php:104
+#: includes/class-rest.php:246
+msgid "No such report."
+msgstr ""
+
+#: includes/class-admin.php:139
+msgid "Reopen"
+msgstr ""
+
+#: includes/class-admin.php:140
+msgid "Mark as done"
+msgstr ""
+
+#: includes/class-admin.php:146
+msgid "Screenshot"
+msgstr ""
+
+#: includes/class-admin.php:148
+msgid "Served only to administrators, through the plugin route. It is not in the media library and has no public URL."
+msgstr ""
+
+#: includes/class-admin.php:156
+msgid "Summary"
+msgstr ""
+
+#: includes/class-admin.php:158
+msgid "Markdown, ready to paste into an issue."
+msgstr ""
+
+#: includes/class-admin.php:171
+msgid "You do not have permission to change a report."
+msgstr ""
+
+#: includes/class-admin.php:197
+msgid "Bug"
+msgstr ""
+
+#: includes/class-admin.php:199
+msgid "Idea"
+msgstr ""
+
+#: includes/class-admin.php:201
+msgid "Feedback"
+msgstr ""
+
+#. translators: 1: site name, 2: report title
+#: includes/class-email.php:64
+#, php-format
+msgid "[%1$s] %2$s"
+msgstr ""
+
+#: includes/class-email.php:77
+msgid "Not logged in"
+msgstr ""
+
+#. translators: %d: user id
+#: includes/class-email.php:82
+#, php-format
+msgid "User %d"
+msgstr ""
+
+#: includes/class-reports-list-table.php:46
+msgid "Type"
+msgstr ""
+
+#: includes/class-reports-list-table.php:47
+msgid "Report"
+msgstr ""
+
+#: includes/class-reports-list-table.php:48
+msgid "Page"
+msgstr ""
+
+#: includes/class-reports-list-table.php:49
+msgid "Reporter"
+msgstr ""
+
+#: includes/class-reports-list-table.php:50
+msgid "Date"
+msgstr ""
+
+#: includes/class-reports-list-table.php:51
+msgid "Status"
+msgstr ""
+
+#: includes/class-reports-list-table.php:98
+msgid "All"
+msgstr ""
+
+#: includes/class-reports-list-table.php:99
+#: includes/class-reports-list-table.php:141
+msgid "Open"
+msgstr ""
+
+#: includes/class-reports-list-table.php:100
+#: includes/class-reports-list-table.php:140
+msgid "Done"
+msgstr ""
+
+#: includes/class-reports-list-table.php:114
+msgid "No reports yet."
+msgstr ""
+
+#: includes/class-rest.php:85
+msgid "You must be logged in to send a report."
+msgstr ""
+
+#: includes/class-rest.php:92
+msgid "Too many reports from this address. Try again later."
+msgstr ""
+
+#: includes/class-rest.php:143
+msgid "Unknown report type."
+msgstr ""
+
+#: includes/class-rest.php:151
+msgid "A report needs a message."
+msgstr ""
+
+#: includes/class-rest.php:183
+msgid "The report could not be stored."
+msgstr ""
+
+#: includes/class-rest.php:250
+msgid "That report has no screenshot."
+msgstr ""
+
+#: includes/class-settings.php:130
+msgid "You do not have permission to change these settings."
+msgstr ""
+
+#: includes/class-settings.php:140
+msgid "Panel"
+msgstr ""
+
+#: includes/class-settings.php:144
+msgid "Show the report panel on the front end"
+msgstr ""
+
+#: includes/class-settings.php:148
+msgid "Only for logged-in users"
+msgstr ""
+
+#: includes/class-settings.php:152
+msgid "Accept reports from visitors who are not logged in (rate-limited to 10 per hour per IP address)"
+msgstr ""
+
+#: includes/class-settings.php:157
+msgid "Language"
+msgstr ""
+
+#: includes/class-settings.php:166
+msgid "The language the panel speaks. Auto follows the site language."
+msgstr ""
+
+#: includes/class-settings.php:170
+msgid "Primary colour"
+msgstr ""
+
+#: includes/class-settings.php:174
+msgid "Position"
+msgstr ""
+
+#: includes/class-settings.php:186
+msgid "Brand name"
+msgstr ""
+
+#: includes/class-settings.php:190
+msgid "Logo URL"
+msgstr ""
+
+#: includes/class-settings.php:194
+msgid "Trigger selector"
+msgstr ""
+
+#: includes/class-settings.php:197
+msgid "A CSS selector for your own button. Leave empty for the floating button."
+msgstr ""
+
+#: includes/class-settings.php:201
+msgid "Scrubbing"
+msgstr ""
+
+#: includes/class-settings.php:205
+msgid "Redact email addresses, tokens, card numbers and query values before the report is sent"
+msgstr ""
+
+#: includes/class-settings.php:210
+msgid "Email recipient"
+msgstr ""
+
+#: includes/class-settings.php:213
+msgid "Leave empty to only store reports in wp-admin."
+msgstr ""
+
+#: includes/class-settings.php:217
+msgid "Email on submit"
+msgstr ""
+
+#: includes/class-settings.php:221
+msgid "Send the email as soon as a report arrives"
+msgstr ""
+
+#: includes/class-settings.php:234
+msgid "Auto (site language)"
+msgstr ""
+
+#: includes/class-settings.php:235
+msgid "Danish"
+msgstr ""
+
+#: includes/class-settings.php:236
+msgid "English"
+msgstr ""
+
+#: includes/class-settings.php:237
+msgid "Swedish"
+msgstr ""
+
+#: includes/class-settings.php:238
+msgid "Norwegian"
+msgstr ""
+
+#: includes/class-settings.php:239
+msgid "German"
+msgstr ""
+
+#: includes/class-settings.php:240
+msgid "Dutch"
+msgstr ""
+
+#: includes/class-settings.php:241
+msgid "French"
+msgstr ""
+
+#: includes/class-settings.php:242
+msgid "Spanish"
+msgstr ""
+
+#: includes/class-settings.php:249
+msgid "Bottom right"
+msgstr ""
+
+#: includes/class-settings.php:250
+msgid "Bottom left"
+msgstr ""
+
+#: includes/class-settings.php:251
+msgid "Top right"
+msgstr ""
+
+#: includes/class-settings.php:252
+msgid "Top left"
+msgstr ""
+
+#: includes/class-storage.php:54
+msgid "Bug report"
+msgstr ""

@@ -1,0 +1,224 @@
+# Danish translation of the Bugbottle plugin.
+# Copyright (C) 2026 Mads Holst Jensen
+# This file is distributed under the same licence as the Bugbottle plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: Bugbottle 0.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/mahope/bugbottle-wordpress/issues\n"
+"POT-Creation-Date: 2026-09-07T10:00:00+00:00\n"
+"PO-Revision-Date: 2026-09-07T10:00:00+00:00\n"
+"Last-Translator: Mads Holst Jensen\n"
+"Language-Team: Danish\n"
+"Language: da_DK\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Domain: bugbottle\n"
+
+msgid "In-app bug reports that arrive with the evidence attached. Adds the bugbottle panel to the front end and receives the reports as a private post type in wp-admin."
+msgstr "Fejlrapporter fra selve siden, med beviserne vedhæftet. Lægger bugbottle-panelet på forsiden og modtager rapporterne som en privat indholdstype i wp-admin."
+
+msgid "Bug reports"
+msgstr "Fejlrapporter"
+
+msgid "Bug report"
+msgstr "Fejlrapport"
+
+msgid "All reports"
+msgstr "Alle rapporter"
+
+msgid "Bugbottle settings"
+msgstr "Bugbottle-indstillinger"
+
+msgid "Settings"
+msgstr "Indstillinger"
+
+msgid "You do not have permission to read bug reports."
+msgstr "Du har ikke adgang til at læse fejlrapporter."
+
+msgid "No email recipient is set, so reports are only stored here. %s"
+msgstr "Der er ikke sat en modtager af e-mail, så rapporter gemmes kun her. %s"
+
+msgid "No such report."
+msgstr "Rapporten findes ikke."
+
+msgid "Reopen"
+msgstr "Genåbn"
+
+msgid "Mark as done"
+msgstr "Markér som færdig"
+
+msgid "Screenshot"
+msgstr "Skærmbillede"
+
+msgid "Served only to administrators, through the plugin route. It is not in the media library and has no public URL."
+msgstr "Vises kun for administratorer, gennem pluginnets egen rute. Billedet ligger ikke i mediebiblioteket og har ingen offentlig adresse."
+
+msgid "Summary"
+msgstr "Opsummering"
+
+msgid "Markdown, ready to paste into an issue."
+msgstr "Markdown, klar til at sætte ind i et issue."
+
+msgid "You do not have permission to change a report."
+msgstr "Du har ikke adgang til at ændre en rapport."
+
+msgid "Bug"
+msgstr "Fejl"
+
+msgid "Idea"
+msgstr "Idé"
+
+msgid "Feedback"
+msgstr "Andet"
+
+msgid "Not logged in"
+msgstr "Ikke logget ind"
+
+msgid "User %d"
+msgstr "Bruger %d"
+
+msgid "Type"
+msgstr "Type"
+
+msgid "Report"
+msgstr "Rapport"
+
+msgid "Page"
+msgstr "Side"
+
+msgid "Reporter"
+msgstr "Afsender"
+
+msgid "Date"
+msgstr "Dato"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "All"
+msgstr "Alle"
+
+msgid "Open"
+msgstr "Åben"
+
+msgid "Done"
+msgstr "Færdig"
+
+msgid "No reports yet."
+msgstr "Der er ingen rapporter endnu."
+
+msgid "You must be logged in to send a report."
+msgstr "Du skal være logget ind for at sende en rapport."
+
+msgid "Too many reports from this address. Try again later."
+msgstr "For mange rapporter fra denne adresse. Prøv igen senere."
+
+msgid "Unknown report type."
+msgstr "Ukendt rapporttype."
+
+msgid "A report needs a message."
+msgstr "En rapport skal have en besked."
+
+msgid "The report could not be stored."
+msgstr "Rapporten kunne ikke gemmes."
+
+msgid "That report has no screenshot."
+msgstr "Rapporten har intet skærmbillede."
+
+msgid "You do not have permission to change these settings."
+msgstr "Du har ikke adgang til at ændre disse indstillinger."
+
+msgid "Panel"
+msgstr "Panel"
+
+msgid "Show the report panel on the front end"
+msgstr "Vis rapportpanelet på hjemmesiden"
+
+msgid "Only for logged-in users"
+msgstr "Kun for brugere der er logget ind"
+
+msgid "Accept reports from visitors who are not logged in (rate-limited to 10 per hour per IP address)"
+msgstr "Tag imod rapporter fra besøgende der ikke er logget ind (højst 10 i timen pr. IP-adresse)"
+
+msgid "Language"
+msgstr "Sprog"
+
+msgid "The language the panel speaks. Auto follows the site language."
+msgstr "Det sprog panelet taler. Auto følger sidens sprog."
+
+msgid "Primary colour"
+msgstr "Primærfarve"
+
+msgid "Position"
+msgstr "Placering"
+
+msgid "Brand name"
+msgstr "Firmanavn"
+
+msgid "Logo URL"
+msgstr "Adresse på logo"
+
+msgid "Trigger selector"
+msgstr "Selector til din egen knap"
+
+msgid "A CSS selector for your own button. Leave empty for the floating button."
+msgstr "En CSS-selector til din egen knap. Lad feltet stå tomt for at bruge den svævende knap."
+
+msgid "Scrubbing"
+msgstr "Rensning"
+
+msgid "Redact email addresses, tokens, card numbers and query values before the report is sent"
+msgstr "Sløre e-mailadresser, tokens, kortnumre og værdier i adresselinjen før rapporten sendes"
+
+msgid "Email recipient"
+msgstr "Modtager af e-mail"
+
+msgid "Leave empty to only store reports in wp-admin."
+msgstr "Lad feltet stå tomt for kun at gemme rapporter i wp-admin."
+
+msgid "Email on submit"
+msgstr "Send e-mail med det samme"
+
+msgid "Send the email as soon as a report arrives"
+msgstr "Send e-mailen så snart en rapport kommer ind"
+
+msgid "Auto (site language)"
+msgstr "Auto (sidens sprog)"
+
+msgid "Danish"
+msgstr "Dansk"
+
+msgid "English"
+msgstr "Engelsk"
+
+msgid "Swedish"
+msgstr "Svensk"
+
+msgid "Norwegian"
+msgstr "Norsk"
+
+msgid "German"
+msgstr "Tysk"
+
+msgid "Dutch"
+msgstr "Hollandsk"
+
+msgid "French"
+msgstr "Fransk"
+
+msgid "Spanish"
+msgstr "Spansk"
+
+msgid "Bottom right"
+msgstr "Nederst til højre"
+
+msgid "Bottom left"
+msgstr "Nederst til venstre"
+
+msgid "Top right"
+msgstr "Øverst til højre"
+
+msgid "Top left"
+msgstr "Øverst til venstre"

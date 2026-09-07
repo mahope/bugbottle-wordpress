@@ -1,0 +1,11 @@
+/vendor/
+/.composer-home/
+/node_modules/
+/bugbottle-wordpress.zip
+
+# Editor and OS noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

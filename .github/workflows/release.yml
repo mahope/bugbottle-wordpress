@@ -1,0 +1,63 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.1"
+          tools: composer
+
+      - name: Install dev dependencies
+        run: composer install --no-interaction --no-progress
+
+      - name: PHPStan
+        run: vendor/bin/phpstan analyse --memory-limit=1G --no-progress
+
+      # The tag is the source of truth for the version. A zip whose plugin
+      # header disagrees with its tag is the kind of thing nobody notices until
+      # a site will not update, so it fails the release instead.
+      - name: Check the tag matches the plugin header
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          HEADER=$(grep -m1 '^ \* Version:' bugbottle.php | awk '{print $3}')
+          echo "tag=$TAG header=$HEADER"
+          test "$TAG" = "$HEADER"
+
+      # The zip has to unpack into a directory WordPress recognises, so the
+      # plugin files are staged under `bugbottle-wordpress/` first. `vendor/`
+      # is dev-only and never ships.
+      - name: Build the zip
+        run: |
+          mkdir -p build/bugbottle-wordpress
+          rsync -a --exclude '.git' \
+                   --exclude '.github' \
+                   --exclude 'vendor' \
+                   --exclude 'node_modules' \
+                   --exclude 'build' \
+                   --exclude 'composer.json' \
+                   --exclude 'composer.lock' \
+                   --exclude 'phpstan.neon' \
+                   --exclude 'phpstan-bootstrap.php' \
+                   --exclude '.gitignore' \
+                   ./ build/bugbottle-wordpress/
+          cd build && zip -rq ../bugbottle-wordpress.zip bugbottle-wordpress
+          unzip -l ../bugbottle-wordpress.zip
+
+      - name: Publish the release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: bugbottle-wordpress.zip
+          generate_release_notes: true

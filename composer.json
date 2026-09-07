@@ -1,0 +1,20 @@
+{
+	"name": "mahope/bugbottle-wordpress",
+	"description": "In-app bug reports that arrive with the evidence attached — the bugbottle panel and its receiving endpoint, as a WordPress plugin.",
+	"type": "wordpress-plugin",
+	"license": "MIT",
+	"homepage": "https://github.com/mahope/bugbottle-wordpress",
+	"require": {
+		"php": ">=8.1"
+	},
+	"require-dev": {
+		"php-stubs/wordpress-stubs": "^6.4",
+		"phpstan/phpstan": "^2.0"
+	},
+	"scripts": {
+		"check": "phpstan analyse --memory-limit=1G"
+	},
+	"config": {
+		"sort-packages": true
+	}
+}

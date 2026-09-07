@@ -171,6 +171,7 @@ final class Rest {
 			'console'     => Validator::console( $body['console'] ?? null ),
 			'elements'    => Validator::elements( $body['elements'] ?? null ),
 			'breadcrumbs' => Validator::breadcrumbs( $body['breadcrumbs'] ?? null ),
+			'network'     => Validator::network( $body['network'] ?? null ),
 			'extra'       => self::extra( $body ),
 			'reporter'    => get_current_user_id(),
 			'screenshot'  => $screenshot,
@@ -208,7 +209,7 @@ final class Rest {
 	 * @return array<string, string>
 	 */
 	private static function extra( array $body ): array {
-		$known = array( 'type', 'message', 'context', 'console', 'elements', 'breadcrumbs', 'screenshotDataUrl' );
+		$known = array( 'type', 'message', 'context', 'console', 'elements', 'breadcrumbs', 'network', 'screenshotDataUrl' );
 		$out   = array();
 		foreach ( $body as $key => $value ) {
 			if ( count( $out ) >= 20 ) {

@@ -153,6 +153,11 @@ final class Admin {
 				</p>
 			<?php endif; ?>
 
+			<?php
+			self::render_breadcrumbs( Validator::breadcrumbs( $report['breadcrumbs'] ?? null ) );
+			self::render_network( Validator::network( $report['network'] ?? null ) );
+			?>
+
 			<h2><?php esc_html_e( 'Summary', 'bugbottle' ); ?></h2>
 			<p class="description">
 				<?php esc_html_e( 'Markdown, ready to paste into an issue.', 'bugbottle' ); ?>
@@ -160,6 +165,120 @@ final class Admin {
 			<textarea readonly rows="24" style="width:100%;font-family:Menlo,Consolas,monospace;font-size:12px"
 				onclick="this.select()"><?php echo esc_textarea( $summary ); ?></textarea>
 		</div>
+		<?php
+	}
+
+	/**
+	 * What the reporter did before they reported, oldest first. The Markdown
+	 * summary carries the same timeline, but this is the one a reader scans:
+	 * the textarea below is for pasting, not for reading.
+	 *
+	 * @param array<int, array<string, string>> $breadcrumbs Validated breadcrumbs.
+	 */
+	private static function render_breadcrumbs( array $breadcrumbs ): void {
+		if ( 0 === count( $breadcrumbs ) ) {
+			return;
+		}
+		?>
+		<h2><?php esc_html_e( 'What happened before', 'bugbottle' ); ?></h2>
+		<table class="widefat striped">
+			<thead>
+				<tr>
+					<th scope="col"><?php esc_html_e( 'Time', 'bugbottle' ); ?></th>
+					<th scope="col"><?php esc_html_e( 'What', 'bugbottle' ); ?></th>
+					<th scope="col"><?php esc_html_e( 'Where', 'bugbottle' ); ?></th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php foreach ( $breadcrumbs as $crumb ) : ?>
+					<tr>
+						<td><?php echo esc_html( $crumb['ts'] ); ?></td>
+						<td><?php echo esc_html( self::breadcrumb_label( $crumb['kind'] ) ); ?></td>
+						<td>
+							<code><?php echo esc_html( self::breadcrumb_where( $crumb ) ); ?></code>
+							<?php if ( isset( $crumb['text'] ) && '' !== $crumb['text'] ) : ?>
+								<?php echo esc_html( ' — "' . $crumb['text'] . '"' ); ?>
+							<?php endif; ?>
+						</td>
+					</tr>
+				<?php endforeach; ?>
+			</tbody>
+		</table>
+		<?php
+	}
+
+	/** The translated verb for a breadcrumb kind. */
+	private static function breadcrumb_label( string $kind ): string {
+		switch ( $kind ) {
+			case 'click':
+				return __( 'Clicked', 'bugbottle' );
+			case 'submit':
+				return __( 'Submitted', 'bugbottle' );
+			case 'navigation':
+				return __( 'Navigated', 'bugbottle' );
+			default:
+				return __( 'Page visibility', 'bugbottle' );
+		}
+	}
+
+	/**
+	 * The selector a click or a submit names, or the two ends of a navigation.
+	 *
+	 * @param array<string, string> $crumb A validated breadcrumb.
+	 */
+	private static function breadcrumb_where( array $crumb ): string {
+		if ( 'navigation' === $crumb['kind'] ) {
+			$from = $crumb['from'] ?? '';
+			return '' !== $from ? $from . ' → ' . ( $crumb['to'] ?? '' ) : ( $crumb['to'] ?? '' );
+		}
+		return $crumb['target'] ?? ( $crumb['to'] ?? '' );
+	}
+
+	/**
+	 * The requests that failed or were slow before the report. A request that
+	 * never got a status shows the failure rather than a bare zero, which
+	 * reads as a status nobody recognises.
+	 *
+	 * @param array<int, array<string, mixed>> $network Validated network entries.
+	 */
+	private static function render_network( array $network ): void {
+		if ( 0 === count( $network ) ) {
+			return;
+		}
+		?>
+		<h2><?php esc_html_e( 'Requests', 'bugbottle' ); ?></h2>
+		<p class="description">
+			<?php esc_html_e( 'Requests that failed or were slow. Bodies and headers are never recorded, in either direction.', 'bugbottle' ); ?>
+		</p>
+		<table class="widefat striped">
+			<thead>
+				<tr>
+					<th scope="col"><?php esc_html_e( 'Method', 'bugbottle' ); ?></th>
+					<th scope="col"><?php esc_html_e( 'URL', 'bugbottle' ); ?></th>
+					<th scope="col"><?php esc_html_e( 'Status', 'bugbottle' ); ?></th>
+					<th scope="col"><?php esc_html_e( 'ms', 'bugbottle' ); ?></th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php foreach ( $network as $entry ) : ?>
+					<tr>
+						<td><?php echo esc_html( (string) $entry['method'] ); ?></td>
+						<td><code><?php echo esc_html( (string) $entry['url'] ); ?></code></td>
+						<td>
+							<?php
+							$status = (int) $entry['status'];
+							if ( $status > 0 ) {
+								echo esc_html( (string) $status );
+							} elseif ( ! empty( $entry['error'] ) ) {
+								esc_html_e( 'Failed', 'bugbottle' );
+							}
+							?>
+						</td>
+						<td><?php echo esc_html( (string) (int) $entry['ms'] ); ?></td>
+					</tr>
+				<?php endforeach; ?>
+			</tbody>
+		</table>
 		<?php
 	}
 

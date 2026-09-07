@@ -3,7 +3,7 @@
 # This file is distributed under the same licence as the Bugbottle plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: Bugbottle 0.1.0\n"
+"Project-Id-Version: Bugbottle 0.3.0\n"
 "Report-Msgid-Bugs-To: https://github.com/mahope/bugbottle-wordpress/issues\n"
 "POT-Creation-Date: 2026-09-07T10:00:00+00:00\n"
 "PO-Revision-Date: 2026-09-07T10:00:00+00:00\n"
@@ -222,3 +222,78 @@ msgstr "Øverst til højre"
 
 msgid "Top left"
 msgstr "Øverst til venstre"
+
+msgid "What happened before"
+msgstr "Hvad skete der forinden"
+
+msgid "Time"
+msgstr "Tidspunkt"
+
+msgid "What"
+msgstr "Hvad"
+
+msgid "Where"
+msgstr "Hvor"
+
+msgid "Clicked"
+msgstr "Klikkede"
+
+msgid "Submitted"
+msgstr "Indsendte"
+
+msgid "Navigated"
+msgstr "Navigerede"
+
+msgid "Page visibility"
+msgstr "Sidens synlighed"
+
+msgid "Requests"
+msgstr "Forespørgsler"
+
+msgid "Requests that failed or were slow. Bodies and headers are never recorded, in either direction."
+msgstr "Forespørgsler der fejlede eller var langsomme. Hverken indhold eller headere gemmes, i nogen af retningerne."
+
+msgid "Method"
+msgstr "Metode"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "ms"
+msgstr "ms"
+
+msgid "Failed"
+msgstr "Fejlede"
+
+msgid "Keyboard shortcut"
+msgstr "Tastaturgenvej"
+
+msgid "Opens the panel from the keyboard. \"mod\" is Command on a Mac and Ctrl everywhere else. Leave empty for no shortcut."
+msgstr "Åbner panelet fra tastaturet. \"mod\" er Command på en Mac og Ctrl alle andre steder. Lad feltet stå tomt for ingen genvej."
+
+msgid "Open on error"
+msgstr "Åbn ved fejl"
+
+msgid "Open the panel by itself when the page throws an uncaught error"
+msgstr "Åbn panelet af sig selv, når siden kaster en ufanget fejl"
+
+msgid "Off by default: it shows the panel to whoever happens to be on the page, including customers."
+msgstr "Slået fra som standard: det viser panelet til enhver, der tilfældigvis er på siden, kunder inklusive."
+
+msgid "Evidence"
+msgstr "Beviser"
+
+msgid "Breadcrumbs: record clicks, navigations and form submits before the report"
+msgstr "Brødkrummer: registrér klik, navigationer og formularindsendelser før rapporten"
+
+msgid "Network log: record requests that failed or were slow. Never their bodies or headers"
+msgstr "Netværkslog: registrér forespørgsler der fejlede eller var langsomme. Aldrig deres indhold eller headere"
+
+msgid "Offline queue"
+msgstr "Offline-kø"
+
+msgid "Keep a report the browser could not send and deliver it when the connection is back"
+msgstr "Gem en rapport, som browseren ikke kunne sende, og aflevér den når forbindelsen er tilbage"
+
+msgid "Reports wait in the browser, for up to seven days."
+msgstr "Rapporter venter i browseren i op til syv dage."

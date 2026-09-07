@@ -1,15 +1,15 @@
 # Copyright (C) 2026 Mads Holst Jensen
-# This file is distributed under the MIT.
+# This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Bugbottle 0.1.0\n"
+"Project-Id-Version: Bugbottle 0.3.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/bugbottle-wordpress\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-07T10:16:22+00:00\n"
+"POT-Creation-Date: 2026-09-07T23:35:12+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: bugbottle\n"
@@ -21,7 +21,7 @@ msgstr ""
 
 #. Plugin URI of the plugin
 #: bugbottle.php
-msgid "https://github.com/mahope/bugbottle-wordpress"
+msgid "https://bugbottle.dev"
 msgstr ""
 
 #. Description of the plugin
@@ -36,14 +36,14 @@ msgstr ""
 
 #. Author URI of the plugin
 #: bugbottle.php
-msgid "https://mahope.dk"
+msgid "https://mahoje.dk"
 msgstr ""
 
 #: includes/class-admin.php:30
 #: includes/class-admin.php:31
 #: includes/class-admin.php:41
 #: includes/class-admin.php:79
-#: includes/class-storage.php:53
+#: includes/class-storage.php:54
 msgid "Bug reports"
 msgstr ""
 
@@ -53,7 +53,7 @@ msgid "All reports"
 msgstr ""
 
 #: includes/class-admin.php:50
-#: includes/class-settings.php:135
+#: includes/class-settings.php:182
 msgid "Bugbottle settings"
 msgstr ""
 
@@ -73,7 +73,7 @@ msgid "No email recipient is set, so reports are only stored here. %s"
 msgstr ""
 
 #: includes/class-admin.php:104
-#: includes/class-rest.php:246
+#: includes/class-rest.php:247
 msgid "No such report."
 msgstr ""
 
@@ -93,27 +93,88 @@ msgstr ""
 msgid "Served only to administrators, through the plugin route. It is not in the media library and has no public URL."
 msgstr ""
 
-#: includes/class-admin.php:156
+#: includes/class-admin.php:161
 msgid "Summary"
 msgstr ""
 
-#: includes/class-admin.php:158
+#: includes/class-admin.php:163
 msgid "Markdown, ready to paste into an issue."
 msgstr ""
 
-#: includes/class-admin.php:171
+#: includes/class-admin.php:183
+msgid "What happened before"
+msgstr ""
+
+#: includes/class-admin.php:187
+msgid "Time"
+msgstr ""
+
+#: includes/class-admin.php:188
+msgid "What"
+msgstr ""
+
+#: includes/class-admin.php:189
+msgid "Where"
+msgstr ""
+
+#: includes/class-admin.php:214
+msgid "Clicked"
+msgstr ""
+
+#: includes/class-admin.php:216
+msgid "Submitted"
+msgstr ""
+
+#: includes/class-admin.php:218
+msgid "Navigated"
+msgstr ""
+
+#: includes/class-admin.php:220
+msgid "Page visibility"
+msgstr ""
+
+#: includes/class-admin.php:249
+msgid "Requests"
+msgstr ""
+
+#: includes/class-admin.php:251
+msgid "Requests that failed or were slow. Bodies and headers are never recorded, in either direction."
+msgstr ""
+
+#: includes/class-admin.php:256
+msgid "Method"
+msgstr ""
+
+#: includes/class-admin.php:257
+msgid "URL"
+msgstr ""
+
+#: includes/class-admin.php:258
+#: includes/class-reports-list-table.php:51
+msgid "Status"
+msgstr ""
+
+#: includes/class-admin.php:259
+msgid "ms"
+msgstr ""
+
+#: includes/class-admin.php:273
+msgid "Failed"
+msgstr ""
+
+#: includes/class-admin.php:290
 msgid "You do not have permission to change a report."
 msgstr ""
 
-#: includes/class-admin.php:197
+#: includes/class-admin.php:316
 msgid "Bug"
 msgstr ""
 
-#: includes/class-admin.php:199
+#: includes/class-admin.php:318
 msgid "Idea"
 msgstr ""
 
-#: includes/class-admin.php:201
+#: includes/class-admin.php:320
 msgid "Feedback"
 msgstr ""
 
@@ -153,25 +214,21 @@ msgstr ""
 msgid "Date"
 msgstr ""
 
-#: includes/class-reports-list-table.php:51
-msgid "Status"
-msgstr ""
-
-#: includes/class-reports-list-table.php:98
+#: includes/class-reports-list-table.php:100
 msgid "All"
 msgstr ""
 
-#: includes/class-reports-list-table.php:99
-#: includes/class-reports-list-table.php:141
+#: includes/class-reports-list-table.php:101
+#: includes/class-reports-list-table.php:143
 msgid "Open"
 msgstr ""
 
-#: includes/class-reports-list-table.php:100
-#: includes/class-reports-list-table.php:140
+#: includes/class-reports-list-table.php:102
+#: includes/class-reports-list-table.php:142
 msgid "Done"
 msgstr ""
 
-#: includes/class-reports-list-table.php:114
+#: includes/class-reports-list-table.php:116
 msgid "No reports yet."
 msgstr ""
 
@@ -191,142 +248,186 @@ msgstr ""
 msgid "A report needs a message."
 msgstr ""
 
-#: includes/class-rest.php:183
+#: includes/class-rest.php:184
 msgid "The report could not be stored."
 msgstr ""
 
-#: includes/class-rest.php:250
+#: includes/class-rest.php:251
 msgid "That report has no screenshot."
 msgstr ""
 
-#: includes/class-settings.php:130
+#: includes/class-settings.php:177
 msgid "You do not have permission to change these settings."
 msgstr ""
 
-#: includes/class-settings.php:140
+#: includes/class-settings.php:187
 msgid "Panel"
 msgstr ""
 
-#: includes/class-settings.php:144
+#: includes/class-settings.php:191
 msgid "Show the report panel on the front end"
 msgstr ""
 
-#: includes/class-settings.php:148
+#: includes/class-settings.php:195
 msgid "Only for logged-in users"
 msgstr ""
 
-#: includes/class-settings.php:152
+#: includes/class-settings.php:199
 msgid "Accept reports from visitors who are not logged in (rate-limited to 10 per hour per IP address)"
 msgstr ""
 
-#: includes/class-settings.php:157
+#: includes/class-settings.php:204
 msgid "Language"
 msgstr ""
 
-#: includes/class-settings.php:166
+#: includes/class-settings.php:213
 msgid "The language the panel speaks. Auto follows the site language."
 msgstr ""
 
-#: includes/class-settings.php:170
+#: includes/class-settings.php:217
 msgid "Primary colour"
 msgstr ""
 
-#: includes/class-settings.php:174
+#: includes/class-settings.php:221
 msgid "Position"
 msgstr ""
 
-#: includes/class-settings.php:186
+#: includes/class-settings.php:233
 msgid "Brand name"
 msgstr ""
 
-#: includes/class-settings.php:190
+#: includes/class-settings.php:237
 msgid "Logo URL"
 msgstr ""
 
-#: includes/class-settings.php:194
+#: includes/class-settings.php:241
 msgid "Trigger selector"
 msgstr ""
 
-#: includes/class-settings.php:197
+#: includes/class-settings.php:244
 msgid "A CSS selector for your own button. Leave empty for the floating button."
 msgstr ""
 
-#: includes/class-settings.php:201
-msgid "Scrubbing"
-msgstr ""
-
-#: includes/class-settings.php:205
-msgid "Redact email addresses, tokens, card numbers and query values before the report is sent"
-msgstr ""
-
-#: includes/class-settings.php:210
-msgid "Email recipient"
-msgstr ""
-
-#: includes/class-settings.php:213
-msgid "Leave empty to only store reports in wp-admin."
-msgstr ""
-
-#: includes/class-settings.php:217
-msgid "Email on submit"
-msgstr ""
-
-#: includes/class-settings.php:221
-msgid "Send the email as soon as a report arrives"
-msgstr ""
-
-#: includes/class-settings.php:234
-msgid "Auto (site language)"
-msgstr ""
-
-#: includes/class-settings.php:235
-msgid "Danish"
-msgstr ""
-
-#: includes/class-settings.php:236
-msgid "English"
-msgstr ""
-
-#: includes/class-settings.php:237
-msgid "Swedish"
-msgstr ""
-
-#: includes/class-settings.php:238
-msgid "Norwegian"
-msgstr ""
-
-#: includes/class-settings.php:239
-msgid "German"
-msgstr ""
-
-#: includes/class-settings.php:240
-msgid "Dutch"
-msgstr ""
-
-#: includes/class-settings.php:241
-msgid "French"
-msgstr ""
-
-#: includes/class-settings.php:242
-msgid "Spanish"
-msgstr ""
-
-#: includes/class-settings.php:249
-msgid "Bottom right"
-msgstr ""
-
-#: includes/class-settings.php:250
-msgid "Bottom left"
+#: includes/class-settings.php:248
+msgid "Keyboard shortcut"
 msgstr ""
 
 #: includes/class-settings.php:251
+msgid "Opens the panel from the keyboard. \"mod\" is Command on a Mac and Ctrl everywhere else. Leave empty for no shortcut."
+msgstr ""
+
+#: includes/class-settings.php:255
+msgid "Open on error"
+msgstr ""
+
+#: includes/class-settings.php:259
+msgid "Open the panel by itself when the page throws an uncaught error"
+msgstr ""
+
+#: includes/class-settings.php:261
+msgid "Off by default: it shows the panel to whoever happens to be on the page, including customers."
+msgstr ""
+
+#: includes/class-settings.php:265
+msgid "Evidence"
+msgstr ""
+
+#: includes/class-settings.php:269
+msgid "Breadcrumbs: record clicks, navigations and form submits before the report"
+msgstr ""
+
+#: includes/class-settings.php:273
+msgid "Network log: record requests that failed or were slow. Never their bodies or headers"
+msgstr ""
+
+#: includes/class-settings.php:278
+msgid "Offline queue"
+msgstr ""
+
+#: includes/class-settings.php:282
+msgid "Keep a report the browser could not send and deliver it when the connection is back"
+msgstr ""
+
+#: includes/class-settings.php:284
+msgid "Reports wait in the browser, for up to seven days."
+msgstr ""
+
+#: includes/class-settings.php:288
+msgid "Scrubbing"
+msgstr ""
+
+#: includes/class-settings.php:292
+msgid "Redact email addresses, tokens, card numbers and query values before the report is sent"
+msgstr ""
+
+#: includes/class-settings.php:297
+msgid "Email recipient"
+msgstr ""
+
+#: includes/class-settings.php:300
+msgid "Leave empty to only store reports in wp-admin."
+msgstr ""
+
+#: includes/class-settings.php:304
+msgid "Email on submit"
+msgstr ""
+
+#: includes/class-settings.php:308
+msgid "Send the email as soon as a report arrives"
+msgstr ""
+
+#: includes/class-settings.php:321
+msgid "Auto (site language)"
+msgstr ""
+
+#: includes/class-settings.php:322
+msgid "Danish"
+msgstr ""
+
+#: includes/class-settings.php:323
+msgid "English"
+msgstr ""
+
+#: includes/class-settings.php:324
+msgid "Swedish"
+msgstr ""
+
+#: includes/class-settings.php:325
+msgid "Norwegian"
+msgstr ""
+
+#: includes/class-settings.php:326
+msgid "German"
+msgstr ""
+
+#: includes/class-settings.php:327
+msgid "Dutch"
+msgstr ""
+
+#: includes/class-settings.php:328
+msgid "French"
+msgstr ""
+
+#: includes/class-settings.php:329
+msgid "Spanish"
+msgstr ""
+
+#: includes/class-settings.php:336
+msgid "Bottom right"
+msgstr ""
+
+#: includes/class-settings.php:337
+msgid "Bottom left"
+msgstr ""
+
+#: includes/class-settings.php:338
 msgid "Top right"
 msgstr ""
 
-#: includes/class-settings.php:252
+#: includes/class-settings.php:339
 msgid "Top left"
 msgstr ""
 
-#: includes/class-storage.php:54
+#: includes/class-storage.php:55
 msgid "Bug report"
 msgstr ""

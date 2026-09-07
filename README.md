@@ -1,6 +1,7 @@
 # bugbottle for WordPress
 
-The [bugbottle](https://github.com/mahope/bugbottle) panel and its receiving
+The [bugbottle](https://github.com/mahope/bugbottle) panel — see it at
+[bugbottle.dev](https://bugbottle.dev) — and its receiving
 endpoint, in one activation. Reports land as a private post type in wp-admin —
 with the page, the viewport, the recent console errors, the element the
 reporter pointed at, what they did just before, and optionally a picture of
@@ -22,19 +23,18 @@ Requires WordPress 6.4 and PHP 8.1.
 
 ## Install
 
-There is no wordpress.org listing. Install from the GitHub release:
-
-1. Download `bugbottle-wordpress.zip` from the
-   [latest release](https://github.com/mahope/bugbottle-wordpress/releases/latest).
-2. In wp-admin, go to **Plugins → Add New → Upload Plugin**, choose the zip,
-   install and activate.
-3. Go to **Bug reports → Settings** and set at least an email recipient, or
+1. In wp-admin, go to **Plugins → Add New**, search for "Bugbottle", then
+   install and activate. Or download `bugbottle.zip` from the
+   [latest GitHub release](https://github.com/mahope/bugbottle-wordpress/releases/latest)
+   and upload it under **Plugins → Add New → Upload Plugin**.
+2. Go to **Bug reports → Settings** and set at least an email recipient, or
    plan to read the reports in wp-admin.
 
-To update, upload the newer zip over the old one — WordPress will ask you to
-confirm the replacement — or delete the plugin and install again. Your reports
-and settings survive both: they live in the database, not in the plugin
-directory.
+GitHub stays the canonical source and where releases are tagged; the zip on
+wordpress.org is built from the same tag. To update, use the in-admin updater,
+or upload the newer zip over the old one — WordPress will ask you to confirm
+the replacement. Your reports and settings survive either: they live in the
+database, not in the plugin directory.
 
 ## Settings
 
@@ -155,8 +155,10 @@ wp i18n make-mo languages/
 ```
 
 `vendor/` is not committed and never ships in the zip. Tagging `vX.Y.Z` builds
-`bugbottle-wordpress.zip` and attaches it to a GitHub release.
+`bugbottle.zip` and attaches it to a GitHub release. See `SUBMIT.md` for how a
+tagged release also ships to the wordpress.org SVN repository.
 
 ## Licence
 
-MIT.
+GPL-2.0-or-later. The bundled `assets/bugbottle.js` stays MIT-licensed; see
+`assets/LICENSE-bugbottle.txt`.

@@ -1,0 +1,57 @@
+name: Deploy to wordpress.org
+
+# Ships a tagged release to the wordpress.org plugin SVN repository. Disabled
+# until the plugin has been submitted and approved at
+# https://wordpress.org/plugins/developers/add/ and the SVN_USERNAME /
+# SVN_PASSWORD repository secrets exist — see SUBMIT.md. The `check-secrets`
+# job below is the guard: every later job needs it and it is the only one
+# that runs when the secrets are missing, so a tag push is a no-op rather
+# than a failed run until Mads wires the secrets up.
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  check-secrets:
+    runs-on: ubuntu-latest
+    outputs:
+      configured: ${{ steps.check.outputs.configured }}
+    steps:
+      - name: Check whether SVN credentials exist
+        id: check
+        run: |
+          if [ -n "${{ secrets.SVN_USERNAME }}" ] && [ -n "${{ secrets.SVN_PASSWORD }}" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::SVN_USERNAME/SVN_PASSWORD are not set — skipping the wordpress.org deploy. See SUBMIT.md."
+          fi
+
+  deploy:
+    needs: check-secrets
+    if: needs.check-secrets.outputs.configured == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the tag matches the plugin header
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          HEADER=$(grep -m1 '^ \* Version:' bugbottle.php | awk '{print $3}')
+          echo "tag=$TAG header=$HEADER"
+          test "$TAG" = "$HEADER"
+
+      - name: Deploy to wordpress.org
+        uses: 10up/action-wordpress-plugin-deploy@stable
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: bugbottle
+          # The action ships everything not excluded by .distignore, from
+          # trunk, so dev-only files need to be listed there once (see
+          # .distignore) rather than duplicated in this workflow.
+          ASSETS_DIR: .wordpress-org

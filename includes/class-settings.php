@@ -30,6 +30,13 @@ final class Settings {
 	public const POSITIONS = array( 'bottom-right', 'bottom-left', 'top-right', 'top-left' );
 
 	/**
+	 * The combination the library opens the panel on by default. `mod` is
+	 * Command on a Mac and Control everywhere else, which is why it is written
+	 * once rather than as two settings. An empty setting means no shortcut.
+	 */
+	public const DEFAULT_SHORTCUT = 'mod+shift+b';
+
+	/**
 	 * @return array<string, mixed>
 	 */
 	public static function defaults(): array {
@@ -43,7 +50,12 @@ final class Settings {
 			'brand_name'       => '',
 			'logo_url'         => '',
 			'trigger_selector' => '',
+			'shortcut'         => self::DEFAULT_SHORTCUT,
+			'open_on_error'    => false,
 			'scrub'            => true,
+			'queue'            => true,
+			'network_log'      => true,
+			'breadcrumbs'      => true,
 			'email_recipient'  => '',
 			'email_on_submit'  => false,
 		);
@@ -98,7 +110,18 @@ final class Settings {
 		$input = is_array( $input ) ? $input : array();
 		$out   = self::defaults();
 
-		foreach ( array( 'enabled', 'logged_in_only', 'allow_anonymous', 'scrub', 'email_on_submit' ) as $flag ) {
+		$flags = array(
+			'enabled',
+			'logged_in_only',
+			'allow_anonymous',
+			'open_on_error',
+			'scrub',
+			'queue',
+			'network_log',
+			'breadcrumbs',
+			'email_on_submit',
+		);
+		foreach ( $flags as $flag ) {
 			$out[ $flag ] = ! empty( $input[ $flag ] );
 		}
 
@@ -114,11 +137,35 @@ final class Settings {
 		$out['brand_name']       = sanitize_text_field( (string) ( $input['brand_name'] ?? '' ) );
 		$out['logo_url']         = esc_url_raw( (string) ( $input['logo_url'] ?? '' ) );
 		$out['trigger_selector'] = sanitize_text_field( (string) ( $input['trigger_selector'] ?? '' ) );
+		$out['shortcut']         = self::shortcut( $input['shortcut'] ?? null );
 
 		$recipient = trim( (string) ( $input['email_recipient'] ?? '' ) );
 		$out['email_recipient'] = is_email( $recipient ) ? sanitize_email( $recipient ) : '';
 
 		return $out;
+	}
+
+	/**
+	 * A keyboard combination the library will accept: lower-case names joined
+	 * by `+`, such as `mod+shift+b`. The empty string is kept as-is — it is
+	 * how the screen says "no shortcut" — and anything that is neither is a
+	 * typo, so the default is restored rather than a combination nobody can
+	 * press being saved.
+	 *
+	 * @param mixed $raw Raw $_POST value.
+	 */
+	private static function shortcut( $raw ): string {
+		$value = strtolower( trim( (string) ( is_scalar( $raw ) ? $raw : '' ) ) );
+		if ( '' === $value ) {
+			return '';
+		}
+		$value = (string) preg_replace( '/\s+/', '', $value );
+		foreach ( explode( '+', $value ) as $part ) {
+			if ( 1 !== preg_match( '/^[a-z0-9]{1,12}$/', $part ) ) {
+				return self::DEFAULT_SHORTCUT;
+			}
+		}
+		return mb_substr( $value, 0, 64 );
 	}
 
 	/**
@@ -195,6 +242,46 @@ final class Settings {
 						<td>
 							<input id="bugbottle-trigger" type="text" class="regular-text" name="bugbottle_settings[trigger_selector]" value="<?php echo esc_attr( $s['trigger_selector'] ); ?>" placeholder="#report-a-bug">
 							<p class="description"><?php esc_html_e( 'A CSS selector for your own button. Leave empty for the floating button.', 'bugbottle' ); ?></p>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="bugbottle-shortcut"><?php esc_html_e( 'Keyboard shortcut', 'bugbottle' ); ?></label></th>
+						<td>
+							<input id="bugbottle-shortcut" type="text" class="regular-text" name="bugbottle_settings[shortcut]" value="<?php echo esc_attr( $s['shortcut'] ); ?>" placeholder="<?php echo esc_attr( self::DEFAULT_SHORTCUT ); ?>">
+							<p class="description"><?php esc_html_e( 'Opens the panel from the keyboard. "mod" is Command on a Mac and Ctrl everywhere else. Leave empty for no shortcut.', 'bugbottle' ); ?></p>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><?php esc_html_e( 'Open on error', 'bugbottle' ); ?></th>
+						<td>
+							<label>
+								<input type="checkbox" name="bugbottle_settings[open_on_error]" value="1" <?php checked( $s['open_on_error'] ); ?>>
+								<?php esc_html_e( 'Open the panel by itself when the page throws an uncaught error', 'bugbottle' ); ?>
+							</label>
+							<p class="description"><?php esc_html_e( 'Off by default: it shows the panel to whoever happens to be on the page, including customers.', 'bugbottle' ); ?></p>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><?php esc_html_e( 'Evidence', 'bugbottle' ); ?></th>
+						<td>
+							<label>
+								<input type="checkbox" name="bugbottle_settings[breadcrumbs]" value="1" <?php checked( $s['breadcrumbs'] ); ?>>
+								<?php esc_html_e( 'Breadcrumbs: record clicks, navigations and form submits before the report', 'bugbottle' ); ?>
+							</label><br>
+							<label>
+								<input type="checkbox" name="bugbottle_settings[network_log]" value="1" <?php checked( $s['network_log'] ); ?>>
+								<?php esc_html_e( 'Network log: record requests that failed or were slow. Never their bodies or headers', 'bugbottle' ); ?>
+							</label>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><?php esc_html_e( 'Offline queue', 'bugbottle' ); ?></th>
+						<td>
+							<label>
+								<input type="checkbox" name="bugbottle_settings[queue]" value="1" <?php checked( $s['queue'] ); ?>>
+								<?php esc_html_e( 'Keep a report the browser could not send and deliver it when the connection is back', 'bugbottle' ); ?>
+							</label>
+							<p class="description"><?php esc_html_e( 'Reports wait in the browser, for up to seven days.', 'bugbottle' ); ?></p>
 						</td>
 					</tr>
 					<tr>

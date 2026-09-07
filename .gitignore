@@ -1,7 +1,7 @@
 /vendor/
 /.composer-home/
 /node_modules/
-/bugbottle-wordpress.zip
+/bugbottle.zip
 
 # Editor and OS noise
 .DS_Store

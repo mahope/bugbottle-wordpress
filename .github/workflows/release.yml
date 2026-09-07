@@ -36,28 +36,19 @@ jobs:
           echo "tag=$TAG header=$HEADER"
           test "$TAG" = "$HEADER"
 
-      # The zip has to unpack into a directory WordPress recognises, so the
-      # plugin files are staged under `bugbottle-wordpress/` first. `vendor/`
-      # is dev-only and never ships.
+      # The zip has to unpack into the directory WordPress.org will install the
+      # plugin as, which is the slug: `bugbottle`. Everything dev-only —
+      # `vendor/`, Composer, PHPStan, the workflows, the repo docs — is left
+      # out, because the Plugin Check rejects most of it and none of it is
+      # useful on a live site.
       - name: Build the zip
-        run: |
-          mkdir -p build/bugbottle-wordpress
-          rsync -a --exclude '.git' \
-                   --exclude '.github' \
-                   --exclude 'vendor' \
-                   --exclude 'node_modules' \
-                   --exclude 'build' \
-                   --exclude 'composer.json' \
-                   --exclude 'composer.lock' \
-                   --exclude 'phpstan.neon' \
-                   --exclude 'phpstan-bootstrap.php' \
-                   --exclude '.gitignore' \
-                   ./ build/bugbottle-wordpress/
-          cd build && zip -rq ../bugbottle-wordpress.zip bugbottle-wordpress
-          unzip -l ../bugbottle-wordpress.zip
+        run: bash bin/build-zip.sh
+
+      - name: Show what shipped
+        run: unzip -l bugbottle.zip
 
       - name: Publish the release
         uses: softprops/action-gh-release@v2
         with:
-          files: bugbottle-wordpress.zip
+          files: bugbottle.zip
           generate_release_notes: true

@@ -36,6 +36,13 @@ final class Markdown {
 	);
 
 	/**
+	 * How many frames of a stack are printed under a console entry. Ten are
+	 * kept in the report, but a reader scanning an issue wants the innermost
+	 * few; the whole stack is in the JSON for anyone who needs it.
+	 */
+	private const MAX_RENDERED_STACK_FRAMES = 3;
+
+	/**
 	 * Renders a report (raw request body or stored report) as Markdown. Never
 	 * throws on malformed input: missing sections are left out.
 	 *
@@ -49,6 +56,7 @@ final class Markdown {
 		$context = Validator::context( $raw['context'] ?? null );
 		$elements    = Validator::elements( $raw['elements'] ?? null );
 		$breadcrumbs = Validator::breadcrumbs( $raw['breadcrumbs'] ?? null );
+		$network     = Validator::network( $raw['network'] ?? null );
 		$console     = Validator::console( $raw['console'] ?? null );
 
 		$max_console = $options['max_console_entries'] ?? null;
@@ -77,8 +85,26 @@ final class Markdown {
 		if ( '' !== $context['viewport'] ) {
 			$facts[] = array( 'Viewport', $context['viewport'] );
 		}
+		if ( isset( $context['screen'] ) ) {
+			$facts[] = array( 'Screen', (string) $context['screen'] );
+		}
 		if ( '' !== $context['userAgent'] ) {
 			$facts[] = array( 'Browser', $context['userAgent'] );
+		}
+		if ( isset( $context['language'] ) ) {
+			$facts[] = array( 'Language', (string) $context['language'] );
+		}
+		if ( isset( $context['timezone'] ) ) {
+			$facts[] = array( 'Time zone', (string) $context['timezone'] );
+		}
+		if ( isset( $context['colorScheme'] ) ) {
+			$facts[] = array( 'Colour scheme', (string) $context['colorScheme'] );
+		}
+		if ( isset( $context['online'] ) && is_bool( $context['online'] ) ) {
+			$facts[] = array( 'Online', $context['online'] ? 'yes' : 'no' );
+		}
+		if ( isset( $context['connection'] ) ) {
+			$facts[] = array( 'Connection', (string) $context['connection'] );
 		}
 		$last = end( $console );
 		if ( is_array( $last ) && '' !== $last['ts'] ) {
@@ -121,10 +147,27 @@ final class Markdown {
 			$out[] = '';
 		}
 
+		if ( count( $network ) > 0 ) {
+			$out[] = '### Requests';
+			$out[] = '';
+			$out[] = '| Method | URL | Status | ms |';
+			$out[] = '|---|---|---|---|';
+			foreach ( $network as $entry ) {
+				$out[] = self::request_row( $entry );
+			}
+			$out[] = '';
+		}
+
 		if ( count( $console ) > 0 ) {
 			$lines = array();
 			foreach ( $console as $entry ) {
 				$lines[] = ( '' !== $entry['ts'] ? $entry['ts'] . ' ' : '' ) . '[' . $entry['level'] . '] ' . $entry['message'];
+				// The top of the stack is where the fault is; the rest is framework.
+				$frames = is_array( $entry['stack'] ?? null ) ? $entry['stack'] : array();
+				foreach ( array_slice( $frames, 0, self::MAX_RENDERED_STACK_FRAMES ) as $frame ) {
+					$lines[] = '    at ' . ( isset( $frame['fn'] ) ? $frame['fn'] . ' ' : '' )
+						. $frame['file'] . ':' . $frame['line'] . ':' . $frame['col'];
+				}
 			}
 			$block = self::fence( implode( "\n", $lines ), 'text' );
 			$label = sprintf(
@@ -211,6 +254,25 @@ final class Markdown {
 		$rect   = $element['rect'];
 		$bits[] = sprintf( 'at %d,%d %d×%d', $rect['x'], $rect['y'], $rect['width'], $rect['height'] );
 		return '- ' . implode( ' ', $bits );
+	}
+
+	/**
+	 * One row of the Requests table. A request that never got a status shows
+	 * the failure instead of a bare 0, which reads as a status nobody
+	 * recognises.
+	 *
+	 * @param array<string, mixed> $entry A validated network entry.
+	 */
+	private static function request_row( array $entry ): string {
+		$code   = (int) $entry['status'];
+		$status = '';
+		if ( $code > 0 ) {
+			$status = (string) $code;
+		} elseif ( ! empty( $entry['error'] ) ) {
+			$status = 'failed';
+		}
+		return '| ' . self::cell( (string) $entry['method'] ) . ' | `' . self::cell( (string) $entry['url'] )
+			. '` | ' . $status . ' | ' . (int) $entry['ms'] . ' |';
 	}
 
 	/**

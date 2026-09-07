@@ -49,6 +49,27 @@ final class Validator {
 	/** Longest a single console message may be before it is clipped. */
 	public const MAX_CONSOLE_MESSAGE_LENGTH = 500;
 
+	/** How many stack frames one console entry may carry. */
+	public const MAX_STACK_FRAMES = 10;
+
+	/** Longest a file or function name in a stack frame may be. */
+	public const MAX_STACK_STRING_LENGTH = 200;
+
+	/**
+	 * Longest each of the optional context facts may be. They are tokens
+	 * rather than prose — a locale, an IANA zone, a screen size, a connection
+	 * type — so anything longer is a mistake or an attempt to smuggle text
+	 * into a field nobody reads.
+	 *
+	 * @var array<string, int>
+	 */
+	public const MAX_CONTEXT_LENGTHS = array(
+		'language'   => 35,
+		'timezone'   => 64,
+		'screen'     => 32,
+		'connection' => 16,
+	);
+
 	/** How many pointed-at elements a report may carry. */
 	public const MAX_ELEMENTS = 10;
 
@@ -62,6 +83,9 @@ final class Validator {
 	public const MAX_BREADCRUMB_TEXT_LENGTH = 40;
 
 	public const BREADCRUMB_KINDS = array( 'click', 'navigation', 'submit', 'visibility' );
+
+	/** How many recorded requests a report may carry. Oldest are dropped first. */
+	public const MAX_NETWORK_ENTRIES = 30;
 
 	private const PNG_DATA_URL_PREFIX = 'data:image/png;base64,';
 
@@ -117,25 +141,108 @@ final class Validator {
 	 * Clips the context strings. A browser can send a user-agent of any
 	 * length, and this ends up in your database.
 	 *
+	 * The three required fields are always present, empty when they were
+	 * missing. The six optional facts are only carried through when they
+	 * arrived as the right type and were not empty, so a reader never has to
+	 * tell "the browser had no answer" from "the browser sent an empty
+	 * string"; anything else in the object is dropped. `online: false` is an
+	 * answer rather than a missing value, which is why it is type-checked
+	 * rather than emptiness-checked.
+	 *
 	 * @param mixed $raw Anything from the request body.
-	 * @return array{url: string, viewport: string, userAgent: string}
+	 * @return array<string, string|bool>
 	 */
 	public static function context( $raw ): array {
-		$obj = is_array( $raw ) ? $raw : array();
-		return array(
+		$obj     = is_array( $raw ) ? $raw : array();
+		$context = array(
 			'url'       => self::str( $obj['url'] ?? null, 500 ),
 			'viewport'  => self::str( $obj['viewport'] ?? null, 32 ),
 			'userAgent' => self::str( $obj['userAgent'] ?? null, 500 ),
 		);
+
+		// The order matches the TypeScript normaliser, so the JSON a report is
+		// stored as is byte-identical to the one the library would produce.
+		foreach ( array( 'language', 'timezone', 'screen' ) as $key ) {
+			$value = self::str( $obj[ $key ] ?? null, self::MAX_CONTEXT_LENGTHS[ $key ] );
+			if ( '' !== $value ) {
+				$context[ $key ] = $value;
+			}
+		}
+		$scheme = $obj['colorScheme'] ?? null;
+		if ( 'dark' === $scheme || 'light' === $scheme ) {
+			$context['colorScheme'] = $scheme;
+		}
+		if ( isset( $obj['online'] ) && is_bool( $obj['online'] ) ) {
+			$context['online'] = $obj['online'];
+		}
+		$connection = self::str( $obj['connection'] ?? null, self::MAX_CONTEXT_LENGTHS['connection'] );
+		if ( '' !== $connection ) {
+			$context['connection'] = $connection;
+		}
+
+		return $context;
+	}
+
+	/**
+	 * Validates the stack frames one console entry arrived with. A frame
+	 * without a string `file` is dropped rather than failing the entry, the
+	 * line and column are non-negative integers, strings are clipped, and at
+	 * most ten frames are kept — the innermost ones, which is where a stack is
+	 * written from. There is never source text in a frame, and none is
+	 * accepted if it appears.
+	 *
+	 * @param mixed $raw Anything from the request body.
+	 * @return array<int, array<string, string|int>>
+	 */
+	public static function stack( $raw ): array {
+		if ( ! is_array( $raw ) ) {
+			return array();
+		}
+		$frames = array();
+		foreach ( $raw as $item ) {
+			if ( count( $frames ) >= self::MAX_STACK_FRAMES ) {
+				break;
+			}
+			if ( ! is_array( $item ) || ! isset( $item['file'] ) || ! is_string( $item['file'] ) ) {
+				continue;
+			}
+			$frame = array(
+				'file' => self::str( $item['file'], self::MAX_STACK_STRING_LENGTH ),
+				'line' => self::frame_num( $item['line'] ?? null ),
+				'col'  => self::frame_num( $item['col'] ?? null ),
+			);
+			if ( isset( $item['fn'] ) && is_string( $item['fn'] ) && '' !== $item['fn'] ) {
+				$frame['fn'] = self::str( $item['fn'], self::MAX_STACK_STRING_LENGTH );
+			}
+			$frames[] = $frame;
+		}
+		return $frames;
+	}
+
+	/**
+	 * A frame position: truncated towards zero and never negative, the way
+	 * `Math.max(Math.trunc(v), 0)` behaves upstream.
+	 *
+	 * @param mixed $value Anything from the request body.
+	 */
+	private static function frame_num( $value ): int {
+		if ( is_int( $value ) ) {
+			return max( $value, 0 );
+		}
+		if ( is_float( $value ) && is_finite( $value ) ) {
+			return max( (int) $value, 0 );
+		}
+		return 0;
 	}
 
 	/**
 	 * Validates the console entries a report arrived with. Anything that is
 	 * not `{ ts, level, message }` with a known level is dropped, messages are
-	 * clipped, and only the most recent entries are kept.
+	 * clipped, stack frames are validated separately, and only the most recent
+	 * entries are kept.
 	 *
 	 * @param mixed $raw Anything from the request body.
-	 * @return array<int, array{ts: string, level: string, message: string}>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public static function console( $raw ): array {
 		if ( ! is_array( $raw ) ) {
@@ -153,11 +260,16 @@ final class Validator {
 			if ( ! isset( $item['message'] ) || ! is_string( $item['message'] ) ) {
 				continue;
 			}
-			$out[] = array(
+			$entry  = array(
 				'ts'      => self::timestamp( $item['ts'] ?? null ),
 				'level'   => $level,
 				'message' => self::str( $item['message'], self::MAX_CONSOLE_MESSAGE_LENGTH ),
 			);
+			$frames = self::stack( $item['stack'] ?? null );
+			if ( count( $frames ) > 0 ) {
+				$entry['stack'] = $frames;
+			}
+			$out[] = $entry;
 		}
 		return count( $out ) > self::MAX_CONSOLE_ENTRIES
 			? array_slice( $out, -self::MAX_CONSOLE_ENTRIES )
@@ -293,6 +405,67 @@ final class Validator {
 		return count( $out ) > self::MAX_BREADCRUMBS
 			? array_slice( $out, -self::MAX_BREADCRUMBS )
 			: $out;
+	}
+
+	/**
+	 * Validates the recorded requests a report arrived with. An entry without
+	 * a string `url` is not a request and is dropped; everything else is
+	 * clipped, rounded or defaulted rather than rejected, and the most recent
+	 * thirty are kept. Never throws: a malformed section means "no requests",
+	 * not a failed report.
+	 *
+	 * Bodies and headers are never part of an entry, in either direction —
+	 * that is where tokens and personal data live.
+	 *
+	 * @param mixed $raw Anything from the request body.
+	 * @return array<int, array<string, mixed>>
+	 */
+	public static function network( $raw ): array {
+		if ( ! is_array( $raw ) ) {
+			return array();
+		}
+		$out = array();
+		foreach ( $raw as $item ) {
+			if ( ! is_array( $item ) || ! isset( $item['url'] ) || ! is_string( $item['url'] ) ) {
+				continue;
+			}
+			$entry = array(
+				'ts'     => self::timestamp( $item['ts'] ?? null ),
+				// A method is a short token by definition, so anything longer
+				// is either a mistake or an attempt to smuggle text through a
+				// field nobody reads.
+				'method' => isset( $item['method'] ) && is_string( $item['method'] )
+					? self::str( $item['method'], 20 )
+					: 'GET',
+				'url'    => self::str( $item['url'], 500 ),
+				'status' => min( max( self::truncated( $item['status'] ?? null ), 0 ), 999 ),
+				'ms'     => min( max( self::num( $item['ms'] ?? null ), 0 ), 3600000 ),
+			);
+			if ( true === ( $item['error'] ?? null ) ) {
+				$entry['error'] = true;
+			}
+			$out[] = $entry;
+		}
+		return count( $out ) > self::MAX_NETWORK_ENTRIES
+			? array_slice( $out, -self::MAX_NETWORK_ENTRIES )
+			: $out;
+	}
+
+	/**
+	 * Truncated towards zero, the way `Math.trunc` behaves — a status is a
+	 * code, not a measurement, so rounding one up would invent a different
+	 * status.
+	 *
+	 * @param mixed $value Anything from the request body.
+	 */
+	private static function truncated( $value ): int {
+		if ( is_int( $value ) ) {
+			return $value;
+		}
+		if ( is_float( $value ) && is_finite( $value ) ) {
+			return (int) $value;
+		}
+		return 0;
 	}
 
 	/**

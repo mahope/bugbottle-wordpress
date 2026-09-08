@@ -62,6 +62,8 @@ Two filters, `bugbottle_show_panel` and `bugbottle_panel_config`, and one action
 
 This plugin is developed on GitHub at https://github.com/mahope/bugbottle-wordpress and is licensed GPL-2.0-or-later. See the panel itself at https://bugbottle.dev.
 
+The bundled library is bugbottle 0.13.0.
+
 It bundles the official build of the bugbottle library (https://github.com/mahope/bugbottle), unmodified, as `assets/bugbottle.js`. It also bundles `assets/bugbottle-screenshot.js`, which is that library's `bugbottle/html-to-image` entry built together with html-to-image (https://github.com/bubkoo/html-to-image, MIT, copyright W.Y.) by `bin/build-screenshot-bundle.sh`; it is loaded only when the Screenshots setting is on. Both files are MIT-licensed; the notice is in `assets/LICENSE-bugbottle.txt`. MIT is GPL-compatible, so the plugin as a whole is distributable under the GPL.
 
 == Installation ==

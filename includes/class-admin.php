@@ -156,6 +156,8 @@ final class Admin {
 			<?php
 			self::render_breadcrumbs( Validator::breadcrumbs( $report['breadcrumbs'] ?? null ) );
 			self::render_network( Validator::network( $report['network'] ?? null ) );
+			self::render_perf( Validator::perf( $report['perf'] ?? null ) );
+			self::render_storage( Validator::storage( $report['storage'] ?? null ) );
 			?>
 
 			<h2><?php esc_html_e( 'Summary', 'bugbottle' ); ?></h2>
@@ -275,6 +277,133 @@ final class Admin {
 							?>
 						</td>
 						<td><?php echo esc_html( (string) (int) $entry['ms'] ); ?></td>
+					</tr>
+				<?php endforeach; ?>
+			</tbody>
+		</table>
+		<?php
+	}
+
+	/**
+	 * What the page cost the reporter. The Markdown summary carries the same
+	 * figures in the library's English; this table is the translated one a
+	 * reader scans. A figure the browser never measured is absent rather than
+	 * zero, which would read as "instant" instead of "unknown".
+	 *
+	 * @param array<string, mixed>|null $perf A validated performance snapshot.
+	 */
+	private static function render_perf( ?array $perf ): void {
+		if ( null === $perf ) {
+			return;
+		}
+		$rows = array();
+		if ( isset( $perf['lcp'] ) ) {
+			$rows[] = array( __( 'Largest contentful paint', 'bugbottle' ), $perf['lcp'] . ' ms' );
+		}
+		if ( isset( $perf['cls'] ) ) {
+			$rows[] = array( __( 'Cumulative layout shift', 'bugbottle' ), (string) $perf['cls'] );
+		}
+		if ( isset( $perf['inp'] ) ) {
+			$rows[] = array( __( 'Interaction to next paint', 'bugbottle' ), $perf['inp'] . ' ms' );
+		}
+		if ( isset( $perf['ttfb'] ) ) {
+			$rows[] = array( __( 'Time to first byte', 'bugbottle' ), $perf['ttfb'] . ' ms' );
+		}
+		if ( isset( $perf['domContentLoaded'] ) ) {
+			$rows[] = array( __( 'DOM content loaded', 'bugbottle' ), $perf['domContentLoaded'] . ' ms' );
+		}
+		if ( isset( $perf['load'] ) ) {
+			$rows[] = array( __( 'Load', 'bugbottle' ), $perf['load'] . ' ms' );
+		}
+		if ( isset( $perf['longTasks'] ) && is_array( $perf['longTasks'] ) ) {
+			$rows[] = array(
+				__( 'Long tasks', 'bugbottle' ),
+				sprintf(
+					/* translators: 1: number of long tasks, 2: their total duration in milliseconds */
+					__( '%1$d (%2$d ms total)', 'bugbottle' ),
+					(int) $perf['longTasks']['count'],
+					(int) $perf['longTasks']['totalMs']
+				),
+			);
+		}
+		if ( isset( $perf['memory'] ) && is_array( $perf['memory'] ) ) {
+			$rows[] = array(
+				__( 'JS heap', 'bugbottle' ),
+				sprintf(
+					/* translators: 1: megabytes of JS heap used, 2: the heap limit in megabytes */
+					__( '%1$d MB of %2$d MB', 'bugbottle' ),
+					(int) $perf['memory']['usedMB'],
+					(int) $perf['memory']['limitMB']
+				),
+			);
+		}
+		if ( 0 === count( $rows ) ) {
+			return;
+		}
+		?>
+		<h2><?php esc_html_e( 'Performance', 'bugbottle' ); ?></h2>
+		<p class="description">
+			<?php esc_html_e( 'What the page cost on the visit the report came from. Two of these are simplifications: the layout shift is the sum of the shifts, and the interaction figure is the worst one rather than a percentile.', 'bugbottle' ); ?>
+		</p>
+		<table class="widefat striped">
+			<tbody>
+				<?php foreach ( $rows as $row ) : ?>
+					<tr>
+						<th scope="row" style="width:16em"><?php echo esc_html( $row[0] ); ?></th>
+						<td><?php echo esc_html( (string) $row[1] ); ?></td>
+					</tr>
+				<?php endforeach; ?>
+			</tbody>
+		</table>
+		<?php
+	}
+
+	/**
+	 * What the browser had stored. Key names and how long their values were,
+	 * and cookie names — never a value, unless the site allow-listed that key,
+	 * in which case it is here because somebody asked for it.
+	 *
+	 * @param array<string, mixed>|null $storage A validated storage snapshot.
+	 */
+	private static function render_storage( ?array $storage ): void {
+		if ( null === $storage ) {
+			return;
+		}
+		$rows = array();
+		foreach ( array( 'local' => 'localStorage', 'session' => 'sessionStorage' ) as $key => $label ) {
+			if ( ! isset( $storage[ $key ] ) || ! is_array( $storage[ $key ] ) ) {
+				continue;
+			}
+			$parts = array();
+			foreach ( $storage[ $key ] as $entry ) {
+				$parts[] = $entry['key'] . ' (' . (int) $entry['length'] . ')';
+			}
+			if ( count( $parts ) > 0 ) {
+				$rows[] = array( $label, implode( ', ', $parts ) );
+			}
+		}
+		if ( isset( $storage['cookies'] ) && is_array( $storage['cookies'] ) && count( $storage['cookies'] ) > 0 ) {
+			$rows[] = array( __( 'Cookies', 'bugbottle' ), implode( ', ', $storage['cookies'] ) );
+		}
+		if ( isset( $storage['values'] ) && is_array( $storage['values'] ) ) {
+			foreach ( $storage['values'] as $key => $value ) {
+				$rows[] = array( (string) $key, (string) $value );
+			}
+		}
+		if ( 0 === count( $rows ) ) {
+			return;
+		}
+		?>
+		<h2><?php esc_html_e( 'Storage', 'bugbottle' ); ?></h2>
+		<p class="description">
+			<?php esc_html_e( 'Key names and how long their values were, and the names of the cookies. Never a value, and never a cookie value at all — unless the site allow-listed a key, in which case its value is below because somebody asked for it.', 'bugbottle' ); ?>
+		</p>
+		<table class="widefat striped">
+			<tbody>
+				<?php foreach ( $rows as $row ) : ?>
+					<tr>
+						<th scope="row" style="width:16em"><?php echo esc_html( $row[0] ); ?></th>
+						<td><code><?php echo esc_html( $row[1] ); ?></code></td>
 					</tr>
 				<?php endforeach; ?>
 			</tbody>

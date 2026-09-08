@@ -38,6 +38,8 @@ final class Storage {
 	public const META_ELEMENTS    = '_bugbottle_elements';
 	public const META_BREADCRUMBS = '_bugbottle_breadcrumbs';
 	public const META_NETWORK     = '_bugbottle_network';
+	public const META_PERF        = '_bugbottle_perf';
+	public const META_STORAGE     = '_bugbottle_storage';
 	public const META_SCREENSHOT  = '_bugbottle_screenshot';
 	public const META_REPORTER    = '_bugbottle_reporter';
 	public const META_EXTRA       = '_bugbottle_extra';
@@ -190,6 +192,15 @@ final class Storage {
 		update_post_meta( $post_id, self::META_ELEMENTS, wp_json_encode( $report['elements'] ) );
 		update_post_meta( $post_id, self::META_BREADCRUMBS, wp_json_encode( $report['breadcrumbs'] ) );
 		update_post_meta( $post_id, self::META_NETWORK, wp_json_encode( $report['network'] ?? array() ) );
+		// A snapshot that was never measured is absent rather than stored as
+		// an empty object: a reader can then tell "nothing was measured" from
+		// "measured and empty", which is the distinction the validators make.
+		if ( ! empty( $report['perf'] ) ) {
+			update_post_meta( $post_id, self::META_PERF, wp_json_encode( $report['perf'] ) );
+		}
+		if ( ! empty( $report['storage'] ) ) {
+			update_post_meta( $post_id, self::META_STORAGE, wp_json_encode( $report['storage'] ) );
+		}
 		update_post_meta( $post_id, self::META_REPORTER, (int) ( $report['reporter'] ?? 0 ) );
 		update_post_meta( $post_id, self::META_STATUS, self::STATUS_OPEN );
 		if ( ! empty( $report['extra'] ) ) {
@@ -216,6 +227,8 @@ final class Storage {
 			'elements'    => self::json_meta( $post->ID, self::META_ELEMENTS ),
 			'breadcrumbs' => self::json_meta( $post->ID, self::META_BREADCRUMBS ),
 			'network'     => self::json_meta( $post->ID, self::META_NETWORK ),
+			'perf'        => self::json_meta( $post->ID, self::META_PERF ),
+			'storage'     => self::json_meta( $post->ID, self::META_STORAGE ),
 			'extra'       => self::json_meta( $post->ID, self::META_EXTRA ),
 			'reporter'    => (int) get_post_meta( $post->ID, self::META_REPORTER, true ),
 			'screenshot'  => (string) get_post_meta( $post->ID, self::META_SCREENSHOT, true ),

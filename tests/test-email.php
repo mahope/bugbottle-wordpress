@@ -198,6 +198,23 @@ $phone = send( false, 'ring me on 12345678' );
 check( 'a phone number is still a fact in the body', true, str_contains( $phone, '| Contact | ring me on 12345678 |' ) );
 check( 'but it is never a Reply-To', array(), sent_headers() );
 
+// Header injection. `Validator::contact` strips null bytes but not newlines,
+// because it is a byte-for-byte port of the library's `normaliseContact` and
+// that is what the library does. What keeps a second header out of the mail is
+// `looks_like_email`: every one of its character classes excludes whitespace,
+// so a line carrying a CR or an LF cannot match and never becomes a Reply-To.
+$injected = send( false, "anna@example.test" . chr( 13 ) . chr( 10 ) . 'Bcc: eve@example.test' );
+check( 'a contact line carrying a newline sets no header', array(), sent_headers() );
+// The line is still data, so the body carries it — as one table row. What must
+// not happen is the newline surviving into the rendering, where it would break
+// the table and read as something the mail said rather than something the
+// reporter typed. `Markdown::cell` collapses it.
+check(
+	'and the newline does not survive into the body',
+	true,
+	str_contains( $injected, '| Contact | anna@example.test Bcc: eve@example.test |' )
+);
+
 $none = send( false );
 check( 'no contact line, no Contact row', false, str_contains( $none, '| Contact |' ) );
 check( 'no contact line, no Reply-To', array(), sent_headers() );

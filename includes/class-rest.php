@@ -8,7 +8,9 @@
  * which WordPress checks before this code runs. An anonymous reporter is only
  * accepted when the site says so, and then no more than ten times an hour from
  * one address — enough for a real person filing several reports in a sitting,
- * not enough to be worth scripting.
+ * not enough to be worth scripting. When a signing key is configured, the
+ * request also has to carry `X-Bugbottle-Signature` over its raw body; see
+ * `class-signature.php` for why that is spam deterrence and not authentication.
  *
  * `GET /bugbottle/v1/screenshot/<id>` is the only way a screenshot comes back
  * out. The file name is read from the row, never from the request.
@@ -75,7 +77,16 @@ final class Rest {
 	 *
 	 * @return true|\WP_Error
 	 */
-	public static function may_report() {
+	public static function may_report( \WP_REST_Request $request ) {
+		// Before anything else, and before the rate limit is spent: a request
+		// that cannot produce a valid signature should not be able to use up
+		// somebody else's allowance by trying. On a site with no signing key
+		// configured this returns true without looking at the request.
+		$signature = Signature::check( $request );
+		if ( is_wp_error( $signature ) ) {
+			return $signature;
+		}
+
 		if ( is_user_logged_in() ) {
 			return true;
 		}

@@ -297,3 +297,21 @@ msgstr "Gem en rapport, som browseren ikke kunne sende, og aflevér den når for
 
 msgid "Reports wait in the browser, for up to seven days."
 msgstr "Rapporter venter i browseren i op til syv dage."
+
+msgid "Signing key(s)"
+msgstr "Signeringsnøgle(r)"
+
+msgid "One key per line. A report must then arrive signed with any one of them, and a report signed with a key that is not here is refused. Several lines is how a key is rotated: add the new one, wait for cached pages carrying the old one to expire, then delete the old one. Empty means no signature is asked for."
+msgstr "Én nøgle pr. linje. En rapport skal så ankomme signeret med en af dem, og en rapport signeret med en nøgle, der ikke står her, bliver afvist. Flere linjer er måden, en nøgle udskiftes på: tilføj den nye, vent på at cachede sider med den gamle udløber, og slet så den gamle. Tom betyder, at der ikke bliver bedt om en signatur."
+
+msgid "A key that is sent to the browser is public."
+msgstr "En nøgle, der sendes til browseren, er offentlig."
+
+msgid "It is in the page source, so anyone who wants it has it. Signing raises the cost of sending junk to the endpoint from a script that has not read your page — it is spam deterrence beside the rate limit, and it is not authentication. Do not treat it as securing the endpoint."
+msgstr "Den står i sidens kildekode, så enhver, der vil have den, har den. Signering gør det dyrere at sende skrald til endpointet fra et script, der ikke har læst din side — det er spamafskrækkelse ved siden af hastighedsgrænsen, og det er ikke autentificering. Behandl det ikke som noget, der sikrer endpointet."
+
+msgid "The bundled panel does not sign yet: signing arrives in bugbottle 0.7.0. Until this plugin ships that bundle, filling this in will refuse every report the panel sends."
+msgstr "Det medfølgende panel signerer ikke endnu: signering kommer i bugbottle 0.7.0. Indtil dette plugin leverer den udgave, vil udfyldning af feltet her afvise hver eneste rapport, panelet sender."
+
+msgid "Bad signature."
+msgstr "Ugyldig signatur."

@@ -56,6 +56,7 @@ final class Settings {
 			'queue'            => true,
 			'network_log'      => true,
 			'breadcrumbs'      => true,
+			'signing_keys'     => '',
 			'email_recipient'  => '',
 			'email_on_submit'  => false,
 		);
@@ -139,6 +140,8 @@ final class Settings {
 		$out['trigger_selector'] = sanitize_text_field( (string) ( $input['trigger_selector'] ?? '' ) );
 		$out['shortcut']         = self::shortcut( $input['shortcut'] ?? null );
 
+		$out['signing_keys'] = self::signing_keys( $input['signing_keys'] ?? '' );
+
 		$recipient = trim( (string) ( $input['email_recipient'] ?? '' ) );
 		$out['email_recipient'] = is_email( $recipient ) ? sanitize_email( $recipient ) : '';
 
@@ -166,6 +169,30 @@ final class Settings {
 			}
 		}
 		return mb_substr( $value, 0, 64 );
+	}
+
+	/**
+	 * The signing keys, one per line. A key is an opaque secret, so nothing is
+	 * done to its characters beyond trimming the line and dropping the blank
+	 * ones; only the length is capped, because a textarea is otherwise a place
+	 * to store a novel in the options table.
+	 *
+	 * @param mixed $raw Raw $_POST value.
+	 */
+	private static function signing_keys( $raw ): string {
+		$value = is_scalar( $raw ) ? (string) $raw : '';
+		$value = str_replace( "\0", '', $value );
+		$lines = array();
+		foreach ( preg_split( '/\R/', $value ) ?: array() as $line ) {
+			$line = trim( $line );
+			if ( '' !== $line && ! in_array( $line, $lines, true ) ) {
+				$lines[] = mb_substr( $line, 0, 200 );
+			}
+			if ( count( $lines ) >= 10 ) {
+				break;
+			}
+		}
+		return implode( "\n", $lines );
 	}
 
 	/**
@@ -291,6 +318,15 @@ final class Settings {
 								<input type="checkbox" name="bugbottle_settings[scrub]" value="1" <?php checked( $s['scrub'] ); ?>>
 								<?php esc_html_e( 'Redact email addresses, tokens, card numbers and query values before the report is sent', 'bugbottle' ); ?>
 							</label>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="bugbottle-signing-keys"><?php esc_html_e( 'Signing key(s)', 'bugbottle' ); ?></label></th>
+						<td>
+							<textarea id="bugbottle-signing-keys" class="large-text code" rows="3" name="bugbottle_settings[signing_keys]" spellcheck="false"><?php echo esc_textarea( $s['signing_keys'] ); ?></textarea>
+							<p class="description"><?php esc_html_e( 'One key per line. A report must then arrive signed with any one of them, and a report signed with a key that is not here is refused. Several lines is how a key is rotated: add the new one, wait for cached pages carrying the old one to expire, then delete the old one. Empty means no signature is asked for.', 'bugbottle' ); ?></p>
+							<p class="description"><strong><?php esc_html_e( 'A key that is sent to the browser is public.', 'bugbottle' ); ?></strong> <?php esc_html_e( 'It is in the page source, so anyone who wants it has it. Signing raises the cost of sending junk to the endpoint from a script that has not read your page — it is spam deterrence beside the rate limit, and it is not authentication. Do not treat it as securing the endpoint.', 'bugbottle' ); ?></p>
+							<p class="description"><?php esc_html_e( 'The bundled panel does not sign yet: signing arrives in bugbottle 0.7.0. Until this plugin ships that bundle, filling this in will refuse every report the panel sends.', 'bugbottle' ); ?></p>
 						</td>
 					</tr>
 					<tr>

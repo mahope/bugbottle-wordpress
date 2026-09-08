@@ -56,6 +56,7 @@ database, not in the plugin directory.
 | Evidence | Breadcrumbs (clicks, navigations, submits) and the network log (requests that failed or were slow — method, URL, status and duration, never a body or a header). Both on. |
 | Offline queue | Keeps a report the browser could not send and delivers it when the connection is back. Reports wait in the browser for up to seven days. On by default. |
 | Scrubbing | Redacts email addresses, bearer tokens, JWTs, card numbers, IBANs and query values before the report is sent. On by default. |
+| Signing key(s) | One key per line. With a key set, a report must arrive signed with one of them or it is refused. Empty by default. Read [Signing requests](#signing-requests) before you fill it in — a key that ships to the browser is public. |
 | Email recipient | Where reports are emailed, through `wp_mail` — so an SMTP plugin handles delivery. Empty means reports are only stored. |
 | Email on submit | Send the email as soon as a report arrives. |
 
@@ -89,6 +90,46 @@ bugbottle JSON body, and a logged-in caller identifies itself with the standard
 `includes/class-validator.php`, and `includes/class-markdown.php` is the same
 port of the library's `toMarkdown`, so the summary in wp-admin and in the email
 is the rendering you already know.
+
+## Signing requests
+
+**A key that is sent to the browser is public.** It is in the page source, so
+anyone who wants it has it. Signing raises the cost of posting junk to the
+endpoint from a script that has not read your page; it is spam deterrence
+beside the rate limit, and it is not authentication. Nothing here secures the
+endpoint, and it must not be described as if it did.
+
+With **Signing key(s)** filled in, the route requires the header the library
+sends:
+
+```
+X-Bugbottle-Signature: t=1757260800000,v1=<64 lowercase hex characters>
+```
+
+`t` is a unix timestamp in milliseconds and `v1` is
+`HMAC-SHA-256(key, "<t>.<body>")` over the raw request body. The plugin
+verifies over the bytes as they arrived — `WP_REST_Request::get_body()`, which
+WordPress fills from `php://input` before it parses anything — and never over
+`json_decode` followed by `json_encode`, which would move key order, spacing
+and number formatting and take the digest with them.
+
+A request is refused with `401` and `Bad signature` when the header is missing,
+malformed, signed with a key that is not listed, more than five minutes away
+from the server clock in either direction, or carries a digest already
+accepted inside that window. The reason is deliberately not narrowed down:
+telling a caller which part they got wrong tells them how to get it right.
+
+Several lines is how a key is rotated. Add the new key, leave the old one until
+the last cached page carrying it has expired, then delete the old one. The
+first line is the key the panel is given; every line is a key the route
+accepts.
+
+> **Not yet usable.** The bundled `assets/bugbottle.js` is bugbottle 0.6.0,
+> which does not sign. Signing arrives in bugbottle 0.7.0. Until this plugin
+> ships that bundle, filling the setting in will refuse every report the panel
+> sends — the setting is here so the server side is in place and tested first.
+> The mount script already passes the key through
+> `bugbottle/sign`'s `createSigner`, guarded on the function existing.
 
 ## What a report carries
 
@@ -172,9 +213,19 @@ would serve to the next visitor.
 ```bash
 composer install                 # dev only: PHPStan and the WordPress stubs
 vendor/bin/phpstan analyse       # level 5, clean
-wp i18n make-pot . languages/bugbottle.pot --domain=bugbottle --exclude=assets,vendor
+wp i18n make-pot . languages/bugbottle.pot --domain=bugbottle --exclude=assets,vendor,tests
 wp i18n make-mo languages/
 ```
+
+There are two test files, neither of which needs a framework:
+
+```bash
+php tests/test-signature.php          # the signature rules, no WordPress needed
+wp eval-file tests/test-rest-signature.php   # the REST route, from a scratch install
+```
+
+The second writes settings and stores reports, so point it at a scratch
+install and never at a live site. Both exit non-zero on a failure.
 
 `vendor/` is not committed and never ships in the zip. Tagging `vX.Y.Z` builds
 `bugbottle.zip` and attaches it to a GitHub release. See `SUBMIT.md` for how a

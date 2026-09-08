@@ -84,6 +84,14 @@ The row is deleted. The screenshot file is left on disk on purpose: an accidenta
 
 Not by default. Turn it on under **Bug reports -> Settings**; anonymous reports are then rate-limited to ten an hour per IP address. Requiring people to be signed in is worth considering: an anonymous screenshot is one nobody can be asked about later.
 
+= Can I make the endpoint refuse reports that were not signed? =
+
+Yes, but read what it is first. Put one or more keys in "Signing key(s)" under **Bug reports -> Settings** and the route then requires an `X-Bugbottle-Signature` header computed over the raw request body with one of them. **A key that is sent to the browser is public** - it is in the page source, so anyone who wants it has it. Signing raises the cost of posting junk from a script that has not read your page. It is spam deterrence beside the rate limit, it is not authentication, and it does not secure the endpoint.
+
+One key per line is how a key is rotated: add the new one, wait for cached pages carrying the old one to expire, then remove the old one.
+
+The bundled panel does not sign yet - that arrives with bugbottle 0.7.0 - so filling the setting in today refuses every report the panel sends.
+
 = Where do the emails come from? =
 
 `wp_mail`, so whatever SMTP plugin the site already has handles delivery. The body is the report rendered as Markdown, ready to paste into an issue.
@@ -104,6 +112,11 @@ No. Composer is used only to run PHPStan while developing; the shipped plugin is
 4. The settings screen: language, colour, position, branding, anonymous reports and the email recipient.
 
 == Changelog ==
+
+= Unreleased =
+* New "Signing key(s)" setting. With a key set, `POST /wp-json/bugbottle/v1/report` requires the library's `X-Bugbottle-Signature` header - `t=<unix ms>,v1=<hmac-sha256 over "<t>.<raw body>">` - verified over the raw request body, within five minutes of the server clock in either direction, in constant time, and refused if the same digest has already been accepted inside that window. Missing, malformed, wrong, expired and replayed all answer `401 Bad signature` alike. One key per line, so a key can be rotated. A site with no key set is unaffected.
+* A key that is sent to the browser is public. Signing is spam deterrence beside the rate limit and is not authentication; the settings screen says so beside the field.
+* The bundled `assets/bugbottle.js` is still bugbottle 0.6.0, which does not sign. The setting cannot be used in earnest until the 0.7.0 bundle ships with the plugin.
 
 = 0.3.0 =
 * Updated the bundled panel to bugbottle 0.6.0. Reports now carry the browser language, time zone, screen size, colour scheme, online state and connection type; uncaught errors carry up to ten stack frames; and requests that failed or were slow are recorded as their own section. The PHP validator caps every one of them to the same limits the library does.

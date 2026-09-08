@@ -4,6 +4,53 @@ All notable changes to this plugin are documented here and in `readme.txt`
 (which is what wordpress.org shows). This file exists for anyone reading the
 repository directly; keep the two in step.
 
+## Unreleased
+
+### Added
+
+- **Signing key(s)**, one key per line. With at least one key set,
+  `POST /wp-json/bugbottle/v1/report` requires the library's
+  `X-Bugbottle-Signature` header — `t=<unix milliseconds>,v1=<hex>`, where the
+  hex is `HMAC-SHA-256(key, "<t>.<body>")` — and refuses the report without it.
+  `includes/class-signature.php` verifies it over the **raw** bytes
+  (`WP_REST_Request::get_body()`, which `WP_REST_Server::serve_request()` fills
+  from `php://input` before it parses anything), inside a five-minute window in
+  **both** directions, with `hash_equals`, against every configured key so a
+  key can be rotated, and refuses a digest already accepted inside the window —
+  remembered in a transient that lives for twice the skew, because a timestamp
+  five minutes ahead is still fresh five minutes from now. Missing, malformed,
+  wrong, expired and replayed all answer `401 {"error":"Bad signature"}`
+  alike: saying which part was wrong says how to get it right. The check runs
+  before the anonymous rate limit, so a caller who cannot sign cannot spend
+  somebody else's allowance trying. A site with no key configured verifies
+  nothing and is unaffected.
+- The settings screen says, beside the field, that **a key sent to the browser
+  is public** — it is in the page source — and that signing is spam deterrence
+  beside the rate limit rather than authentication. That text is load-bearing;
+  do not soften it.
+- `tests/test-signature.php`, the rules without WordPress (21 checks,
+  `php tests/test-signature.php`), and `tests/test-rest-signature.php`, the
+  REST route through `rest_do_request` against real settings and transients
+  (14 checks, `wp eval-file`). The first pins a vector against Node's
+  `crypto.createHmac` so the PHP and the library agree byte for byte:
+  `hash_hmac("sha256", '1757260800000.{"a":1}', "bugbottle-test-key")` is
+  `f358148d3bf2ba334ce21bbafb5c3cc088dbd007e9773682e9a8fdc9f2ccaf07`.
+- `.distignore`, so the wordpress.org deploy — which ships everything not
+  listed there — leaves `tests/`, `bin/`, the repo docs and the Composer files
+  out of SVN trunk. `bin/build-zip.sh` works from an allowlist and never
+  needed one; the deploy workflow always did.
+
+### Still to do before this can be switched on
+
+- **The bundled `assets/bugbottle.js` is bugbottle 0.6.0, which does not
+  sign.** Signing ships in bugbottle 0.7.0 (`createSigner` from
+  `bugbottle/sign`). The inline mount already passes the key through
+  `api.createSigner`, guarded on the function existing, so it is inert on the
+  0.6.0 bundle — which means a site that fills the setting in today will have
+  every report the panel sends refused. Copy `dist/bugbottle.js` from bugbottle
+  0.7.0 into `assets/`, bump `LIB_VERSION`, and drop the warning from the
+  settings screen, the README and `readme.txt` in the same commit.
+
 ## 0.3.0 — 2026-09-08
 
 Follows the library to bugbottle 0.6.0, and lets the settings screen turn on

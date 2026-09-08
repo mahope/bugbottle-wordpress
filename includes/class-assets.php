@@ -106,6 +106,14 @@ final class Assets {
 			'extra'       => new \stdClass(),
 		);
 
+		// Only the first key is handed to the browser. The rest of the list is
+		// there so the server keeps accepting the key that older cached pages
+		// were rendered with; a page rendered now signs with the current one.
+		$keys = Signature::keys();
+		if ( array() !== $keys ) {
+			$config['signKey'] = $keys[0];
+		}
+
 		/**
 		 * Filters the configuration handed to `window.bugbottle.mount`.
 		 *
@@ -150,6 +158,13 @@ final class Assets {
 				'	options.shortcut = config.shortcut;',
 				'	if (config.openOnError) options.openOnError = true;',
 				'	if (config.scrub) options.scrub = api.scrubReport;',
+				'	// TODO(bugbottle 0.7.0): the bundled assets/bugbottle.js is 0.6.0 and has',
+				'	// no createSigner, so this block does nothing yet and a site that fills',
+				'	// the setting in will have every report refused. Ship the 0.7.0 bundle',
+				'	// (LIB_VERSION, assets/bugbottle.js) before telling anyone to use it.',
+				'	if (config.signKey && typeof api.createSigner === "function") {',
+				'		options.sign = api.createSigner({ key: config.signKey });',
+				'	}',
 				'	// The nonce travels with a queued report too: it is delivered by the',
 				'	// queue rather than by the panel, on a later page load.',
 				'	if (config.queue && typeof api.createQueue === "function") {',

@@ -3,7 +3,7 @@
  * Plugin Name:       Bugbottle
  * Plugin URI:        https://bugbottle.dev
  * Description:       In-app bug reports that arrive with the evidence attached. Adds the bugbottle panel to the front end and receives the reports as a private post type in wp-admin.
- * Version:           0.5.0
+ * Version:           0.6.0
  * Requires at least: 6.4
  * Requires PHP:      8.1
  * Author:            Mads Holst Jensen
@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-const VERSION = '0.5.0';
+const VERSION = '0.6.0';
 
 /**
  * The bugbottle release `assets/bugbottle.js` was copied from. Bump it in the

@@ -4,7 +4,7 @@ Tags: bug report, feedback, screenshot, support, qa
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.5.0
+Stable tag: 0.6.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -34,6 +34,7 @@ The panel speaks Danish, English, Swedish, Norwegian, German, Dutch, French and 
 * The reporter's own description, and their name and email if they gave them.
 * Optionally a contact line - how the reporter says you can reach them. Off unless you turn it on, and it is personal data you asked for: it is kept where the rest of the report is kept and it goes when the report goes.
 * Optionally a picture of the page, when you have turned Screenshots on and the reporter leaves the box ticked. They see it first and can mark it before it is sent. Off unless you turn it on, and before version 0.4.1 the plugin could not take one at all.
+* Notes the reporting library wrote about the report itself, never the reporter. There is one of them today: a report the browser had to keep while it was offline, and could not keep in full, is stored without its picture and says so. The report screen shows those lines above the evidence, so a reader who sees no picture is told why before they go looking for one.
 
 None of the context facts says more about the person than the user agent already does, and nothing beyond that list is collected: no canvas fingerprint, no font enumeration, no device enumeration.
 
@@ -149,6 +150,13 @@ No. Composer is used only to run PHPStan while developing; the shipped plugin is
 
 == Changelog ==
 
+= 0.6.0 =
+* **Both bundled JavaScript files follow the library to bugbottle 0.13.0.** `assets/bugbottle.js` is 65,942 bytes (md5 `3d891eb27e30ff6c61ff989e1c5c7cc9`) and `assets/bugbottle-screenshot.js` 15,000 bytes (md5 `5c617d79e0fb52110ad116193dde7b52`).
+* **A report the offline queue could not keep in full is no longer lost.** A browser that is offline keeps the report in localStorage until it can be sent, and until now a report with a picture on it that did not fit was gone on the next reload. bugbottle 0.13.0 stores it without the picture and leaves a line saying so; the plugin validates and stores those lines as `notes` and shows them on the report screen, above the evidence, and in the Markdown summary in the same place the library puts them. At most five, each clipped at 200 characters, validated like every other field.
+* The Language setting was already an allow-list and could never have saved `__proto__` or `constructor` - the two names bugbottle 0.13.0 stopped treating as languages - and `tests/test-settings.php` is new and pins that, along with the position, contact-mode, colour and shortcut fallbacks.
+* Danish for the two new strings on the report screen.
+* No setting changed and no stored report changed. Reports from earlier versions simply carry no notes.
+
 = 0.5.0 =
 * **New "Contact field" setting, off by default.** Three states rather than a checkbox: do not ask, ask, or ask and refuse to send without an answer. On, the panel puts one field under the message asking how the reporter can be reached. Nothing checks what they type - a phone number or a name in your own chat is a good answer.
 * The contact line is stored with the report, shown on the report screen (as a mailto link when it looks like an address), and rendered as a Contact row in the Markdown summary, directly under the type.
@@ -193,6 +201,9 @@ No. Composer is used only to run PHPStan while developing; the shipped plugin is
 * First release. REST endpoint, private `bugbottle_report` post type, admin list and detail screens, settings, email via `wp_mail`, screenshots behind an admin-only route, Danish and English.
 
 == Upgrade Notice ==
+
+= 0.6.0 =
+Updates the bundled panel to bugbottle 0.13.0. A report queued while the browser was offline is no longer lost when it will not fit in storage: the picture is dropped and a line saying so is stored and shown with the report. No settings changed; existing reports are untouched.
 
 = 0.5.0 =
 Updates the bundled panel to bugbottle 0.9.0 and adds an optional contact field, off by default, so a report can say how to reach the person who wrote it - and the notification email can reply to them. It is personal data you asked for; read what the setting says beside the box before you turn it on. Also fixes the notification email's screenshot link, which always answered 401. Existing reports are untouched.

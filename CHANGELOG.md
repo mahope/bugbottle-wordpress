@@ -6,6 +6,86 @@ repository directly; keep the two in step.
 
 ## Unreleased
 
+## 0.6.0 — 2026-09-08
+
+Follows the library from **bugbottle 0.9.0 to 0.13.0**. Four library releases,
+and the one a WordPress site can feel is the smallest of them: a report the
+browser wrote while it was offline is no longer lost when there is no room to
+keep it.
+
+### Added
+
+- **`notes`: what the library had to do to the report, in its own words.**
+  bugbottle 0.13.0's offline queue used to answer a refused `localStorage`
+  write by going memory-only, which meant the report reached storage nowhere
+  and was gone on the next reload — the reload an outage usually ends in. It
+  now stores the report without its picture and adds a line saying the picture
+  would not fit. The plugin validates that line the way it validates everything
+  else, because it arrives from a browser like everything else:
+  `Validator::notes()` is a port of `normaliseNotes` from
+  `v0.13.0:src/report-core.ts`, with `MAX_NOTES` (5) and `MAX_NOTE_LENGTH`
+  (200), dropping anything that is not a non-empty string.
+- The notes are stored as `_bugbottle_notes`, absent rather than stored as an
+  empty array — the distinction the `perf` and `storage` snapshots already
+  make. A report from an earlier version simply carries none.
+- **The report screen shows them**, as a `Notes` section above the screenshot
+  and the evidence tables, with a line saying they were written by the library
+  and not by the reporter. The Markdown summary renders them as block quotes in
+  exactly the place `v0.13.0:src/markdown.ts` renders them: under the facts
+  table, above the elements. Above the evidence rather than below it, because a
+  note is about what is missing from the evidence, and a reader who sees no
+  picture should be told why before they go looking for one.
+- `tests/test-settings.php` is new: the settings sanitiser, and in particular
+  that **Language** is an allow-list. bugbottle 0.13.0 fixed a crash in
+  `resolveLocale()` where a tag of `__proto__` or `constructor` found an
+  inherited property of the messages object rather than a language and threw at
+  mount. The plugin never could send one — `in_array( $locale, self::LOCALES,
+  true )` is the whole story — but a `<select>` is only a suggestion to whoever
+  posts the form, so it is a test now rather than a property somebody has to
+  notice. Twenty-six checks, including the position, contact-mode, colour and
+  shortcut fallbacks.
+
+### Changed
+
+- **`assets/bugbottle.js` is bugbottle 0.13.0**, 65,942 bytes (md5
+  `3d891eb27e30ff6c61ff989e1c5c7cc9`), copied verbatim from that release's
+  `dist/bugbottle.js` and md5-verified against `git show v0.13.0:dist/bugbottle.js`.
+  `LIB_VERSION` is `0.13.0`, which is what busts the cache on both enqueued
+  files.
+- **`assets/bugbottle-screenshot.js` was rebuilt** against `bugbottle@0.13.0`
+  with `bin/build-screenshot-bundle.sh`, whose `LIB_VERSION` is pinned to
+  match: 15,000 bytes, md5 `5c617d79e0fb52110ad116193dde7b52`. As at 0.9.0 the
+  only byte that changed is the version in the licence notice — the library's
+  `bugbottle/html-to-image` entry is one expression and has not moved since
+  0.7.0 — but the two bundles are enqueued with one version string and must
+  come from one release.
+- `tests/test-report-parity.php` grew twelve checks and its fixture grew a
+  `notes` array carrying a note to keep, a blank one, one that is not a string
+  and one that needs trimming. The expected Markdown and the expected validated
+  JSON were regenerated from `v0.13.0:src/markdown.ts` and
+  `v0.13.0:src/report-core.ts` with `node --experimental-strip-types`; both
+  compare byte for byte against the PHP output. Fifty-one checks, none failing.
+- Nothing in the mount script changed. `data-network` and `data-perf` are
+  unchanged for the script-tag build, `bugbottle/locales-extra` — the four
+  languages 0.11.0 added as an entry you import on purpose — is deliberately
+  not in it, and every function the inline script calls (`mount`,
+  `initConsoleBuffer`, `initBreadcrumbs`, `initNetwork`, `initPerf`,
+  `createQueue`, `resolveLocale`, `scrubReport`, `createSigner`, `onShake`) is
+  still on `window.bugbottle` in 0.13.0.
+- No setting changed, so the settings screenshot in `.wordpress-org/` is
+  unchanged.
+
+### Verified
+
+- A round trip in a real Chrome against `php -S` and the plugin's own
+  validators: the panel opens from its button, refuses an empty message, and
+  sends a signed report with a contact line that verifies against
+  `Signature::verify()` and stores as `anna@example.test`. Then a queue built
+  from the bundled library, against a `localStorage` filled to its quota,
+  drops a megabyte of picture, writes the note, delivers the report, and the
+  PHP endpoint validates and stores it with its note and without the picture.
+  Thirteen checks, none failing.
+
 ## 0.5.0 — 2026-09-08
 
 Follows the library to **bugbottle 0.9.0**, and the one thing that release

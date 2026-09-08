@@ -4,7 +4,7 @@ Tags: bug report, feedback, screenshot, support, qa
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.6.0
+Stable tag: 0.6.1
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -154,6 +154,11 @@ No. Composer is used only to run PHPStan while developing; the shipped plugin is
 
 == Changelog ==
 
+= 0.6.1 =
+* **Fixed: a report the offline queue kept through an outage was refused and thrown away**, on any site with "Signing key(s)" filled in. The queue delivers a stored report on a later page load with a request of its own, and it was not being given the signer, so the report arrived without the `X-Bugbottle-Signature` header, the route answered 401, and the queue - which treats a 4xx as final - deleted it. Exactly the reports the queue exists to save were the ones it lost. The queue now signs what it delivers, at the moment it delivers it, so the timestamp is inside the five-minute window the route allows. Present since signing arrived in 0.4.0.
+* **Both bundled JavaScript files follow the library to bugbottle 0.15.0.** `assets/bugbottle.js` is 66,440 bytes (md5 `9f41d7ea9a01ac567f2738a114a26ebf`) and `assets/bugbottle-screenshot.js` 15,000 bytes (md5 `69e9fab0313dd32796ffc7fd1b864f3c`). Two library releases, and what reaches a WordPress page is two style rules in the panel: it survives Windows High Contrast now, and a visitor who asked their system for less motion gets every state change at once rather than over time. Everything else in those releases is server-side and this plugin has its own server.
+* No setting changed and no report field changed. Existing reports are untouched.
+
 = 0.6.0 =
 * **Both bundled JavaScript files follow the library to bugbottle 0.13.0.** `assets/bugbottle.js` is 65,942 bytes (md5 `3d891eb27e30ff6c61ff989e1c5c7cc9`) and `assets/bugbottle-screenshot.js` 15,000 bytes (md5 `5c617d79e0fb52110ad116193dde7b52`).
 * **A report the offline queue could not keep in full is no longer lost.** A browser that is offline keeps the report in localStorage until it can be sent, and until now a report with a picture on it that did not fit was gone on the next reload. bugbottle 0.13.0 stores it without the picture and leaves a line saying so; the plugin validates and stores those lines as `notes` and shows them on the report screen, above the evidence, and in the Markdown summary in the same place the library puts them. At most five, each clipped at 200 characters, validated like every other field.
@@ -205,6 +210,9 @@ No. Composer is used only to run PHPStan while developing; the shipped plugin is
 * First release. REST endpoint, private `bugbottle_report` post type, admin list and detail screens, settings, email via `wp_mail`, screenshots behind an admin-only route, Danish and English.
 
 == Upgrade Notice ==
+
+= 0.6.1 =
+Fixes a report the offline queue kept through an outage being refused and deleted, on sites with signing keys. Updates the bundled panel to bugbottle 0.15.0. No settings changed; existing reports are untouched.
 
 = 0.6.0 =
 Updates the bundled panel to bugbottle 0.13.0. A report queued while the browser was offline is no longer lost when it will not fit in storage: the picture is dropped and a line saying so is stored and shown with the report. No settings changed; existing reports are untouched.

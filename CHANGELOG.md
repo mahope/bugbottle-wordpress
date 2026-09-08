@@ -6,6 +6,13 @@ repository directly; keep the two in step.
 
 ## Unreleased
 
+## 0.6.1 — 2026-09-08
+
+A bug fix worth having on any site that filled in **Signing key(s)**: reports
+the offline queue kept through an outage were refused and thrown away. Also
+follows the library to **bugbottle 0.15.0**, and puts the hour that used to
+cost into a script.
+
 ### Changed
 
 <!-- sync-library: replaced on every run; the prose around it is not -->

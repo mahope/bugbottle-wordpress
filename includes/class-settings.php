@@ -56,6 +56,8 @@ final class Settings {
 			'queue'            => true,
 			'network_log'      => true,
 			'breadcrumbs'      => true,
+			'perf'             => false,
+			'shake'            => false,
 			'signing_keys'     => '',
 			'email_recipient'  => '',
 			'email_on_submit'  => false,
@@ -120,6 +122,8 @@ final class Settings {
 			'queue',
 			'network_log',
 			'breadcrumbs',
+			'perf',
+			'shake',
 			'email_on_submit',
 		);
 		foreach ( $flags as $flag ) {
@@ -312,6 +316,36 @@ final class Settings {
 						</td>
 					</tr>
 					<tr>
+						<th scope="row"><?php esc_html_e( 'Timings and storage snapshot', 'bugbottle' ); ?></th>
+						<td>
+							<label>
+								<input type="checkbox" name="bugbottle_settings[perf]" value="1" <?php checked( $s['perf'] ); ?>>
+								<?php esc_html_e( 'Record how the page performed, and which keys the browser had stored', 'bugbottle' ); ?>
+							</label>
+							<p class="description"><?php esc_html_e( 'Off by default. The timings are the ones a web vitals report shows: largest contentful paint, layout shift, interaction to next paint, time to first byte, the load events, long tasks and — in Chrome — the JavaScript heap.', 'bugbottle' ); ?></p>
+							<p class="description"><?php esc_html_e( 'The storage snapshot lists the key names in localStorage and sessionStorage with the length of each value, and the names of the cookies. It never records a value, and never a cookie value at all. A key name can still say something — "impersonating_user" is a fact about the visit — so read the report screen before you forward one.', 'bugbottle' ); ?></p>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><?php esc_html_e( 'Shake to report', 'bugbottle' ); ?></th>
+						<td>
+							<label>
+								<input type="checkbox" name="bugbottle_settings[shake]" value="1" <?php checked( $s['shake'] ); ?>>
+								<?php esc_html_e( 'Open the panel when the phone is shaken', 'bugbottle' ); ?>
+							</label>
+							<p class="description"><?php esc_html_e( 'Off by default. It is the gesture a phone has instead of a keyboard shortcut: three shakes inside a second, with a three-second pause afterwards so one gesture opens one panel.', 'bugbottle' ); ?></p>
+							<p class="description">
+								<?php
+								printf(
+									/* translators: %s: the JavaScript call a theme has to make, already wrapped in <code> */
+									esc_html__( 'On iPhone and iPad, Safari only reports motion after the visitor has agreed to it, and it will only ask from a button the visitor pressed. This plugin never puts up that prompt for you. If you want the gesture there, call %s from a button of your own; everywhere else it works as soon as you tick this box.', 'bugbottle' ),
+									'<code>window.bugbottle.requestShakePermission()</code>'
+								);
+								?>
+							</p>
+						</td>
+					</tr>
+					<tr>
 						<th scope="row"><?php esc_html_e( 'Scrubbing', 'bugbottle' ); ?></th>
 						<td>
 							<label>
@@ -326,7 +360,7 @@ final class Settings {
 							<textarea id="bugbottle-signing-keys" class="large-text code" rows="3" name="bugbottle_settings[signing_keys]" spellcheck="false"><?php echo esc_textarea( $s['signing_keys'] ); ?></textarea>
 							<p class="description"><?php esc_html_e( 'One key per line. A report must then arrive signed with any one of them, and a report signed with a key that is not here is refused. Several lines is how a key is rotated: add the new one, wait for cached pages carrying the old one to expire, then delete the old one. Empty means no signature is asked for.', 'bugbottle' ); ?></p>
 							<p class="description"><strong><?php esc_html_e( 'A key that is sent to the browser is public.', 'bugbottle' ); ?></strong> <?php esc_html_e( 'It is in the page source, so anyone who wants it has it. Signing raises the cost of sending junk to the endpoint from a script that has not read your page — it is spam deterrence beside the rate limit, and it is not authentication. Do not treat it as securing the endpoint.', 'bugbottle' ); ?></p>
-							<p class="description"><?php esc_html_e( 'The bundled panel does not sign yet: signing arrives in bugbottle 0.7.0. Until this plugin ships that bundle, filling this in will refuse every report the panel sends.', 'bugbottle' ); ?></p>
+							<p class="description"><?php esc_html_e( 'The bundled panel signs what it sends, so filling this in is all there is to it. A report sent by anything else — your own form, a script — has to sign the same way.', 'bugbottle' ); ?></p>
 						</td>
 					</tr>
 					<tr>

@@ -157,6 +157,13 @@ final class Admin {
 				</p>
 			<?php endif; ?>
 
+			<?php
+			// Above the evidence, for the reason the Markdown puts them there: a
+			// note is about what is missing, and a reader who sees no picture
+			// should be told why before they go looking for one.
+			self::render_notes( Validator::notes( $report['notes'] ?? null ) );
+			?>
+
 			<?php if ( $has_shot ) : ?>
 				<h2><?php esc_html_e( 'Screenshot', 'bugbottle' ); ?></h2>
 				<p class="description">
@@ -186,6 +193,32 @@ final class Admin {
 			<textarea readonly rows="24" style="width:100%;font-family:Menlo,Consolas,monospace;font-size:12px"
 				onclick="this.select()"><?php echo esc_textarea( $summary ); ?></textarea>
 		</div>
+		<?php
+	}
+
+	/**
+	 * What the library had to do to this report on the way out, in its own
+	 * words. A note is written by the library and not by the reporter — the
+	 * offline queue dropping a picture it could not store is the only one
+	 * today — so it is not translated: it arrives in English from the browser
+	 * and is shown as it arrived.
+	 *
+	 * @param array<int, string> $notes Validated notes.
+	 */
+	private static function render_notes( array $notes ): void {
+		if ( 0 === count( $notes ) ) {
+			return;
+		}
+		?>
+		<h2><?php esc_html_e( 'Notes', 'bugbottle' ); ?></h2>
+		<p class="description">
+			<?php esc_html_e( 'Written by the reporting library about the report itself, not by the reporter. A report that could not be kept in full while the browser was offline says so here.', 'bugbottle' ); ?>
+		</p>
+		<ul class="ul-disc">
+			<?php foreach ( $notes as $note ) : ?>
+				<li><?php echo esc_html( $note ); ?></li>
+			<?php endforeach; ?>
+		</ul>
 		<?php
 	}
 

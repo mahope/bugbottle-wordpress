@@ -200,6 +200,11 @@ final class Rest {
 			'network'     => Validator::network( $body['network'] ?? null ),
 			'perf'        => Validator::perf( $body['perf'] ?? null ),
 			'storage'     => Validator::storage( $body['storage'] ?? null ),
+			// Written by the library rather than by the reporter: the offline
+			// queue drops a picture that would not fit in `localStorage` and
+			// leaves a line saying so. Validated like everything else, because
+			// it arrives from a browser like everything else.
+			'notes'       => Validator::notes( $body['notes'] ?? null ),
 			'extra'       => self::extra( $body ),
 			'reporter'    => get_current_user_id(),
 			'screenshot'  => $screenshot,
@@ -242,7 +247,7 @@ final class Rest {
 		// why the plugin does not store one at all. It never gets that far in
 		// practice, because `extra` only keeps scalars and a replay is an
 		// object, but naming it says the omission is a decision.
-		$known = array( 'type', 'message', 'contact', 'context', 'console', 'elements', 'breadcrumbs', 'network', 'perf', 'storage', 'replay', 'screenshotDataUrl' );
+		$known = array( 'type', 'message', 'contact', 'context', 'console', 'elements', 'breadcrumbs', 'network', 'perf', 'storage', 'notes', 'replay', 'screenshotDataUrl' );
 		$out   = array();
 		foreach ( $body as $key => $value ) {
 			if ( count( $out ) >= 20 ) {

@@ -51,6 +51,16 @@ final class Validator {
 	 */
 	public const MAX_CONTACT_LENGTH = 200;
 
+	/**
+	 * How many notes a report may carry. A note is written by the library
+	 * about the report itself — "the picture would not fit" — never by the
+	 * reporter, so a handful is already more than anything here has to say.
+	 */
+	public const MAX_NOTES = 5;
+
+	/** Longest a single note may be. They are one sentence each. */
+	public const MAX_NOTE_LENGTH = 200;
+
 	/** How many console entries a report may carry. Oldest are dropped first. */
 	public const MAX_CONSOLE_ENTRIES = 50;
 
@@ -207,6 +217,39 @@ final class Validator {
 	public static function looks_like_email( $value ): bool {
 		return is_string( $value )
 			&& 1 === preg_match( '/^[^\s@,;]+@[^\s@,;.]+(?:\.[^\s@,;.]+)+$/', trim( $value ) );
+	}
+
+	/**
+	 * Clips the library's own notes about the report. Anything that is not a
+	 * non-empty string is dropped, the rest is trimmed and clipped exactly as
+	 * a message is, and at most `MAX_NOTES` survive.
+	 *
+	 * A note arrives from the browser like everything else, so it is not
+	 * trusted for being ours: a page can put whatever it likes in this field.
+	 * The offline queue is the only thing that writes one today — a report
+	 * that would not fit in `localStorage` is stored without its picture and
+	 * says so here, which is the difference between "no picture was taken" and
+	 * "one was taken and could not be kept".
+	 *
+	 * @param mixed $raw       Anything from the request body.
+	 * @param int   $max_notes How many to keep.
+	 * @return array<int, string>
+	 */
+	public static function notes( $raw, int $max_notes = self::MAX_NOTES ): array {
+		if ( ! is_array( $raw ) || ! self::is_list( $raw ) ) {
+			return array();
+		}
+		$notes = array();
+		foreach ( $raw as $value ) {
+			$note = self::message( $value, self::MAX_NOTE_LENGTH );
+			if ( null !== $note ) {
+				$notes[] = $note;
+			}
+			if ( count( $notes ) >= $max_notes ) {
+				break;
+			}
+		}
+		return $notes;
 	}
 
 	/**

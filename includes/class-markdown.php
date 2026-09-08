@@ -67,6 +67,7 @@ final class Markdown {
 		$perf        = Validator::perf( $raw['perf'] ?? null );
 		$storage     = Validator::storage( $raw['storage'] ?? null );
 		$console     = Validator::console( $raw['console'] ?? null );
+		$notes       = Validator::notes( $raw['notes'] ?? null );
 
 		$max_console = $options['max_console_entries'] ?? null;
 		if ( is_int( $max_console ) && count( $console ) > $max_console ) {
@@ -143,6 +144,16 @@ final class Markdown {
 			$out[] = '| ' . self::cell( $fact[0] ) . ' | ' . self::cell( $fact[1] ) . ' |';
 		}
 		$out[] = '';
+
+		// Above the evidence rather than below it, because a note is about what
+		// is missing from the evidence, and a reader who sees no picture should
+		// be told why before they go looking for one.
+		if ( count( $notes ) > 0 ) {
+			foreach ( $notes as $note ) {
+				$out[] = '> ' . $note;
+			}
+			$out[] = '';
+		}
 
 		if ( count( $elements ) > 0 ) {
 			$out[] = '### Element' . ( count( $elements ) > 1 ? 's' : '' ) . ' pointed at';

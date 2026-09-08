@@ -22,11 +22,11 @@ msgstr "Fejlrapporter fra selve siden, med beviserne vedhæftet. Lægger bugbott
 #: includes/class-admin.php:31
 #: includes/class-admin.php:41
 #: includes/class-admin.php:79
-#: includes/class-storage.php:57
+#: includes/class-storage.php:58
 msgid "Bug reports"
 msgstr "Fejlrapporter"
 
-#: includes/class-storage.php:58
+#: includes/class-storage.php:59
 msgid "Bug report"
 msgstr "Fejlrapport"
 
@@ -56,7 +56,7 @@ msgid "No email recipient is set, so reports are only stored here. %s"
 msgstr "Der er ikke sat en modtager af e-mail, så rapporter gemmes kun her. %s"
 
 #: includes/class-admin.php:104
-#: includes/class-rest.php:280
+#: includes/class-rest.php:285
 msgid "No such report."
 msgstr "Rapporten findes ikke."
 
@@ -68,35 +68,35 @@ msgstr "Genåbn"
 msgid "Mark as done"
 msgstr "Markér som færdig"
 
-#: includes/class-admin.php:161
+#: includes/class-admin.php:168
 msgid "Screenshot"
 msgstr "Skærmbillede"
 
-#: includes/class-admin.php:163
+#: includes/class-admin.php:170
 msgid "Served only to administrators, through the plugin route. It is not in the media library and has no public URL."
 msgstr "Vises kun for administratorer, gennem pluginnets egen rute. Billedet ligger ikke i mediebiblioteket og har ingen offentlig adresse."
 
-#: includes/class-admin.php:182
+#: includes/class-admin.php:189
 msgid "Summary"
 msgstr "Opsummering"
 
-#: includes/class-admin.php:184
+#: includes/class-admin.php:191
 msgid "Markdown, ready to paste into an issue."
 msgstr "Markdown, klar til at sætte ind i et issue."
 
-#: includes/class-admin.php:438
+#: includes/class-admin.php:471
 msgid "You do not have permission to change a report."
 msgstr "Du har ikke adgang til at ændre en rapport."
 
-#: includes/class-admin.php:464
+#: includes/class-admin.php:497
 msgid "Bug"
 msgstr "Fejl"
 
-#: includes/class-admin.php:466
+#: includes/class-admin.php:499
 msgid "Idea"
 msgstr "Idé"
 
-#: includes/class-admin.php:468
+#: includes/class-admin.php:501
 msgid "Feedback"
 msgstr "Andet"
 
@@ -130,7 +130,7 @@ msgstr "Afsender"
 msgid "Date"
 msgstr "Dato"
 
-#: includes/class-admin.php:279
+#: includes/class-admin.php:312
 #: includes/class-reports-list-table.php:51
 msgid "Status"
 msgstr "Status"
@@ -169,11 +169,11 @@ msgstr "Ukendt rapporttype."
 msgid "A report needs a message."
 msgstr "En rapport skal have en besked."
 
-#: includes/class-rest.php:212
+#: includes/class-rest.php:217
 msgid "The report could not be stored."
 msgstr "Rapporten kunne ikke gemmes."
 
-#: includes/class-rest.php:284
+#: includes/class-rest.php:289
 msgid "That report has no screenshot."
 msgstr "Rapporten har intet skærmbillede."
 
@@ -305,59 +305,59 @@ msgstr "Øverst til højre"
 msgid "Top left"
 msgstr "Øverst til venstre"
 
-#: includes/class-admin.php:204
+#: includes/class-admin.php:237
 msgid "What happened before"
 msgstr "Hvad skete der forinden"
 
-#: includes/class-admin.php:208
+#: includes/class-admin.php:241
 msgid "Time"
 msgstr "Tidspunkt"
 
-#: includes/class-admin.php:209
+#: includes/class-admin.php:242
 msgid "What"
 msgstr "Hvad"
 
-#: includes/class-admin.php:210
+#: includes/class-admin.php:243
 msgid "Where"
 msgstr "Hvor"
 
-#: includes/class-admin.php:235
+#: includes/class-admin.php:268
 msgid "Clicked"
 msgstr "Klikkede"
 
-#: includes/class-admin.php:237
+#: includes/class-admin.php:270
 msgid "Submitted"
 msgstr "Indsendte"
 
-#: includes/class-admin.php:239
+#: includes/class-admin.php:272
 msgid "Navigated"
 msgstr "Navigerede"
 
-#: includes/class-admin.php:241
+#: includes/class-admin.php:274
 msgid "Page visibility"
 msgstr "Sidens synlighed"
 
-#: includes/class-admin.php:270
+#: includes/class-admin.php:303
 msgid "Requests"
 msgstr "Forespørgsler"
 
-#: includes/class-admin.php:272
+#: includes/class-admin.php:305
 msgid "Requests that failed or were slow. Bodies and headers are never recorded, in either direction."
 msgstr "Forespørgsler der fejlede eller var langsomme. Hverken indhold eller headere gemmes, i nogen af retningerne."
 
-#: includes/class-admin.php:277
+#: includes/class-admin.php:310
 msgid "Method"
 msgstr "Metode"
 
-#: includes/class-admin.php:278
+#: includes/class-admin.php:311
 msgid "URL"
 msgstr "URL"
 
-#: includes/class-admin.php:280
+#: includes/class-admin.php:313
 msgid "ms"
 msgstr "ms"
 
-#: includes/class-admin.php:294
+#: includes/class-admin.php:327
 msgid "Failed"
 msgstr "Fejlede"
 
@@ -445,67 +445,67 @@ msgstr ""
 msgid "https://mahoje.dk"
 msgstr ""
 
-#: includes/class-admin.php:320
+#: includes/class-admin.php:353
 msgid "Largest contentful paint"
 msgstr "Største indholdsvisning"
 
-#: includes/class-admin.php:323
+#: includes/class-admin.php:356
 msgid "Cumulative layout shift"
 msgstr "Samlet layoutforskydning"
 
-#: includes/class-admin.php:326
+#: includes/class-admin.php:359
 msgid "Interaction to next paint"
 msgstr "Interaktion til næste optegning"
 
-#: includes/class-admin.php:329
+#: includes/class-admin.php:362
 msgid "Time to first byte"
 msgstr "Tid til første byte"
 
-#: includes/class-admin.php:332
+#: includes/class-admin.php:365
 msgid "DOM content loaded"
 msgstr "DOM-indhold indlæst"
 
-#: includes/class-admin.php:335
+#: includes/class-admin.php:368
 msgid "Load"
 msgstr "Indlæsning"
 
-#: includes/class-admin.php:339
+#: includes/class-admin.php:372
 msgid "Long tasks"
 msgstr "Lange opgaver"
 
 #. translators: 1: number of long tasks, 2: their total duration in milliseconds
-#: includes/class-admin.php:342
+#: includes/class-admin.php:375
 #, php-format
 msgid "%1$d (%2$d ms total)"
 msgstr "%1$d (%2$d ms i alt)"
 
-#: includes/class-admin.php:350
+#: includes/class-admin.php:383
 msgid "JS heap"
 msgstr "JS-heap"
 
 #. translators: 1: megabytes of JS heap used, 2: the heap limit in megabytes
-#: includes/class-admin.php:353
+#: includes/class-admin.php:386
 #, php-format
 msgid "%1$d MB of %2$d MB"
 msgstr "%1$d MB af %2$d MB"
 
-#: includes/class-admin.php:363
+#: includes/class-admin.php:396
 msgid "Performance"
 msgstr "Ydelse"
 
-#: includes/class-admin.php:365
+#: includes/class-admin.php:398
 msgid "What the page cost on the visit the report came from. Two of these are simplifications: the layout shift is the sum of the shifts, and the interaction figure is the worst one rather than a percentile."
 msgstr "Hvad siden kostede på det besøg, rapporten kom fra. To af tallene er forenklinger: layoutforskydningen er summen af forskydningerne, og interaktionstallet er det værste frem for en percentil."
 
-#: includes/class-admin.php:405
+#: includes/class-admin.php:438
 msgid "Cookies"
 msgstr "Cookies"
 
-#: includes/class-admin.php:416
+#: includes/class-admin.php:449
 msgid "Storage"
 msgstr "Lager"
 
-#: includes/class-admin.php:418
+#: includes/class-admin.php:451
 msgid "Key names and how long their values were, and the names of the cookies. Never a value, and never a cookie value at all — unless the site allow-listed a key, in which case its value is below because somebody asked for it."
 msgstr "Nøglenavne og hvor lange deres værdier var, samt navnene på cookies. Aldrig en værdi, og aldrig en cookieværdi overhovedet — medmindre sitet har tilladt en nøgle, og så står værdien nedenfor, fordi nogen har bedt om den."
 
@@ -554,7 +554,7 @@ msgid "The bundled panel signs what it sends, so filling this in is all there is
 msgstr "Det medfølgende panel signerer det, det sender, så det er alt, der skal til at udfylde feltet her. En rapport sendt af noget andet — din egen formular, et script — skal signere på samme måde."
 
 #. translators: %s: the title of the report, which is its first line.
-#: includes/class-admin.php:169
+#: includes/class-admin.php:176
 #, php-format
 msgid "The page as the reporter saw it when they sent %s."
 msgstr "Siden, som anmelderen så den, da de sendte %s."
@@ -632,3 +632,11 @@ msgstr "Spørg, men lad dem sende uden"
 #: includes/class-settings.php:475
 msgid "Ask, and refuse to send without it"
 msgstr "Spørg, og afvis at sende uden"
+
+#: includes/class-admin.php:213
+msgid "Notes"
+msgstr "Noter"
+
+#: includes/class-admin.php:215
+msgid "Written by the reporting library about the report itself, not by the reporter. A report that could not be kept in full while the browser was offline says so here."
+msgstr "Skrevet af rapporteringsbiblioteket om selve rapporten, ikke af den der sendte den. En rapport, der ikke kunne gemmes i sin helhed, mens browseren var offline, siger det her."

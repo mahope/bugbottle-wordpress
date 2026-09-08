@@ -4,12 +4,12 @@
  * port, must come out byte for byte the way `bugbottle` itself renders it.
  *
  * The fixture below carries every section a report can have, including the
- * `perf` and `storage` blocks bugbottle 0.7.0 added and the `contact` line
- * 0.8.0 added, and several entries that are meant to be dropped or clipped — a
+ * `perf` and `storage` blocks bugbottle 0.7.0 added, the `contact` line
+ * 0.8.0 added and the `notes` line 0.13.0 added, and several entries that are meant to be dropped or clipped — a
  * stack frame past the third, a `length` that is not a number, a cookie name
  * that is not a string, a negative duration. The expected Markdown and the
  * expected validated JSON are not written by hand: they came out of
- * `src/markdown.ts` and `src/report-core.ts` of bugbottle v0.9.0, run over this
+ * `src/markdown.ts` and `src/report-core.ts` of bugbottle v0.13.0, run over this
  * same fixture with `node --experimental-strip-types`, and `diff -u` against
  * the PHP output was empty. Regenerate them the same way whenever either side
  * moves.
@@ -141,11 +141,17 @@ const FIXTURE_JSON = <<<'JSON'
     "cookies": ["wordpress_logged_in_abc", "woocommerce_cart_hash", 7],
     "values": { "step": "2", "cart": "dropped-not-allowlisted-server-side-is-fine" }
   },
+  "notes": [
+    "Screenshot dropped: it did not fit in the offline queue.",
+    "   ",
+    7,
+    "  Queued while offline; delivered on the next visit.  "
+  ],
   "screenshotDataUrl": "data:image/png;base64,iVBORw0KGgo="
 }
 JSON;
 
-/** `toMarkdown( fixture )`, from bugbottle v0.7.0. */
+/** `toMarkdown( fixture )`, from bugbottle v0.13.0. */
 const EXPECTED_MARKDOWN = <<<'MARKDOWN'
 ## Bug: The save button does nothing
 
@@ -167,6 +173,9 @@ I clicked it three times.
 | Connection | 4g |
 | Last console entry | 2026-09-08T09:12:03.500Z |
 | Screenshot | attached |
+
+> Screenshot dropped: it did not fit in the offline queue.
+> Queued while offline; delivered on the next visit.
 
 ### Element pointed at
 
@@ -224,7 +233,7 @@ MARKDOWN;
 
 /** The validated sections, as `JSON.stringify` writes them. */
 const EXPECTED_JSON = <<<'JSON'
-{"contact":"anna@example.test","context":{"url":"/checkout/step-2?coupon=SPRING","viewport":"1280x720","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36","language":"da-DK","timezone":"Europe/Copenhagen","screen":"2560x1440@2x","colorScheme":"dark","online":false,"connection":"4g"},"console":[{"ts":"2026-09-08T09:12:00.000Z","level":"warn","message":"Deprecated API in use"},{"ts":"2026-09-08T09:12:03.500Z","level":"error","message":"TypeError: cannot read properties of undefined (reading 'total')","stack":[{"file":"https://example.test/app.js","line":42,"col":9,"fn":"submitOrder"},{"file":"https://example.test/app.js","line":118,"col":3},{"file":"https://example.test/vendor.js","line":9001,"col":17,"fn":"dispatch"},{"file":"https://example.test/vendor.js","line":9100,"col":1,"fn":"notPrinted"}]}],"elements":[{"selector":"#checkout > button.primary","tag":"button","text":"Gem ordre","rect":{"x":220,"y":640,"width":160,"height":44},"attributes":{"id":"save","class":"primary","data-testid":"save-order"}}],"breadcrumbs":[{"ts":"2026-09-08T09:11:40.000Z","kind":"navigation","from":"/checkout/step-1","to":"/checkout/step-2"},{"ts":"2026-09-08T09:11:55.000Z","kind":"click","target":"#checkout > button.primary","text":"Gem ordre"},{"ts":"2026-09-08T09:12:01.000Z","kind":"submit","target":"form#checkout"},{"ts":"2026-09-08T09:12:02.000Z","kind":"visibility","to":"hidden"}],"network":[{"ts":"2026-09-08T09:12:02.100Z","method":"POST","url":"/api/orders","status":500,"ms":1240},{"ts":"2026-09-08T09:12:03.000Z","method":"GET","url":"/api/orders/42","status":0,"ms":30000,"error":true}],"perf":{"lcp":2432,"inp":312,"ttfb":180,"domContentLoaded":940,"load":1812,"cls":0.123,"longTasks":{"count":7,"totalMs":614},"memory":{"usedMB":85,"limitMB":4096}},"storage":{"local":[{"key":"cart","length":1842},{"key":"impersonating_user","length":6},{"key":"no-length","length":0}],"session":[{"key":"step","length":1}],"cookies":["wordpress_logged_in_abc","woocommerce_cart_hash"],"values":{"step":"2","cart":"dropped-not-allowlisted-server-side-is-fine"}}}
+{"contact":"anna@example.test","context":{"url":"/checkout/step-2?coupon=SPRING","viewport":"1280x720","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36","language":"da-DK","timezone":"Europe/Copenhagen","screen":"2560x1440@2x","colorScheme":"dark","online":false,"connection":"4g"},"console":[{"ts":"2026-09-08T09:12:00.000Z","level":"warn","message":"Deprecated API in use"},{"ts":"2026-09-08T09:12:03.500Z","level":"error","message":"TypeError: cannot read properties of undefined (reading 'total')","stack":[{"file":"https://example.test/app.js","line":42,"col":9,"fn":"submitOrder"},{"file":"https://example.test/app.js","line":118,"col":3},{"file":"https://example.test/vendor.js","line":9001,"col":17,"fn":"dispatch"},{"file":"https://example.test/vendor.js","line":9100,"col":1,"fn":"notPrinted"}]}],"elements":[{"selector":"#checkout > button.primary","tag":"button","text":"Gem ordre","rect":{"x":220,"y":640,"width":160,"height":44},"attributes":{"id":"save","class":"primary","data-testid":"save-order"}}],"breadcrumbs":[{"ts":"2026-09-08T09:11:40.000Z","kind":"navigation","from":"/checkout/step-1","to":"/checkout/step-2"},{"ts":"2026-09-08T09:11:55.000Z","kind":"click","target":"#checkout > button.primary","text":"Gem ordre"},{"ts":"2026-09-08T09:12:01.000Z","kind":"submit","target":"form#checkout"},{"ts":"2026-09-08T09:12:02.000Z","kind":"visibility","to":"hidden"}],"network":[{"ts":"2026-09-08T09:12:02.100Z","method":"POST","url":"/api/orders","status":500,"ms":1240},{"ts":"2026-09-08T09:12:03.000Z","method":"GET","url":"/api/orders/42","status":0,"ms":30000,"error":true}],"perf":{"lcp":2432,"inp":312,"ttfb":180,"domContentLoaded":940,"load":1812,"cls":0.123,"longTasks":{"count":7,"totalMs":614},"memory":{"usedMB":85,"limitMB":4096}},"storage":{"local":[{"key":"cart","length":1842},{"key":"impersonating_user","length":6},{"key":"no-length","length":0}],"session":[{"key":"step","length":1}],"cookies":["wordpress_logged_in_abc","woocommerce_cart_hash"],"values":{"step":"2","cart":"dropped-not-allowlisted-server-side-is-fine"}},"notes":["Screenshot dropped: it did not fit in the offline queue.","Queued while offline; delivered on the next visit."]}
 JSON;
 
 $raw = json_decode( FIXTURE_JSON, true );
@@ -250,6 +259,7 @@ check(
 			'network'     => Validator::network( $raw['network'] ?? null ),
 			'perf'        => Validator::perf( $raw['perf'] ?? null ),
 			'storage'     => Validator::storage( $raw['storage'] ?? null ),
+			'notes'       => Validator::notes( $raw['notes'] ?? null ),
 		)
 	)
 );
@@ -323,6 +333,52 @@ check( 'a name beside an address does not look like an email', false, Validator:
 check( 'a bare hostname does not look like an email', false, Validator::looks_like_email( 'anna@localhost' ) );
 check( 'two addresses do not look like an email', false, Validator::looks_like_email( 'a@b.dk,c@d.dk' ) );
 check( 'something that is not a string never looks like an email', false, Validator::looks_like_email( null ) );
+
+// The library's own notes about the report, rule by rule. They are validated
+// exactly as a message is — trimmed, null bytes gone — but clipped at 200 and
+// capped at five, and anything that is not a non-empty string is dropped. A
+// note arrives from a browser like every other field, so nothing here trusts it
+// for being ours.
+check( 'a note is trimmed', array( 'kept' ), Validator::notes( array( '  kept  ' ) ) );
+check( 'an empty note is dropped', array(), Validator::notes( array( '   ' ) ) );
+check( 'a note that is not a string is dropped', array(), Validator::notes( array( 7, null, array( 'a' ) ) ) );
+check( 'notes that are not a list are no notes', array(), Validator::notes( array( 'a' => 'b' ) ) );
+check( 'a missing notes field is no notes', array(), Validator::notes( null ) );
+check( 'a note is clipped at 200 characters', 200, mb_strlen( Validator::notes( array( str_repeat( 'k', 400 ) ) )[0] ) );
+check( 'a null byte never survives a note', 'ab', Validator::notes( array( 'a' . chr( 0 ) . 'b' ) )[0] );
+check( 'at most five notes survive', 5, count( Validator::notes( array( 'a', 'b', 'c', 'd', 'e', 'f', 'g' ) ) ) );
+check(
+	'the notes are the first five, not the last',
+	array( 'a', 'b', 'c', 'd', 'e' ),
+	Validator::notes( array( 'a', 'b', 'c', 'd', 'e', 'f', 'g' ) )
+);
+check(
+	'a dropped note does not use up one of the five',
+	5,
+	count( Validator::notes( array( 'a', '  ', 'b', 7, 'c', null, 'd', 'e', 'f' ) ) )
+);
+// The whole rendering of a minimal report carrying one note, so the position
+// of the quote is pinned and not only its presence: it sits under the facts
+// table and above where the evidence would be.
+check(
+	'a note is rendered as a quote under the facts table',
+	"## Bug: x
+
+x
+
+| | |
+|---|---|
+| Type | Bug |
+
+> the picture would not fit
+",
+	Markdown::render( array( 'type' => 'bug', 'message' => 'x', 'notes' => array( 'the picture would not fit' ) ) )
+);
+check(
+	'no quote is rendered when there are no notes',
+	false,
+	str_contains( Markdown::render( array( 'type' => 'bug', 'message' => 'x' ) ), '> ' )
+);
 
 // The one place the PHP port deliberately parts company with the library: a
 // session replay is dropped rather than stored, so no `Replay` row is ever

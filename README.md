@@ -131,7 +131,7 @@ first line is the key the panel is given; every line is a key the route
 accepts.
 
 The bundled panel signs what it sends: the mount script hands the first
-configured key to `createSigner` from `bugbottle/sign`, which is in the 0.9.0
+configured key to `createSigner` from `bugbottle/sign`, which is in the 0.13.0
 bundle this plugin ships. Filling the setting in is the whole of it. Anything
 else that posts to the route — your own form, a script, a mobile app — has to
 compute the same digest, or it will be refused along with the spam.
@@ -240,6 +240,17 @@ Since 0.5.0 a report may also carry `contact`, the line the reporter typed when
 It is never there unless the setting asked for it: a report that arrives with a
 contact line the settings never asked for is stored without it.
 
+Since 0.6.0 a report may also carry `notes`: short lines the *library* wrote
+about the report, never the reporter. There is one of them today. A browser
+that is offline keeps the report in `localStorage` until it can be sent, and a
+report with a picture on it can be larger than what is left there; rather than
+losing the report, bugbottle 0.13.0 stores it without the picture and leaves a
+line saying so. The report screen shows those lines above the evidence, and so
+does the Markdown summary, because a reader who sees no picture should be told
+why before they go looking for one. At most five notes survive, each clipped at
+200 characters, and they are validated like every other field: a note arrives
+from a browser, so nothing here trusts it for being ours.
+
 One field the library can send is deliberately not kept. bugbottle 0.8.0 added
 `replay`, up to a megabyte of rrweb events recording the last seconds before
 the report. `wp_postmeta` is the wrong place for a megabyte of nested JSON —
@@ -311,7 +322,7 @@ yourself when you mean it.
 
 `assets/bugbottle.js` is the official one-script-tag build,
 `dist/bugbottle.js`, copied verbatim from the
-[bugbottle](https://github.com/mahope/bugbottle) package — **bugbottle 0.9.0**
+[bugbottle](https://github.com/mahope/bugbottle) package — **bugbottle 0.13.0**
 at the time of writing. It is not modified here and it is not built here.
 
 Since 0.8.0 the library also publishes `dist/bugbottle.slim.js`, the same panel
@@ -378,10 +389,11 @@ wp i18n update-po languages/bugbottle.pot languages/bugbottle-da_DK.po
 wp i18n make-mo languages/bugbottle-da_DK.po languages/
 ```
 
-There are five test files, none of which needs a framework:
+There are six test files, none of which needs a framework:
 
 ```bash
 php tests/test-report-parity.php      # the validators and the Markdown, against the library
+php tests/test-settings.php           # the settings sanitiser, and that Language is an allow-list
 php tests/test-screenshot.php         # the PNG decoder and the Screenshots setting
 php tests/test-signature.php          # the signature rules, no WordPress needed
 php tests/test-email.php              # the notification body: no screenshot link, an admin link that works
@@ -389,7 +401,7 @@ wp eval-file tests/test-rest-signature.php   # the REST route, from a scratch in
 ```
 
 The last writes settings and stores reports, so point it at a scratch install
-and never at a live site. All five exit non-zero on a failure.
+and never at a live site. All six exit non-zero on a failure.
 
 Rebuilding the screenshot renderer needs node and npm, and nothing else:
 
@@ -398,9 +410,10 @@ bin/build-screenshot-bundle.sh   # writes assets/bugbottle-screenshot.js, prints
 ```
 
 `tests/test-report-parity.php` is what pins the PHP port to the library: it
-holds one report carrying every section, including the contact line, and the
-Markdown and the validated JSON that the library's own `src/markdown.ts` and
-`src/report-core.ts` produce from it — v0.9.0 as of this release. When either side moves, regenerate the two expectations by running
+holds one report carrying every section, including the contact line and the
+notes, and the Markdown and the validated JSON that the library's own
+`src/markdown.ts` and `src/report-core.ts` produce from it — v0.13.0 as of this
+release. When either side moves, regenerate the two expectations by running
 the fixture through the TypeScript with `node --experimental-strip-types` and
 diffing the output.
 

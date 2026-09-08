@@ -41,6 +41,7 @@ final class Storage {
 	public const META_NETWORK     = '_bugbottle_network';
 	public const META_PERF        = '_bugbottle_perf';
 	public const META_STORAGE     = '_bugbottle_storage';
+	public const META_NOTES       = '_bugbottle_notes';
 	public const META_SCREENSHOT  = '_bugbottle_screenshot';
 	public const META_REPORTER    = '_bugbottle_reporter';
 	public const META_EXTRA       = '_bugbottle_extra';
@@ -215,6 +216,12 @@ final class Storage {
 		if ( ! empty( $report['storage'] ) ) {
 			update_post_meta( $post_id, self::META_STORAGE, wp_json_encode( $report['storage'] ) );
 		}
+		// The library's own notes about the report — today only the offline
+		// queue saying a picture would not fit. Absent rather than stored as an
+		// empty array, for the same reason the two snapshots above are.
+		if ( ! empty( $report['notes'] ) ) {
+			update_post_meta( $post_id, self::META_NOTES, wp_json_encode( $report['notes'] ) );
+		}
 		update_post_meta( $post_id, self::META_REPORTER, (int) ( $report['reporter'] ?? 0 ) );
 		update_post_meta( $post_id, self::META_STATUS, self::STATUS_OPEN );
 		if ( ! empty( $report['extra'] ) ) {
@@ -244,6 +251,7 @@ final class Storage {
 			'network'     => self::json_meta( $post->ID, self::META_NETWORK ),
 			'perf'        => self::json_meta( $post->ID, self::META_PERF ),
 			'storage'     => self::json_meta( $post->ID, self::META_STORAGE ),
+			'notes'       => self::json_meta( $post->ID, self::META_NOTES ),
 			'extra'       => self::json_meta( $post->ID, self::META_EXTRA ),
 			'reporter'    => (int) get_post_meta( $post->ID, self::META_REPORTER, true ),
 			'screenshot'  => (string) get_post_meta( $post->ID, self::META_SCREENSHOT, true ),

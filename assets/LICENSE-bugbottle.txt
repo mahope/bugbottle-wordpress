@@ -1,8 +1,15 @@
-This file covers `assets/bugbottle.js` only.
+This file covers the two bundled JavaScript files in this directory.
 
 `assets/bugbottle.js` is the official one-script-tag build of the bugbottle
-library (https://github.com/mahope/bugbottle), copied here unmodified. It is
-distributed under the MIT licence, reproduced below.
+library (https://github.com/mahope/bugbottle), copied here unmodified.
+
+`assets/bugbottle-screenshot.js` is the same library's `bugbottle/html-to-image`
+entry bundled together with html-to-image (https://github.com/bubkoo/html-to-image)
+by `bin/build-screenshot-bundle.sh`, which records the exact versions and the
+exact esbuild command. It is loaded only when the Screenshots setting is on.
+
+Both are distributed under the MIT licence, reproduced below; the copyright
+holders are Mads Holst Jensen for bugbottle and W.Y. for html-to-image.
 
 The rest of this plugin is licensed GPL-2.0-or-later; see the `LICENSE` file in
 the plugin root. MIT is GPL-compatible, so the combined work may be
@@ -13,6 +20,7 @@ redistributed under the GPL.
 MIT License
 
 Copyright (c) 2026 Mads Holst Jensen
+Copyright (c) 2017-2026 W.Y.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

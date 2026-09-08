@@ -26,6 +26,15 @@ final class Assets {
 
 	public const HANDLE = 'bugbottle';
 
+	/**
+	 * The screenshot renderer, enqueued only when the Screenshots setting is
+	 * on. It is a second file because the panel bundle deliberately carries no
+	 * renderer: `html-to-image` is larger than the rest of the panel put
+	 * together, and a site that does not ask for pictures should not download
+	 * it. See `bin/build-screenshot-bundle.sh`.
+	 */
+	public const SCREENSHOT_HANDLE = 'bugbottle-screenshot';
+
 	public static function enqueue(): void {
 		if ( ! self::should_show() ) {
 			return;
@@ -39,7 +48,24 @@ final class Assets {
 			true
 		);
 
-		wp_add_inline_script( self::HANDLE, self::config_script(), 'after' );
+		// The inline mount call goes on whichever script is printed last, so
+		// everything it reads off `window` is already there when it runs. With
+		// screenshots on that is the renderer, which depends on the panel and
+		// is therefore printed after it.
+		$mount_on = self::HANDLE;
+
+		if ( Settings::bool( 'screenshot' ) ) {
+			wp_enqueue_script(
+				self::SCREENSHOT_HANDLE,
+				BUGBOTTLE_URL . 'assets/bugbottle-screenshot.js',
+				array( self::HANDLE ),
+				LIB_VERSION,
+				true
+			);
+			$mount_on = self::SCREENSHOT_HANDLE;
+		}
+
+		wp_add_inline_script( $mount_on, self::config_script(), 'after' );
 	}
 
 	/**
@@ -105,6 +131,7 @@ final class Assets {
 			'breadcrumbs' => (bool) $settings['breadcrumbs'],
 			'perf'        => (bool) $settings['perf'],
 			'shake'       => (bool) $settings['shake'],
+			'screenshot'  => (bool) $settings['screenshot'],
 			'extra'       => new \stdClass(),
 		);
 
@@ -171,6 +198,13 @@ final class Assets {
 				'	// arrives until the page has called requestShakePermission() from a',
 				'	// button somebody pressed. That button belongs to the theme, not to us.',
 				'	if (config.shake) options.shake = api.onShake;',
+				'	// The renderer is its own script and is only on the page when the',
+				'	// setting is on. Handing it in is what makes the panel offer a',
+				'	// picture at all — and, because this build already hands the',
+				'	// annotator in, what puts "Edit picture" under the preview.',
+				'	if (config.screenshot && window.bugbottleScreenshot) {',
+				'		options.screenshot = window.bugbottleScreenshot.htmlToImage;',
+				'	}',
 				'	// The nonce travels with a queued report too: it is delivered by the',
 				'	// queue rather than by the panel, on a later page load.',
 				'	if (config.queue && typeof api.createQueue === "function") {',

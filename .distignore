@@ -9,6 +9,7 @@
 .git
 .github
 .gitignore
+.gitattributes
 .distignore
 .wordpress-org
 .composer-home

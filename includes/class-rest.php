@@ -277,4 +277,19 @@ final class Rest {
 	public static function screenshot_url( int $post_id ): string {
 		return rest_url( self::NAMESPACE . '/screenshot/' . $post_id );
 	}
+
+	/**
+	 * The same URL with a REST nonce on it, for an `<img src>`.
+	 *
+	 * A picture is fetched by the browser, not by a script, so it carries no
+	 * `X-WP-Nonce` header — and `rest_cookie_check_errors()` treats a cookie
+	 * request without a nonce as anonymous, which makes
+	 * `may_read_screenshot()` refuse an administrator looking at their own
+	 * report. The nonce in the query string is where WordPress looks second,
+	 * and it is the only thing that makes the picture render. It authorises
+	 * nothing on its own: the capability check still runs.
+	 */
+	public static function screenshot_src( int $post_id ): string {
+		return add_query_arg( '_wpnonce', wp_create_nonce( 'wp_rest' ), self::screenshot_url( $post_id ) );
+	}
 }

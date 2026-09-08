@@ -148,7 +148,11 @@ final class Admin {
 					<?php esc_html_e( 'Served only to administrators, through the plugin route. It is not in the media library and has no public URL.', 'bugbottle' ); ?>
 				</p>
 				<p>
-					<img src="<?php echo esc_url( Rest::screenshot_url( $report_id ) ); ?>" alt=""
+					<img src="<?php echo esc_url( Rest::screenshot_src( $report_id ) ); ?>"
+						alt="<?php
+						/* translators: %s: the title of the report, which is its first line. */
+						echo esc_attr( sprintf( __( 'The page as the reporter saw it when they sent %s.', 'bugbottle' ), get_the_title( $post ) ) );
+						?>"
 						style="max-width:100%;height:auto;border:1px solid #c3c4c7">
 				</p>
 			<?php endif; ?>

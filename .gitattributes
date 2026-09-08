@@ -1,0 +1,8 @@
+# The two bundled JavaScript files are build artefacts whose md5 is recorded in
+# CHANGELOG.md, and `assets/bugbottle.js` is a byte-for-byte copy of a released
+# file. Marking them `-text` stops git rewriting their line endings on checkout
+# on Windows, which would change the hash of the file a reader is asked to
+# verify. The compiled catalogue is binary for the same reason.
+assets/bugbottle.js -text
+assets/bugbottle-screenshot.js -text
+languages/*.mo binary

@@ -58,6 +58,7 @@ final class Settings {
 			'breadcrumbs'      => true,
 			'perf'             => false,
 			'shake'            => false,
+			'screenshot'       => false,
 			'signing_keys'     => '',
 			'email_recipient'  => '',
 			'email_on_submit'  => false,
@@ -124,6 +125,7 @@ final class Settings {
 			'breadcrumbs',
 			'perf',
 			'shake',
+			'screenshot',
 			'email_on_submit',
 		);
 		foreach ( $flags as $flag ) {
@@ -303,6 +305,28 @@ final class Settings {
 								<input type="checkbox" name="bugbottle_settings[network_log]" value="1" <?php checked( $s['network_log'] ); ?>>
 								<?php esc_html_e( 'Network log: record requests that failed or were slow. Never their bodies or headers', 'bugbottle' ); ?>
 							</label>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><?php esc_html_e( 'Screenshots', 'bugbottle' ); ?></th>
+						<td>
+							<label>
+								<input type="checkbox" name="bugbottle_settings[screenshot]" value="1" <?php checked( $s['screenshot'] ); ?>>
+								<?php esc_html_e( 'Let the reporter attach a picture of the page', 'bugbottle' ); ?>
+							</label>
+							<p class="description"><?php esc_html_e( 'Off by default. Taking a picture needs a renderer, and a renderer is a second script of about 15 kB (6 kB over the wire) on every page the panel is on, so it is only loaded when this box is ticked. Until version 0.4.1 the plugin shipped no renderer at all and the panel never offered a picture.', 'bugbottle' ); ?></p>
+							<p class="description"><strong><?php esc_html_e( 'A picture of the page contains whatever was on the page.', 'bugbottle' ); ?></strong> <?php esc_html_e( 'The name of another customer, a price, an order, a message that was open in a tab beside the bug. Reports are a private post type and the picture is served only to people who can read them, through a plugin route of its own rather than the media library — but everyone who can read a report sees it, and forwarding one forwards the picture. Ask for screenshots only if you would be comfortable reading them.', 'bugbottle' ); ?></p>
+							<p class="description">
+								<?php
+								printf(
+									/* translators: 1: the data-bugbottle-mask attribute, wrapped in <code>; 2: the data-bugbottle-block attribute, wrapped in <code> */
+									esc_html__( 'What is typed into a field is replaced with bullets before the picture is taken. Mark anything else you do not want in it with %1$s to bullet its text, or %2$s to cover it entirely.', 'bugbottle' ),
+									'<code>data-bugbottle-mask</code>',
+									'<code>data-bugbottle-block</code>'
+								);
+								?>
+							</p>
+							<p class="description"><?php esc_html_e( 'The reporter sees the picture before it is sent, can untick it, and can mark it first: a rectangle, an arrow, and a blur that reads the region back out of the canvas so the original pixels leave with it.', 'bugbottle' ); ?></p>
 						</td>
 					</tr>
 					<tr>

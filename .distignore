@@ -1,0 +1,27 @@
+# What never belongs in the plugin directory a site installs.
+#
+# `bin/build-zip.sh` works from an allowlist and does not read this file; this
+# is for `.github/workflows/deploy-wporg.yml`, where the 10up action ships
+# everything not listed here straight into SVN trunk. The two have to agree:
+# anything added at the repository root that is not in the build script's
+# allowlist belongs here too.
+
+.git
+.github
+.gitignore
+.distignore
+.wordpress-org
+.composer-home
+bin
+tests
+vendor
+node_modules
+composer.json
+composer.lock
+phpstan.neon
+phpstan-bootstrap.php
+CHANGELOG.md
+README.md
+SUBMIT.md
+bugbottle.zip
+languages/*.po

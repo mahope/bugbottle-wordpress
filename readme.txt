@@ -4,7 +4,7 @@ Tags: bug report, feedback, screenshot, support, qa
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.3.0
+Stable tag: 0.4.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -29,6 +29,8 @@ The panel speaks Danish, English, Swedish, Norwegian, German, Dutch, French and 
 * Requests that failed or were slow, as method, URL, status and duration. Never a body and never a header, in either direction.
 * A CSS selector for the element the reporter pointed at.
 * A short breadcrumb trail: clicks, navigations and form submits.
+* Optionally, what the page cost - largest contentful paint, layout shift, interaction to next paint, time to first byte, the load events, long tasks and, in Chrome, the JavaScript heap.
+* Optionally, the key names in localStorage and sessionStorage with the length of each value, and the names of the cookies. Names only, never values, and never a cookie value at all. Off unless you turn it on.
 * The reporter's own description, and their name and email if they gave them.
 * Optionally a screenshot, only when the reporter ticks the box.
 
@@ -90,7 +92,19 @@ Yes, but read what it is first. Put one or more keys in "Signing key(s)" under *
 
 One key per line is how a key is rotated: add the new one, wait for cached pages carrying the old one to expire, then remove the old one.
 
-The bundled panel does not sign yet - that arrives with bugbottle 0.7.0 - so filling the setting in today refuses every report the panel sends.
+The bundled panel signs what it sends, so filling the setting in is all there is to it. Anything else that posts to the route - your own form, a script - has to compute the same digest or it is refused too.
+
+= What is the "Timings and storage snapshot" setting? =
+
+Two things a report can carry, both off by default. The timings are the ones a Web Vitals report shows: largest contentful paint, cumulative layout shift, interaction to next paint, time to first byte, the load events, long tasks and, on Chrome, the JavaScript heap. Two of them are simplifications and the library says so: the layout shift is the sum of the shifts, and the interaction figure is the worst interaction rather than a percentile.
+
+The storage snapshot is the part to read twice. It lists the **key names** in localStorage and sessionStorage with the **length** of each value, and the **names** of the cookies. It never records a value, and never a cookie value at all. That is still not nothing - a key called `impersonating_user` is a fact about the visit - so turn it on when you are debugging state and leave it off the rest of the time.
+
+= Can people report by shaking their phone? =
+
+Yes, with "Shake to report" turned on: three shakes inside a second open the panel, and there is a three-second pause afterwards so one gesture opens one panel. It is off by default.
+
+On iPhone and iPad, Safari reports no motion until the visitor has agreed to it, and it will only ask from a button the visitor pressed. This plugin never puts that prompt up for you. If you want the gesture on iOS, call `window.bugbottle.requestShakePermission()` from a button of your own; everywhere else the gesture works as soon as you tick the box.
 
 = Where do the emails come from? =
 
@@ -109,14 +123,19 @@ No. Composer is used only to run PHPStan while developing; the shipped plugin is
 1. The report panel on the front end, open, with the console errors and the element the reporter pointed at already collected.
 2. The reports list in wp-admin, filtered by status.
 3. A single report: the summary, the environment, the console errors and the screenshot.
-4. The settings screen: language, colour, position, branding, anonymous reports and the email recipient.
+4. The settings screen: language, colour, position, branding, the keyboard shortcut, the evidence switches, the timings and storage snapshot, shake to report, signing keys and the email recipient.
 
 == Changelog ==
 
-= Unreleased =
-* New "Signing key(s)" setting. With a key set, `POST /wp-json/bugbottle/v1/report` requires the library's `X-Bugbottle-Signature` header - `t=<unix ms>,v1=<hmac-sha256 over "<t>.<raw body>">` - verified over the raw request body, within five minutes of the server clock in either direction, in constant time, and refused if the same digest has already been accepted inside that window. Missing, malformed, wrong, expired and replayed all answer `401 Bad signature` alike. One key per line, so a key can be rotated. A site with no key set is unaffected.
+= 0.4.0 =
+* Updated the bundled panel to bugbottle 0.7.0.
+* New "Signing key(s)" setting, and the panel now signs. With a key set, `POST /wp-json/bugbottle/v1/report` requires the library's `X-Bugbottle-Signature` header - `t=<unix ms>,v1=<hmac-sha256 over "<t>.<raw body>">` - verified over the raw request body, within five minutes of the server clock in either direction, in constant time, and refused if the same digest has already been accepted inside that window. Missing, malformed, wrong, expired and replayed all answer `401 Bad signature` alike. One key per line, so a key can be rotated. A site with no key set is unaffected.
 * A key that is sent to the browser is public. Signing is spam deterrence beside the rate limit and is not authentication; the settings screen says so beside the field.
-* The bundled `assets/bugbottle.js` is still bugbottle 0.6.0, which does not sign. The setting cannot be used in earnest until the 0.7.0 bundle ships with the plugin.
+* New "Timings and storage snapshot" setting, off by default. Records what the page cost, and lists the key names in localStorage and sessionStorage with the length of each value, plus the cookie names - names only, never values, and never a cookie value at all.
+* New "Shake to report" setting, off by default: shaking the phone opens the panel. On iPhone and iPad the visitor has to agree first, and only a button on your own page can ask; the plugin enables the gesture and explains it, and never puts up the prompt itself.
+* The report detail screen shows the timings and the storage snapshot as tables of their own, and both are stored with the report.
+* Marking the screenshot - rectangle, arrow and a blur that really destroys what it covers - is in the bundled panel and needs nothing here.
+* Danish for every new setting, label and screen.
 
 = 0.3.0 =
 * Updated the bundled panel to bugbottle 0.6.0. Reports now carry the browser language, time zone, screen size, colour scheme, online state and connection type; uncaught errors carry up to ten stack frames; and requests that failed or were slow are recorded as their own section. The PHP validator caps every one of them to the same limits the library does.
@@ -134,6 +153,9 @@ No. Composer is used only to run PHPStan while developing; the shipped plugin is
 * First release. REST endpoint, private `bugbottle_report` post type, admin list and detail screens, settings, email via `wp_mail`, screenshots behind an admin-only route, Danish and English.
 
 == Upgrade Notice ==
+
+= 0.4.0 =
+Updates the bundled panel to bugbottle 0.7.0. Signing works now, so the "Signing key(s)" setting can be used in earnest; two new settings, both off by default, add the page timings with a storage snapshot and shake-to-report. Existing reports are untouched.
 
 = 0.3.0 =
 Updates the bundled panel to bugbottle 0.6.0: stack frames, a wider page context, a network log and an offline queue, with settings for each. Existing reports are untouched.

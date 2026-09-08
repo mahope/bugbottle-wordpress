@@ -6,6 +6,15 @@ repository directly; keep the two in step.
 
 ## Unreleased
 
+## 0.4.0 — 2026-09-08
+
+Follows the library to bugbottle 0.7.0. That is the release signing arrives
+in, so the signing key setting below — written and tested against the server
+side first — works from this version on: the bundled panel signs what it
+sends. Two more things 0.7.0 added are settings here, both off by default, and
+one of them — marking the screenshot before it is sent — needed nothing here at
+all.
+
 ### Added
 
 - **Signing key(s)**, one key per line. With at least one key set,
@@ -28,6 +37,38 @@ repository directly; keep the two in step.
   is public** — it is in the page source — and that signing is spam deterrence
   beside the rate limit rather than authentication. That text is load-bearing;
   do not soften it.
+- **Timings and storage snapshot**, a setting, off by default. It starts the
+  library's `initPerf`, so a report carries `perf` — largest contentful paint,
+  cumulative layout shift, interaction to next paint, time to first byte,
+  `DOMContentLoaded`, load, the count and total of long tasks and, on Chromium,
+  the JavaScript heap — and `storage`, which lists the key names in
+  `localStorage` and `sessionStorage` with the **length** of each value, and the
+  **names** of the cookies. Never a value, and never a cookie value at all. The
+  setting text says so, because a key name is still a fact about the visit and
+  the person ticking the box should know what they are turning on.
+- `Validator::perf()` and `Validator::storage()`, the ports of the library's
+  `normalisePerf` and `normaliseStorage`, with the same ceilings
+  (`MAX_STORAGE_KEYS` 50, `MAX_COOKIE_NAMES` 100, `MAX_STORAGE_KEY_LENGTH` 100,
+  `MAX_STORAGE_VALUE_LENGTH` 200, `MAX_STORAGE_VALUES` 20, `MAX_PERF_MS` an
+  hour) and the same "a section with nothing usable in it is null, not an empty
+  object" rule. `Markdown::render()` grew the **Performance** table and the
+  collapsed **Storage** block to match `toMarkdown`, and both blocks are stored
+  in meta of their own (`_bugbottle_perf`, `_bugbottle_storage`) and rendered as
+  tables on the report detail screen.
+- **Shake to report**, a setting, off by default: `mountBugbottle` is handed the
+  library's `onShake`, so shaking the phone opens the panel. iOS is the reason
+  this is two sentences on the settings screen rather than one: Safari reports
+  no motion until the visitor has agreed, and it will only ask from a button the
+  visitor pressed. The plugin **enables the gesture and explains it, and never
+  puts the prompt up itself** — a permission dialog nobody asked for is worse
+  than a missing feature. A theme that wants it on iOS calls
+  `window.bugbottle.requestShakePermission()` from a button of its own.
+- `tests/test-report-parity.php`: one report carrying every section, and the
+  Markdown and the validated JSON the library produces from it, pinned. Both
+  expectations came out of bugbottle v0.7.0's own `src/markdown.ts` and
+  `src/report-core.ts` under `node --experimental-strip-types`, and `diff -u`
+  against the PHP output was empty — 2002 bytes of Markdown, identical, and the
+  validated JSON with it. 20 checks, `php tests/test-report-parity.php`.
 - `tests/test-signature.php`, the rules without WordPress (21 checks,
   `php tests/test-signature.php`), and `tests/test-rest-signature.php`, the
   REST route through `rest_do_request` against real settings and transients
@@ -40,16 +81,28 @@ repository directly; keep the two in step.
   out of SVN trunk. `bin/build-zip.sh` works from an allowlist and never
   needed one; the deploy workflow always did.
 
-### Still to do before this can be switched on
+### Changed
 
-- **The bundled `assets/bugbottle.js` is bugbottle 0.6.0, which does not
-  sign.** Signing ships in bugbottle 0.7.0 (`createSigner` from
-  `bugbottle/sign`). The inline mount already passes the key through
-  `api.createSigner`, guarded on the function existing, so it is inert on the
-  0.6.0 bundle — which means a site that fills the setting in today will have
-  every report the panel sends refused. Copy `dist/bugbottle.js` from bugbottle
-  0.7.0 into `assets/`, bump `LIB_VERSION`, and drop the warning from the
-  settings screen, the README and `readme.txt` in the same commit.
+- `assets/bugbottle.js` is the unmodified `dist/bugbottle.js` from bugbottle
+  0.7.0 (md5 `94bda51f99a6a4bee5973a39012234a2`), and `LIB_VERSION` says so.
+- **The signing setting works now.** The mount script hands the first
+  configured key straight to `api.createSigner`; the `typeof` guard that kept
+  it inert on the 0.6.0 bundle is gone, and so are the three warnings — on the
+  settings screen, in the README and in `readme.txt` — that said it could not
+  be switched on yet. The caveat that stays is the one that matters: a key in
+  the browser is public, and this is spam deterrence, not authentication.
+  Verified end to end in a real Chrome against the shipped bundle: the panel
+  signs, the route accepts, a tampered body is refused with `401 Bad
+  signature`, and so is a replay of the untouched bytes.
+- The mount still calls `window.bugbottle.mount()` rather than the library's
+  `mountBugbottle()`, and that now matters for a second reason. In 0.7.0 the
+  panel takes the annotator as a function you hand in, so an application that
+  never marks a picture does not ship a canvas editor; the script-tag build's
+  `mount()` is the wrapper that hands it in. Calling it is what keeps "Edit
+  picture" — rectangle, arrow, and a blur that reads the region back out of the
+  canvas so the original pixels leave with it — working with nothing added here.
+- The panel's Escape handling and its annotator fixes came with the bundle and
+  needed no change in the plugin.
 
 ## 0.3.0 — 2026-09-08
 

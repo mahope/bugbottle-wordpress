@@ -56,7 +56,9 @@ database, not in the plugin directory.
 | Evidence | Breadcrumbs (clicks, navigations, submits) and the network log (requests that failed or were slow — method, URL, status and duration, never a body or a header). Both on. |
 | Offline queue | Keeps a report the browser could not send and delivers it when the connection is back. Reports wait in the browser for up to seven days. On by default. |
 | Scrubbing | Redacts email addresses, bearer tokens, JWTs, card numbers, IBANs and query values before the report is sent. On by default. |
-| Signing key(s) | One key per line. With a key set, a report must arrive signed with one of them or it is refused. Empty by default. Read [Signing requests](#signing-requests) before you fill it in — a key that ships to the browser is public. |
+| Timings and storage snapshot | Records what the page cost — largest contentful paint, layout shift, interaction to next paint, time to first byte, the load events, long tasks, and the JS heap in Chrome — and lists the key names in `localStorage` and `sessionStorage` with the length of each value, plus the cookie names. **Names only, never values**, and never a cookie value at all. Off by default. |
+| Shake to report | Opens the panel when the phone is shaken: three shakes inside a second, then a three-second pause. Off by default. On iPhone and iPad it also needs the visitor's permission, which only Safari can ask for and only from a button they pressed — see [Shake to report](#shake-to-report). |
+| Signing key(s) | One key per line. With a key set, a report must arrive signed with one of them or it is refused, and the bundled panel signs what it sends. Empty by default. Read [Signing requests](#signing-requests) before you fill it in — a key that ships to the browser is public. |
 | Email recipient | Where reports are emailed, through `wp_mail` — so an SMTP plugin handles delivery. Empty means reports are only stored. |
 | Email on submit | Send the email as soon as a report arrives. |
 
@@ -124,12 +126,57 @@ the last cached page carrying it has expired, then delete the old one. The
 first line is the key the panel is given; every line is a key the route
 accepts.
 
-> **Not yet usable.** The bundled `assets/bugbottle.js` is bugbottle 0.6.0,
-> which does not sign. Signing arrives in bugbottle 0.7.0. Until this plugin
-> ships that bundle, filling the setting in will refuse every report the panel
-> sends — the setting is here so the server side is in place and tested first.
-> The mount script already passes the key through
-> `bugbottle/sign`'s `createSigner`, guarded on the function existing.
+The bundled panel signs what it sends: the mount script hands the first
+configured key to `createSigner` from `bugbottle/sign`, which is in the 0.7.0
+bundle this plugin ships. Filling the setting in is the whole of it. Anything
+else that posts to the route — your own form, a script, a mobile app — has to
+compute the same digest, or it will be refused along with the spam.
+
+## Timings and storage
+
+**Timings and storage snapshot** is off by default, and worth understanding
+before you turn it on.
+
+The timings are the ones a Web Vitals report shows — largest contentful paint,
+cumulative layout shift, interaction to next paint, time to first byte,
+`DOMContentLoaded`, load, the count and total duration of long tasks, and on
+Chromium the JavaScript heap. Two of them are simplifications, and the library
+documents them as such rather than hiding them: the layout shift is the sum of
+the shifts rather than the worst session window, and the interaction figure is
+the worst interaction rather than the 98th percentile.
+
+The storage snapshot is the part to read twice. It lists **the key names** in
+`localStorage` and `sessionStorage` with **the length of each value**, and
+**the names of the cookies**. It never records a value, and never a cookie
+value at all. That is still not nothing: a key called `impersonating_user` is
+a fact about the visit, and a length is a hint about a value. Turn it on when
+you are debugging state, read the report screen before you forward one, and
+leave it off the rest of the time.
+
+## Shake to report
+
+**Shake to report** is off by default. With it on, shaking the phone opens the
+panel — three shakes inside a second, with a three-second pause afterwards so
+one gesture opens one panel, and the listener comes off when the tab goes to
+the background.
+
+On iPhone and iPad, Safari reports no motion at all until the visitor has
+agreed to it, and it will only ask from a button the visitor pressed. **This
+plugin never puts that prompt up for you**: a permission dialog nobody asked
+for is worse than a missing feature. If you want the gesture on iOS, call it
+from a button of your own:
+
+```html
+<button type="button" id="enable-shake">Ryst for at rapportere</button>
+<script>
+document.getElementById( 'enable-shake' ).addEventListener( 'click', function () {
+	window.bugbottle.requestShakePermission();
+} );
+</script>
+```
+
+It resolves to `granted`, `denied` or `unsupported`; everywhere but iOS it is
+`unsupported` and the gesture already works.
 
 ## What a report carries
 
@@ -143,6 +190,13 @@ no source text is ever read or sent, so resolving one stays with whoever has
 the maps. The network log records requests that failed or were slow as method,
 URL, status and duration — never a body and never a header, in either
 direction, because that is where tokens and personal data live.
+
+Since 0.4.0, and only when **Timings and storage snapshot** is on, a report
+also carries `perf` — the timings above — and `storage`, the key names and
+value lengths described in [Timings and storage](#timings-and-storage). Both
+are capped on the way in: fifty keys per store, a hundred cookie names, a
+hundred characters per name, and an hour as the longest duration any figure
+may claim.
 
 None of that says more about the person than the user agent already does, and
 nothing beyond that list is collected: no canvas fingerprint, no font
@@ -188,7 +242,7 @@ yourself when you mean it.
 
 `assets/bugbottle.js` is the official one-script-tag build,
 `dist/bugbottle.js`, copied verbatim from the
-[bugbottle](https://github.com/mahope/bugbottle) package — **bugbottle 0.6.0**
+[bugbottle](https://github.com/mahope/bugbottle) package — **bugbottle 0.7.0**
 at the time of writing. It is not modified here and it is not built here.
 
 When bugbottle publishes a new release, updating the panel is two lines:
@@ -208,6 +262,13 @@ in the footer and follows it with a small inline script that calls
 in a header and a nonce does not belong in an attribute that a cached page
 would serve to the next visitor.
 
+`mount()` rather than the library's own `mountBugbottle()`: since 0.7.0 the
+panel takes the annotator as a function you hand in, so nobody pays for a
+canvas editor they never open, and `mount()` is the script-tag build's wrapper
+that hands it in. Calling it is what keeps "Edit picture" — the rectangle, the
+arrow and the blur that really destroys what it covers — working without the
+plugin needing to know anything about it.
+
 ## Development
 
 ```bash
@@ -217,15 +278,23 @@ wp i18n make-pot . languages/bugbottle.pot --domain=bugbottle --exclude=assets,v
 wp i18n make-mo languages/
 ```
 
-There are two test files, neither of which needs a framework:
+There are three test files, none of which needs a framework:
 
 ```bash
+php tests/test-report-parity.php      # the validators and the Markdown, against the library
 php tests/test-signature.php          # the signature rules, no WordPress needed
 wp eval-file tests/test-rest-signature.php   # the REST route, from a scratch install
 ```
 
-The second writes settings and stores reports, so point it at a scratch
-install and never at a live site. Both exit non-zero on a failure.
+The last writes settings and stores reports, so point it at a scratch install
+and never at a live site. All three exit non-zero on a failure.
+
+`tests/test-report-parity.php` is what pins the PHP port to the library: it
+holds one report carrying every section, and the Markdown and the validated
+JSON that the library's own `src/markdown.ts` and `src/report-core.ts` produce
+from it. When either side moves, regenerate the two expectations by running
+the fixture through the TypeScript with `node --experimental-strip-types` and
+diffing the output.
 
 `vendor/` is not committed and never ships in the zip. Tagging `vX.Y.Z` builds
 `bugbottle.zip` and attaches it to a GitHub release. See `SUBMIT.md` for how a

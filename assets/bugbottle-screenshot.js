@@ -3,7 +3,7 @@
  * plugin. Built by bin/build-screenshot-bundle.sh; do not edit by hand.
  *
  * Contains:
- *   bugbottle 0.9.0 (the bugbottle/html-to-image entry)
+ *   bugbottle 0.13.0 (the bugbottle/html-to-image entry)
  *     https://github.com/mahope/bugbottle — MIT, Mads Holst Jensen
  *   html-to-image 1.11.13
  *     https://github.com/bubkoo/html-to-image — MIT, W.Y.

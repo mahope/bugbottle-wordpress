@@ -42,7 +42,7 @@ const VERSION = '0.5.0';
  * same commit that replaces the file, so the enqueued URL busts caches when
  * the bundle changes and not when the plugin does.
  */
-const LIB_VERSION = '0.9.0';
+const LIB_VERSION = '0.13.0';
 
 define( 'BUGBOTTLE_FILE', __FILE__ );
 define( 'BUGBOTTLE_DIR', plugin_dir_path( __FILE__ ) );

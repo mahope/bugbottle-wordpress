@@ -2,14 +2,14 @@
 # This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Bugbottle 0.4.1\n"
+"Project-Id-Version: Bugbottle 0.5.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/bugbottle\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-08T01:44:53+00:00\n"
+"POT-Creation-Date: 2026-09-08T03:51:10+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: bugbottle\n"
@@ -43,17 +43,17 @@ msgstr ""
 #: includes/class-admin.php:31
 #: includes/class-admin.php:41
 #: includes/class-admin.php:79
-#: includes/class-storage.php:56
+#: includes/class-storage.php:57
 msgid "Bug reports"
 msgstr ""
 
 #: includes/class-admin.php:42
-#: includes/class-admin.php:127
+#: includes/class-admin.php:128
 msgid "All reports"
 msgstr ""
 
 #: includes/class-admin.php:50
-#: includes/class-settings.php:215
+#: includes/class-settings.php:241
 msgid "Bugbottle settings"
 msgstr ""
 
@@ -73,193 +73,201 @@ msgid "No email recipient is set, so reports are only stored here. %s"
 msgstr ""
 
 #: includes/class-admin.php:104
-#: includes/class-rest.php:260
+#: includes/class-rest.php:280
 msgid "No such report."
 msgstr ""
 
-#: includes/class-admin.php:139
+#: includes/class-admin.php:140
 msgid "Reopen"
 msgstr ""
 
-#: includes/class-admin.php:140
+#: includes/class-admin.php:141
 msgid "Mark as done"
 msgstr ""
 
-#: includes/class-admin.php:146
+#: includes/class-admin.php:147
+msgid "Contact"
+msgstr ""
+
+#: includes/class-admin.php:149
+msgid "How the reporter said they can be reached. They typed it themselves and nothing checked it, so it may be a phone number, a name in a chat, or a typo."
+msgstr ""
+
+#: includes/class-admin.php:161
 msgid "Screenshot"
 msgstr ""
 
-#: includes/class-admin.php:148
+#: includes/class-admin.php:163
 msgid "Served only to administrators, through the plugin route. It is not in the media library and has no public URL."
 msgstr ""
 
 #. translators: %s: the title of the report, which is its first line.
-#: includes/class-admin.php:154
+#: includes/class-admin.php:169
 #, php-format
 msgid "The page as the reporter saw it when they sent %s."
 msgstr ""
 
-#: includes/class-admin.php:167
+#: includes/class-admin.php:182
 msgid "Summary"
 msgstr ""
 
-#: includes/class-admin.php:169
+#: includes/class-admin.php:184
 msgid "Markdown, ready to paste into an issue."
 msgstr ""
 
-#: includes/class-admin.php:189
+#: includes/class-admin.php:204
 msgid "What happened before"
 msgstr ""
 
-#: includes/class-admin.php:193
+#: includes/class-admin.php:208
 msgid "Time"
 msgstr ""
 
-#: includes/class-admin.php:194
+#: includes/class-admin.php:209
 msgid "What"
 msgstr ""
 
-#: includes/class-admin.php:195
+#: includes/class-admin.php:210
 msgid "Where"
 msgstr ""
 
-#: includes/class-admin.php:220
+#: includes/class-admin.php:235
 msgid "Clicked"
 msgstr ""
 
-#: includes/class-admin.php:222
+#: includes/class-admin.php:237
 msgid "Submitted"
 msgstr ""
 
-#: includes/class-admin.php:224
+#: includes/class-admin.php:239
 msgid "Navigated"
 msgstr ""
 
-#: includes/class-admin.php:226
+#: includes/class-admin.php:241
 msgid "Page visibility"
 msgstr ""
 
-#: includes/class-admin.php:255
+#: includes/class-admin.php:270
 msgid "Requests"
 msgstr ""
 
-#: includes/class-admin.php:257
+#: includes/class-admin.php:272
 msgid "Requests that failed or were slow. Bodies and headers are never recorded, in either direction."
 msgstr ""
 
-#: includes/class-admin.php:262
+#: includes/class-admin.php:277
 msgid "Method"
 msgstr ""
 
-#: includes/class-admin.php:263
+#: includes/class-admin.php:278
 msgid "URL"
 msgstr ""
 
-#: includes/class-admin.php:264
+#: includes/class-admin.php:279
 #: includes/class-reports-list-table.php:51
 msgid "Status"
 msgstr ""
 
-#: includes/class-admin.php:265
+#: includes/class-admin.php:280
 msgid "ms"
 msgstr ""
 
-#: includes/class-admin.php:279
+#: includes/class-admin.php:294
 msgid "Failed"
 msgstr ""
 
-#: includes/class-admin.php:305
+#: includes/class-admin.php:320
 msgid "Largest contentful paint"
 msgstr ""
 
-#: includes/class-admin.php:308
+#: includes/class-admin.php:323
 msgid "Cumulative layout shift"
 msgstr ""
 
-#: includes/class-admin.php:311
+#: includes/class-admin.php:326
 msgid "Interaction to next paint"
 msgstr ""
 
-#: includes/class-admin.php:314
+#: includes/class-admin.php:329
 msgid "Time to first byte"
 msgstr ""
 
-#: includes/class-admin.php:317
+#: includes/class-admin.php:332
 msgid "DOM content loaded"
 msgstr ""
 
-#: includes/class-admin.php:320
+#: includes/class-admin.php:335
 msgid "Load"
 msgstr ""
 
-#: includes/class-admin.php:324
+#: includes/class-admin.php:339
 msgid "Long tasks"
 msgstr ""
 
 #. translators: 1: number of long tasks, 2: their total duration in milliseconds
-#: includes/class-admin.php:327
+#: includes/class-admin.php:342
 #, php-format
 msgid "%1$d (%2$d ms total)"
 msgstr ""
 
-#: includes/class-admin.php:335
+#: includes/class-admin.php:350
 msgid "JS heap"
 msgstr ""
 
 #. translators: 1: megabytes of JS heap used, 2: the heap limit in megabytes
-#: includes/class-admin.php:338
+#: includes/class-admin.php:353
 #, php-format
 msgid "%1$d MB of %2$d MB"
 msgstr ""
 
-#: includes/class-admin.php:348
+#: includes/class-admin.php:363
 msgid "Performance"
 msgstr ""
 
-#: includes/class-admin.php:350
+#: includes/class-admin.php:365
 msgid "What the page cost on the visit the report came from. Two of these are simplifications: the layout shift is the sum of the shifts, and the interaction figure is the worst one rather than a percentile."
 msgstr ""
 
-#: includes/class-admin.php:390
+#: includes/class-admin.php:405
 msgid "Cookies"
 msgstr ""
 
-#: includes/class-admin.php:401
+#: includes/class-admin.php:416
 msgid "Storage"
 msgstr ""
 
-#: includes/class-admin.php:403
+#: includes/class-admin.php:418
 msgid "Key names and how long their values were, and the names of the cookies. Never a value, and never a cookie value at all — unless the site allow-listed a key, in which case its value is below because somebody asked for it."
 msgstr ""
 
-#: includes/class-admin.php:423
+#: includes/class-admin.php:438
 msgid "You do not have permission to change a report."
 msgstr ""
 
-#: includes/class-admin.php:449
+#: includes/class-admin.php:464
 msgid "Bug"
 msgstr ""
 
-#: includes/class-admin.php:451
+#: includes/class-admin.php:466
 msgid "Idea"
 msgstr ""
 
-#: includes/class-admin.php:453
+#: includes/class-admin.php:468
 msgid "Feedback"
 msgstr ""
 
 #. translators: 1: site name, 2: report title
-#: includes/class-email.php:64
+#: includes/class-email.php:77
 #, php-format
 msgid "[%1$s] %2$s"
 msgstr ""
 
-#: includes/class-email.php:77
+#: includes/class-email.php:100
 msgid "Not logged in"
 msgstr ""
 
 #. translators: %d: user id
-#: includes/class-email.php:82
+#: includes/class-email.php:105
 #, php-format
 msgid "User %d"
 msgstr ""
@@ -302,283 +310,319 @@ msgstr ""
 msgid "No reports yet."
 msgstr ""
 
-#: includes/class-rest.php:96
+#: includes/class-rest.php:104
 msgid "You must be logged in to send a report."
 msgstr ""
 
-#: includes/class-rest.php:103
+#: includes/class-rest.php:111
 msgid "Too many reports from this address. Try again later."
 msgstr ""
 
-#: includes/class-rest.php:154
+#: includes/class-rest.php:162
 msgid "Unknown report type."
 msgstr ""
 
-#: includes/class-rest.php:162
+#: includes/class-rest.php:170
 msgid "A report needs a message."
 msgstr ""
 
-#: includes/class-rest.php:197
+#: includes/class-rest.php:212
 msgid "The report could not be stored."
 msgstr ""
 
-#: includes/class-rest.php:264
+#: includes/class-rest.php:284
 msgid "That report has no screenshot."
 msgstr ""
 
-#: includes/class-settings.php:210
+#: includes/class-settings.php:236
 msgid "You do not have permission to change these settings."
 msgstr ""
 
-#: includes/class-settings.php:220
+#: includes/class-settings.php:246
 msgid "Panel"
 msgstr ""
 
-#: includes/class-settings.php:224
+#: includes/class-settings.php:250
 msgid "Show the report panel on the front end"
 msgstr ""
 
-#: includes/class-settings.php:228
+#: includes/class-settings.php:254
 msgid "Only for logged-in users"
 msgstr ""
 
-#: includes/class-settings.php:232
+#: includes/class-settings.php:258
 msgid "Accept reports from visitors who are not logged in (rate-limited to 10 per hour per IP address)"
 msgstr ""
 
-#: includes/class-settings.php:237
+#: includes/class-settings.php:263
 msgid "Language"
 msgstr ""
 
-#: includes/class-settings.php:246
+#: includes/class-settings.php:272
 msgid "The language the panel speaks. Auto follows the site language."
 msgstr ""
 
-#: includes/class-settings.php:250
+#: includes/class-settings.php:276
 msgid "Primary colour"
 msgstr ""
 
-#: includes/class-settings.php:254
+#: includes/class-settings.php:280
 msgid "Position"
 msgstr ""
 
-#: includes/class-settings.php:266
+#: includes/class-settings.php:292
 msgid "Brand name"
 msgstr ""
 
-#: includes/class-settings.php:270
+#: includes/class-settings.php:296
 msgid "Logo URL"
 msgstr ""
 
-#: includes/class-settings.php:274
+#: includes/class-settings.php:300
 msgid "Trigger selector"
 msgstr ""
 
-#: includes/class-settings.php:277
+#: includes/class-settings.php:303
 msgid "A CSS selector for your own button. Leave empty for the floating button."
 msgstr ""
 
-#: includes/class-settings.php:281
+#: includes/class-settings.php:307
 msgid "Keyboard shortcut"
 msgstr ""
 
-#: includes/class-settings.php:284
+#: includes/class-settings.php:310
 msgid "Opens the panel from the keyboard. \"mod\" is Command on a Mac and Ctrl everywhere else. Leave empty for no shortcut."
 msgstr ""
 
-#: includes/class-settings.php:288
+#: includes/class-settings.php:314
 msgid "Open on error"
 msgstr ""
 
-#: includes/class-settings.php:292
+#: includes/class-settings.php:318
 msgid "Open the panel by itself when the page throws an uncaught error"
 msgstr ""
 
-#: includes/class-settings.php:294
+#: includes/class-settings.php:320
 msgid "Off by default: it shows the panel to whoever happens to be on the page, including customers."
 msgstr ""
 
-#: includes/class-settings.php:298
+#: includes/class-settings.php:324
+msgid "Contact field"
+msgstr ""
+
+#: includes/class-settings.php:327
+msgid "Ask the reporter how to reach them"
+msgstr ""
+
+#: includes/class-settings.php:335
+msgid "Off by default. It adds one field under the message asking how the reporter can be reached, because \"the save button does nothing\" is worth a reply. Nothing checks what they type: a phone number or a name in your own chat is a good answer, and required only means the panel will not send an empty field."
+msgstr ""
+
+#: includes/class-settings.php:336
+msgid "The contact field is personal data you asked for."
+msgstr ""
+
+#: includes/class-settings.php:336
+msgid "Store it like one: it is kept where the rest of the report is kept, it goes when you delete the report, and it is shown to everyone who can read reports. Asking for an address is also a promise to answer, and that promise is yours to make."
+msgstr ""
+
+#: includes/class-settings.php:337
+msgid "When the line looks like an email address, the notification email is sent with it as Reply-To, so replying answers the reporter."
+msgstr ""
+
+#: includes/class-settings.php:341
 msgid "Evidence"
 msgstr ""
 
-#: includes/class-settings.php:302
+#: includes/class-settings.php:345
 msgid "Breadcrumbs: record clicks, navigations and form submits before the report"
 msgstr ""
 
-#: includes/class-settings.php:306
+#: includes/class-settings.php:349
 msgid "Network log: record requests that failed or were slow. Never their bodies or headers"
 msgstr ""
 
-#: includes/class-settings.php:311
+#: includes/class-settings.php:354
 msgid "Screenshots"
 msgstr ""
 
-#: includes/class-settings.php:315
+#: includes/class-settings.php:358
 msgid "Let the reporter attach a picture of the page"
 msgstr ""
 
-#: includes/class-settings.php:317
+#: includes/class-settings.php:360
 msgid "Off by default. Taking a picture needs a renderer, and a renderer is a second script of about 15 kB (6 kB over the wire) on every page the panel is on, so it is only loaded when this box is ticked. Until version 0.4.1 the plugin shipped no renderer at all and the panel never offered a picture."
 msgstr ""
 
-#: includes/class-settings.php:318
+#: includes/class-settings.php:361
 msgid "A picture of the page contains whatever was on the page."
 msgstr ""
 
-#: includes/class-settings.php:318
+#: includes/class-settings.php:361
 msgid "The name of another customer, a price, an order, a message that was open in a tab beside the bug. Reports are a private post type and the picture is served only to people who can read them, through a plugin route of its own rather than the media library — but everyone who can read a report sees it, and forwarding one forwards the picture. Ask for screenshots only if you would be comfortable reading them."
 msgstr ""
 
 #. translators: 1: the data-bugbottle-mask attribute, wrapped in <code>; 2: the data-bugbottle-block attribute, wrapped in <code>
-#: includes/class-settings.php:323
+#: includes/class-settings.php:366
 #, php-format
 msgid "What is typed into a field is replaced with bullets before the picture is taken. Mark anything else you do not want in it with %1$s to bullet its text, or %2$s to cover it entirely."
 msgstr ""
 
-#: includes/class-settings.php:329
+#: includes/class-settings.php:372
 msgid "The reporter sees the picture before it is sent, can untick it, and can mark it first: a rectangle, an arrow, and a blur that reads the region back out of the canvas so the original pixels leave with it."
 msgstr ""
 
-#: includes/class-settings.php:333
+#: includes/class-settings.php:376
 msgid "Offline queue"
 msgstr ""
 
-#: includes/class-settings.php:337
+#: includes/class-settings.php:380
 msgid "Keep a report the browser could not send and deliver it when the connection is back"
 msgstr ""
 
-#: includes/class-settings.php:339
+#: includes/class-settings.php:382
 msgid "Reports wait in the browser, for up to seven days."
 msgstr ""
 
-#: includes/class-settings.php:343
+#: includes/class-settings.php:386
 msgid "Timings and storage snapshot"
 msgstr ""
 
-#: includes/class-settings.php:347
+#: includes/class-settings.php:390
 msgid "Record how the page performed, and which keys the browser had stored"
 msgstr ""
 
-#: includes/class-settings.php:349
+#: includes/class-settings.php:392
 msgid "Off by default. The timings are the ones a web vitals report shows: largest contentful paint, layout shift, interaction to next paint, time to first byte, the load events, long tasks and — in Chrome — the JavaScript heap."
 msgstr ""
 
-#: includes/class-settings.php:350
+#: includes/class-settings.php:393
 msgid "The storage snapshot lists the key names in localStorage and sessionStorage with the length of each value, and the names of the cookies. It never records a value, and never a cookie value at all. A key name can still say something — \"impersonating_user\" is a fact about the visit — so read the report screen before you forward one."
 msgstr ""
 
-#: includes/class-settings.php:354
+#: includes/class-settings.php:397
 msgid "Shake to report"
 msgstr ""
 
-#: includes/class-settings.php:358
+#: includes/class-settings.php:401
 msgid "Open the panel when the phone is shaken"
 msgstr ""
 
-#: includes/class-settings.php:360
+#: includes/class-settings.php:403
 msgid "Off by default. It is the gesture a phone has instead of a keyboard shortcut: three shakes inside a second, with a three-second pause afterwards so one gesture opens one panel."
 msgstr ""
 
 #. translators: %s: the JavaScript call a theme has to make, already wrapped in <code>
-#: includes/class-settings.php:365
+#: includes/class-settings.php:408
 #, php-format
 msgid "On iPhone and iPad, Safari only reports motion after the visitor has agreed to it, and it will only ask from a button the visitor pressed. This plugin never puts up that prompt for you. If you want the gesture there, call %s from a button of your own; everywhere else it works as soon as you tick this box."
 msgstr ""
 
-#: includes/class-settings.php:373
+#: includes/class-settings.php:416
 msgid "Scrubbing"
 msgstr ""
 
-#: includes/class-settings.php:377
+#: includes/class-settings.php:420
 msgid "Redact email addresses, tokens, card numbers and query values before the report is sent"
 msgstr ""
 
-#: includes/class-settings.php:382
+#: includes/class-settings.php:425
 msgid "Signing key(s)"
 msgstr ""
 
-#: includes/class-settings.php:385
+#: includes/class-settings.php:428
 msgid "One key per line. A report must then arrive signed with any one of them, and a report signed with a key that is not here is refused. Several lines is how a key is rotated: add the new one, wait for cached pages carrying the old one to expire, then delete the old one. Empty means no signature is asked for."
 msgstr ""
 
-#: includes/class-settings.php:386
+#: includes/class-settings.php:429
 msgid "A key that is sent to the browser is public."
 msgstr ""
 
-#: includes/class-settings.php:386
+#: includes/class-settings.php:429
 msgid "It is in the page source, so anyone who wants it has it. Signing raises the cost of sending junk to the endpoint from a script that has not read your page — it is spam deterrence beside the rate limit, and it is not authentication. Do not treat it as securing the endpoint."
 msgstr ""
 
-#: includes/class-settings.php:387
+#: includes/class-settings.php:430
 msgid "The bundled panel signs what it sends, so filling this in is all there is to it. A report sent by anything else — your own form, a script — has to sign the same way."
 msgstr ""
 
-#: includes/class-settings.php:391
+#: includes/class-settings.php:434
 msgid "Email recipient"
 msgstr ""
 
-#: includes/class-settings.php:394
+#: includes/class-settings.php:437
 msgid "Leave empty to only store reports in wp-admin."
 msgstr ""
 
-#: includes/class-settings.php:398
+#: includes/class-settings.php:441
 msgid "Email on submit"
 msgstr ""
 
-#: includes/class-settings.php:402
+#: includes/class-settings.php:445
 msgid "Send the email as soon as a report arrives"
 msgstr ""
 
-#: includes/class-settings.php:415
+#: includes/class-settings.php:458
 msgid "Auto (site language)"
 msgstr ""
 
-#: includes/class-settings.php:416
+#: includes/class-settings.php:459
 msgid "Danish"
 msgstr ""
 
-#: includes/class-settings.php:417
+#: includes/class-settings.php:460
 msgid "English"
 msgstr ""
 
-#: includes/class-settings.php:418
+#: includes/class-settings.php:461
 msgid "Swedish"
 msgstr ""
 
-#: includes/class-settings.php:419
+#: includes/class-settings.php:462
 msgid "Norwegian"
 msgstr ""
 
-#: includes/class-settings.php:420
+#: includes/class-settings.php:463
 msgid "German"
 msgstr ""
 
-#: includes/class-settings.php:421
+#: includes/class-settings.php:464
 msgid "Dutch"
 msgstr ""
 
-#: includes/class-settings.php:422
+#: includes/class-settings.php:465
 msgid "French"
 msgstr ""
 
-#: includes/class-settings.php:423
+#: includes/class-settings.php:466
 msgid "Spanish"
 msgstr ""
 
-#: includes/class-settings.php:430
+#: includes/class-settings.php:473
+msgid "Do not ask"
+msgstr ""
+
+#: includes/class-settings.php:474
+msgid "Ask, but let them send without it"
+msgstr ""
+
+#: includes/class-settings.php:475
+msgid "Ask, and refuse to send without it"
+msgstr ""
+
+#: includes/class-settings.php:482
 msgid "Bottom right"
 msgstr ""
 
-#: includes/class-settings.php:431
+#: includes/class-settings.php:483
 msgid "Bottom left"
 msgstr ""
 
-#: includes/class-settings.php:432
+#: includes/class-settings.php:484
 msgid "Top right"
 msgstr ""
 
-#: includes/class-settings.php:433
+#: includes/class-settings.php:485
 msgid "Top left"
 msgstr ""
 
@@ -586,6 +630,6 @@ msgstr ""
 msgid "Bad signature."
 msgstr ""
 
-#: includes/class-storage.php:57
+#: includes/class-storage.php:58
 msgid "Bug report"
 msgstr ""

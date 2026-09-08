@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Bugbottle 0.4.0\n"
+"Project-Id-Version: Bugbottle 0.4.1\n"
 "Report-Msgid-Bugs-To: https://github.com/mahope/bugbottle-wordpress/issues\n"
 "Last-Translator: Mads Holst Jensen\n"
 "Language-Team: Danish\n"
@@ -36,7 +36,7 @@ msgid "All reports"
 msgstr "Alle rapporter"
 
 #: includes/class-admin.php:50
-#: includes/class-settings.php:213
+#: includes/class-settings.php:215
 msgid "Bugbottle settings"
 msgstr "Bugbottle-indstillinger"
 
@@ -76,27 +76,27 @@ msgstr "Skærmbillede"
 msgid "Served only to administrators, through the plugin route. It is not in the media library and has no public URL."
 msgstr "Vises kun for administratorer, gennem pluginnets egen rute. Billedet ligger ikke i mediebiblioteket og har ingen offentlig adresse."
 
-#: includes/class-admin.php:163
+#: includes/class-admin.php:167
 msgid "Summary"
 msgstr "Opsummering"
 
-#: includes/class-admin.php:165
+#: includes/class-admin.php:169
 msgid "Markdown, ready to paste into an issue."
 msgstr "Markdown, klar til at sætte ind i et issue."
 
-#: includes/class-admin.php:420
+#: includes/class-admin.php:423
 msgid "You do not have permission to change a report."
 msgstr "Du har ikke adgang til at ændre en rapport."
 
-#: includes/class-admin.php:446
+#: includes/class-admin.php:449
 msgid "Bug"
 msgstr "Fejl"
 
-#: includes/class-admin.php:448
+#: includes/class-admin.php:451
 msgid "Idea"
 msgstr "Idé"
 
-#: includes/class-admin.php:450
+#: includes/class-admin.php:453
 msgid "Feedback"
 msgstr "Andet"
 
@@ -130,7 +130,7 @@ msgstr "Afsender"
 msgid "Date"
 msgstr "Dato"
 
-#: includes/class-admin.php:260
+#: includes/class-admin.php:264
 #: includes/class-reports-list-table.php:51
 msgid "Status"
 msgstr "Status"
@@ -177,247 +177,247 @@ msgstr "Rapporten kunne ikke gemmes."
 msgid "That report has no screenshot."
 msgstr "Rapporten har intet skærmbillede."
 
-#: includes/class-settings.php:208
+#: includes/class-settings.php:210
 msgid "You do not have permission to change these settings."
 msgstr "Du har ikke adgang til at ændre disse indstillinger."
 
-#: includes/class-settings.php:218
+#: includes/class-settings.php:220
 msgid "Panel"
 msgstr "Panel"
 
-#: includes/class-settings.php:222
+#: includes/class-settings.php:224
 msgid "Show the report panel on the front end"
 msgstr "Vis rapportpanelet på hjemmesiden"
 
-#: includes/class-settings.php:226
+#: includes/class-settings.php:228
 msgid "Only for logged-in users"
 msgstr "Kun for brugere der er logget ind"
 
-#: includes/class-settings.php:230
+#: includes/class-settings.php:232
 msgid "Accept reports from visitors who are not logged in (rate-limited to 10 per hour per IP address)"
 msgstr "Tag imod rapporter fra besøgende der ikke er logget ind (højst 10 i timen pr. IP-adresse)"
 
-#: includes/class-settings.php:235
+#: includes/class-settings.php:237
 msgid "Language"
 msgstr "Sprog"
 
-#: includes/class-settings.php:244
+#: includes/class-settings.php:246
 msgid "The language the panel speaks. Auto follows the site language."
 msgstr "Det sprog panelet taler. Auto følger sidens sprog."
 
-#: includes/class-settings.php:248
+#: includes/class-settings.php:250
 msgid "Primary colour"
 msgstr "Primærfarve"
 
-#: includes/class-settings.php:252
+#: includes/class-settings.php:254
 msgid "Position"
 msgstr "Placering"
 
-#: includes/class-settings.php:264
+#: includes/class-settings.php:266
 msgid "Brand name"
 msgstr "Firmanavn"
 
-#: includes/class-settings.php:268
+#: includes/class-settings.php:270
 msgid "Logo URL"
 msgstr "Adresse på logo"
 
-#: includes/class-settings.php:272
+#: includes/class-settings.php:274
 msgid "Trigger selector"
 msgstr "Selector til din egen knap"
 
-#: includes/class-settings.php:275
+#: includes/class-settings.php:277
 msgid "A CSS selector for your own button. Leave empty for the floating button."
 msgstr "En CSS-selector til din egen knap. Lad feltet stå tomt for at bruge den svævende knap."
 
-#: includes/class-settings.php:349
+#: includes/class-settings.php:373
 msgid "Scrubbing"
 msgstr "Rensning"
 
-#: includes/class-settings.php:353
+#: includes/class-settings.php:377
 msgid "Redact email addresses, tokens, card numbers and query values before the report is sent"
 msgstr "Sløre e-mailadresser, tokens, kortnumre og værdier i adresselinjen før rapporten sendes"
 
-#: includes/class-settings.php:367
+#: includes/class-settings.php:391
 msgid "Email recipient"
 msgstr "Modtager af e-mail"
 
-#: includes/class-settings.php:370
+#: includes/class-settings.php:394
 msgid "Leave empty to only store reports in wp-admin."
 msgstr "Lad feltet stå tomt for kun at gemme rapporter i wp-admin."
 
-#: includes/class-settings.php:374
+#: includes/class-settings.php:398
 msgid "Email on submit"
 msgstr "Send e-mail med det samme"
 
-#: includes/class-settings.php:378
+#: includes/class-settings.php:402
 msgid "Send the email as soon as a report arrives"
 msgstr "Send e-mailen så snart en rapport kommer ind"
 
-#: includes/class-settings.php:391
+#: includes/class-settings.php:415
 msgid "Auto (site language)"
 msgstr "Auto (sidens sprog)"
 
-#: includes/class-settings.php:392
+#: includes/class-settings.php:416
 msgid "Danish"
 msgstr "Dansk"
 
-#: includes/class-settings.php:393
+#: includes/class-settings.php:417
 msgid "English"
 msgstr "Engelsk"
 
-#: includes/class-settings.php:394
+#: includes/class-settings.php:418
 msgid "Swedish"
 msgstr "Svensk"
 
-#: includes/class-settings.php:395
+#: includes/class-settings.php:419
 msgid "Norwegian"
 msgstr "Norsk"
 
-#: includes/class-settings.php:396
+#: includes/class-settings.php:420
 msgid "German"
 msgstr "Tysk"
 
-#: includes/class-settings.php:397
+#: includes/class-settings.php:421
 msgid "Dutch"
 msgstr "Hollandsk"
 
-#: includes/class-settings.php:398
+#: includes/class-settings.php:422
 msgid "French"
 msgstr "Fransk"
 
-#: includes/class-settings.php:399
+#: includes/class-settings.php:423
 msgid "Spanish"
 msgstr "Spansk"
 
-#: includes/class-settings.php:406
+#: includes/class-settings.php:430
 msgid "Bottom right"
 msgstr "Nederst til højre"
 
-#: includes/class-settings.php:407
+#: includes/class-settings.php:431
 msgid "Bottom left"
 msgstr "Nederst til venstre"
 
-#: includes/class-settings.php:408
+#: includes/class-settings.php:432
 msgid "Top right"
 msgstr "Øverst til højre"
 
-#: includes/class-settings.php:409
+#: includes/class-settings.php:433
 msgid "Top left"
 msgstr "Øverst til venstre"
 
-#: includes/class-admin.php:185
+#: includes/class-admin.php:189
 msgid "What happened before"
 msgstr "Hvad skete der forinden"
 
-#: includes/class-admin.php:189
+#: includes/class-admin.php:193
 msgid "Time"
 msgstr "Tidspunkt"
 
-#: includes/class-admin.php:190
+#: includes/class-admin.php:194
 msgid "What"
 msgstr "Hvad"
 
-#: includes/class-admin.php:191
+#: includes/class-admin.php:195
 msgid "Where"
 msgstr "Hvor"
 
-#: includes/class-admin.php:216
+#: includes/class-admin.php:220
 msgid "Clicked"
 msgstr "Klikkede"
 
-#: includes/class-admin.php:218
+#: includes/class-admin.php:222
 msgid "Submitted"
 msgstr "Indsendte"
 
-#: includes/class-admin.php:220
+#: includes/class-admin.php:224
 msgid "Navigated"
 msgstr "Navigerede"
 
-#: includes/class-admin.php:222
+#: includes/class-admin.php:226
 msgid "Page visibility"
 msgstr "Sidens synlighed"
 
-#: includes/class-admin.php:251
+#: includes/class-admin.php:255
 msgid "Requests"
 msgstr "Forespørgsler"
 
-#: includes/class-admin.php:253
+#: includes/class-admin.php:257
 msgid "Requests that failed or were slow. Bodies and headers are never recorded, in either direction."
 msgstr "Forespørgsler der fejlede eller var langsomme. Hverken indhold eller headere gemmes, i nogen af retningerne."
 
-#: includes/class-admin.php:258
+#: includes/class-admin.php:262
 msgid "Method"
 msgstr "Metode"
 
-#: includes/class-admin.php:259
+#: includes/class-admin.php:263
 msgid "URL"
 msgstr "URL"
 
-#: includes/class-admin.php:261
+#: includes/class-admin.php:265
 msgid "ms"
 msgstr "ms"
 
-#: includes/class-admin.php:275
+#: includes/class-admin.php:279
 msgid "Failed"
 msgstr "Fejlede"
 
-#: includes/class-settings.php:279
+#: includes/class-settings.php:281
 msgid "Keyboard shortcut"
 msgstr "Tastaturgenvej"
 
-#: includes/class-settings.php:282
+#: includes/class-settings.php:284
 msgid "Opens the panel from the keyboard. \"mod\" is Command on a Mac and Ctrl everywhere else. Leave empty for no shortcut."
 msgstr "Åbner panelet fra tastaturet. \"mod\" er Command på en Mac og Ctrl alle andre steder. Lad feltet stå tomt for ingen genvej."
 
-#: includes/class-settings.php:286
+#: includes/class-settings.php:288
 msgid "Open on error"
 msgstr "Åbn ved fejl"
 
-#: includes/class-settings.php:290
+#: includes/class-settings.php:292
 msgid "Open the panel by itself when the page throws an uncaught error"
 msgstr "Åbn panelet af sig selv, når siden kaster en ufanget fejl"
 
-#: includes/class-settings.php:292
+#: includes/class-settings.php:294
 msgid "Off by default: it shows the panel to whoever happens to be on the page, including customers."
 msgstr "Slået fra som standard: det viser panelet til enhver, der tilfældigvis er på siden, kunder inklusive."
 
-#: includes/class-settings.php:296
+#: includes/class-settings.php:298
 msgid "Evidence"
 msgstr "Beviser"
 
-#: includes/class-settings.php:300
+#: includes/class-settings.php:302
 msgid "Breadcrumbs: record clicks, navigations and form submits before the report"
 msgstr "Brødkrummer: registrér klik, navigationer og formularindsendelser før rapporten"
 
-#: includes/class-settings.php:304
+#: includes/class-settings.php:306
 msgid "Network log: record requests that failed or were slow. Never their bodies or headers"
 msgstr "Netværkslog: registrér forespørgsler der fejlede eller var langsomme. Aldrig deres indhold eller headere"
 
-#: includes/class-settings.php:309
+#: includes/class-settings.php:333
 msgid "Offline queue"
 msgstr "Offline-kø"
 
-#: includes/class-settings.php:313
+#: includes/class-settings.php:337
 msgid "Keep a report the browser could not send and deliver it when the connection is back"
 msgstr "Gem en rapport, som browseren ikke kunne sende, og aflevér den når forbindelsen er tilbage"
 
-#: includes/class-settings.php:315
+#: includes/class-settings.php:339
 msgid "Reports wait in the browser, for up to seven days."
 msgstr "Rapporter venter i browseren i op til syv dage."
 
-#: includes/class-settings.php:358
+#: includes/class-settings.php:382
 msgid "Signing key(s)"
 msgstr "Signeringsnøgle(r)"
 
-#: includes/class-settings.php:361
+#: includes/class-settings.php:385
 msgid "One key per line. A report must then arrive signed with any one of them, and a report signed with a key that is not here is refused. Several lines is how a key is rotated: add the new one, wait for cached pages carrying the old one to expire, then delete the old one. Empty means no signature is asked for."
 msgstr "Én nøgle pr. linje. En rapport skal så ankomme signeret med en af dem, og en rapport signeret med en nøgle, der ikke står her, bliver afvist. Flere linjer er måden, en nøgle udskiftes på: tilføj den nye, vent på at cachede sider med den gamle udløber, og slet så den gamle. Tom betyder, at der ikke bliver bedt om en signatur."
 
-#: includes/class-settings.php:362
+#: includes/class-settings.php:386
 msgid "A key that is sent to the browser is public."
 msgstr "En nøgle, der sendes til browseren, er offentlig."
 
-#: includes/class-settings.php:362
+#: includes/class-settings.php:386
 msgid "It is in the page source, so anyone who wants it has it. Signing raises the cost of sending junk to the endpoint from a script that has not read your page — it is spam deterrence beside the rate limit, and it is not authentication. Do not treat it as securing the endpoint."
 msgstr "Den står i sidens kildekode, så enhver, der vil have den, har den. Signering gør det dyrere at sende skrald til endpointet fra et script, der ikke har læst din side — det er spamafskrækkelse ved siden af hastighedsgrænsen, og det er ikke autentificering. Behandl det ikke som noget, der sikrer endpointet."
 
@@ -445,67 +445,67 @@ msgstr ""
 msgid "https://mahoje.dk"
 msgstr ""
 
-#: includes/class-admin.php:302
+#: includes/class-admin.php:305
 msgid "Largest contentful paint"
 msgstr "Største indholdsvisning"
 
-#: includes/class-admin.php:305
+#: includes/class-admin.php:308
 msgid "Cumulative layout shift"
 msgstr "Samlet layoutforskydning"
 
-#: includes/class-admin.php:308
+#: includes/class-admin.php:311
 msgid "Interaction to next paint"
 msgstr "Interaktion til næste optegning"
 
-#: includes/class-admin.php:311
+#: includes/class-admin.php:314
 msgid "Time to first byte"
 msgstr "Tid til første byte"
 
-#: includes/class-admin.php:314
+#: includes/class-admin.php:317
 msgid "DOM content loaded"
 msgstr "DOM-indhold indlæst"
 
-#: includes/class-admin.php:317
+#: includes/class-admin.php:320
 msgid "Load"
 msgstr "Indlæsning"
 
-#: includes/class-admin.php:321
+#: includes/class-admin.php:324
 msgid "Long tasks"
 msgstr "Lange opgaver"
 
 #. translators: 1: number of long tasks, 2: their total duration in milliseconds
-#: includes/class-admin.php:324
+#: includes/class-admin.php:327
 #, php-format
 msgid "%1$d (%2$d ms total)"
 msgstr "%1$d (%2$d ms i alt)"
 
-#: includes/class-admin.php:332
+#: includes/class-admin.php:335
 msgid "JS heap"
 msgstr "JS-heap"
 
 #. translators: 1: megabytes of JS heap used, 2: the heap limit in megabytes
-#: includes/class-admin.php:335
+#: includes/class-admin.php:338
 #, php-format
 msgid "%1$d MB of %2$d MB"
 msgstr "%1$d MB af %2$d MB"
 
-#: includes/class-admin.php:345
+#: includes/class-admin.php:348
 msgid "Performance"
 msgstr "Ydelse"
 
-#: includes/class-admin.php:347
+#: includes/class-admin.php:350
 msgid "What the page cost on the visit the report came from. Two of these are simplifications: the layout shift is the sum of the shifts, and the interaction figure is the worst one rather than a percentile."
 msgstr "Hvad siden kostede på det besøg, rapporten kom fra. To af tallene er forenklinger: layoutforskydningen er summen af forskydningerne, og interaktionstallet er det værste frem for en percentil."
 
-#: includes/class-admin.php:387
+#: includes/class-admin.php:390
 msgid "Cookies"
 msgstr "Cookies"
 
-#: includes/class-admin.php:398
+#: includes/class-admin.php:401
 msgid "Storage"
 msgstr "Lager"
 
-#: includes/class-admin.php:400
+#: includes/class-admin.php:403
 msgid "Key names and how long their values were, and the names of the cookies. Never a value, and never a cookie value at all — unless the site allow-listed a key, in which case its value is below because somebody asked for it."
 msgstr "Nøglenavne og hvor lange deres værdier var, samt navnene på cookies. Aldrig en værdi, og aldrig en cookieværdi overhovedet — medmindre sitet har tilladt en nøgle, og så står værdien nedenfor, fordi nogen har bedt om den."
 
@@ -515,40 +515,76 @@ msgstr "Nøglenavne og hvor lange deres værdier var, samt navnene på cookies. 
 msgid "[%1$s] %2$s"
 msgstr ""
 
-#: includes/class-settings.php:319
+#: includes/class-settings.php:343
 msgid "Timings and storage snapshot"
 msgstr "Tider og øjebliksbillede af lageret"
 
-#: includes/class-settings.php:323
+#: includes/class-settings.php:347
 msgid "Record how the page performed, and which keys the browser had stored"
 msgstr "Registrér hvordan siden præsterede, og hvilke nøgler browseren havde gemt"
 
-#: includes/class-settings.php:325
+#: includes/class-settings.php:349
 msgid "Off by default. The timings are the ones a web vitals report shows: largest contentful paint, layout shift, interaction to next paint, time to first byte, the load events, long tasks and — in Chrome — the JavaScript heap."
 msgstr "Slået fra som standard. Tiderne er dem, en web vitals-rapport viser: største indholdsvisning, layoutforskydning, interaktion til næste optegning, tid til første byte, indlæsningshændelserne, lange opgaver og — i Chrome — JavaScript-heapen."
 
-#: includes/class-settings.php:326
+#: includes/class-settings.php:350
 msgid "The storage snapshot lists the key names in localStorage and sessionStorage with the length of each value, and the names of the cookies. It never records a value, and never a cookie value at all. A key name can still say something — \"impersonating_user\" is a fact about the visit — so read the report screen before you forward one."
 msgstr "Øjebliksbilledet af lageret viser nøglenavnene i localStorage og sessionStorage med længden af hver værdi, samt navnene på cookies. Det registrerer aldrig en værdi, og aldrig en cookieværdi overhovedet. Et nøglenavn kan stadig sige noget — \"impersonating_user\" er en oplysning om besøget — så læs rapportskærmen, før du sender en videre."
 
-#: includes/class-settings.php:330
+#: includes/class-settings.php:354
 msgid "Shake to report"
 msgstr "Ryst for at rapportere"
 
-#: includes/class-settings.php:334
+#: includes/class-settings.php:358
 msgid "Open the panel when the phone is shaken"
 msgstr "Åbn panelet når telefonen rystes"
 
-#: includes/class-settings.php:336
+#: includes/class-settings.php:360
 msgid "Off by default. It is the gesture a phone has instead of a keyboard shortcut: three shakes inside a second, with a three-second pause afterwards so one gesture opens one panel."
 msgstr "Slået fra som standard. Det er den gestus, en telefon har i stedet for en tastaturgenvej: tre ryk inden for ét sekund og derefter tre sekunders pause, så én gestus åbner ét panel."
 
 #. translators: %s: the JavaScript call a theme has to make, already wrapped in <code>
-#: includes/class-settings.php:341
+#: includes/class-settings.php:365
 #, php-format
 msgid "On iPhone and iPad, Safari only reports motion after the visitor has agreed to it, and it will only ask from a button the visitor pressed. This plugin never puts up that prompt for you. If you want the gesture there, call %s from a button of your own; everywhere else it works as soon as you tick this box."
 msgstr "På iPhone og iPad rapporterer Safari først bevægelse, når den besøgende har sagt ja, og den spørger kun fra en knap, den besøgende har trykket på. Dette plugin viser aldrig den dialog for dig. Vil du have gestussen der, så kald %s fra din egen knap; alle andre steder virker den, så snart du sætter dette flueben."
 
-#: includes/class-settings.php:363
+#: includes/class-settings.php:387
 msgid "The bundled panel signs what it sends, so filling this in is all there is to it. A report sent by anything else — your own form, a script — has to sign the same way."
 msgstr "Det medfølgende panel signerer det, det sender, så det er alt, der skal til at udfylde feltet her. En rapport sendt af noget andet — din egen formular, et script — skal signere på samme måde."
+
+#. translators: %s: the title of the report, which is its first line.
+#: includes/class-admin.php:154
+#, php-format
+msgid "The page as the reporter saw it when they sent %s."
+msgstr "Siden, som anmelderen så den, da de sendte %s."
+
+#: includes/class-settings.php:311
+msgid "Screenshots"
+msgstr "Skærmbilleder"
+
+#: includes/class-settings.php:315
+msgid "Let the reporter attach a picture of the page"
+msgstr "Lad anmelderen vedhæfte et billede af siden"
+
+#: includes/class-settings.php:317
+msgid "Off by default. Taking a picture needs a renderer, and a renderer is a second script of about 15 kB (6 kB over the wire) on every page the panel is on, so it is only loaded when this box is ticked. Until version 0.4.1 the plugin shipped no renderer at all and the panel never offered a picture."
+msgstr "Slået fra som udgangspunkt. Et billede kræver en renderer, og en renderer er endnu et script på omkring 15 kB (6 kB over ledningen) på hver eneste side, hvor panelet vises, så det hentes kun, når dette felt er sat. Indtil version 0.4.1 fulgte der slet ingen renderer med pluginet, og panelet tilbød aldrig et billede."
+
+#: includes/class-settings.php:318
+msgid "A picture of the page contains whatever was on the page."
+msgstr "Et billede af siden indeholder alt, hvad der stod på siden."
+
+#: includes/class-settings.php:318
+msgid "The name of another customer, a price, an order, a message that was open in a tab beside the bug. Reports are a private post type and the picture is served only to people who can read them, through a plugin route of its own rather than the media library — but everyone who can read a report sees it, and forwarding one forwards the picture. Ask for screenshots only if you would be comfortable reading them."
+msgstr "En anden kundes navn, en pris, en ordre, en besked der lå åben i en fane ved siden af fejlen. Rapporter er en privat indholdstype, og billedet leveres kun til dem, der må læse dem, gennem pluginets egen rute frem for mediebiblioteket — men alle, der kan læse en rapport, kan se billedet, og videresender du en rapport, videresender du billedet. Bed kun om skærmbilleder, hvis du selv ville være tryg ved at læse dem."
+
+#. translators: 1: the data-bugbottle-mask attribute, wrapped in <code>; 2: the data-bugbottle-block attribute, wrapped in <code>
+#: includes/class-settings.php:323
+#, php-format
+msgid "What is typed into a field is replaced with bullets before the picture is taken. Mark anything else you do not want in it with %1$s to bullet its text, or %2$s to cover it entirely."
+msgstr "Det, der er skrevet i et felt, erstattes med prikker, før billedet tages. Marker alt andet, du ikke vil have med, med %1$s for at skjule teksten bag prikker, eller %2$s for at dække det helt."
+
+#: includes/class-settings.php:329
+msgid "The reporter sees the picture before it is sent, can untick it, and can mark it first: a rectangle, an arrow, and a blur that reads the region back out of the canvas so the original pixels leave with it."
+msgstr "Anmelderen ser billedet, før det sendes, kan fravælge det og kan markere i det først: et rektangel, en pil og en sløring, der læser området tilbage fra lærredet, så de oprindelige pixels forsvinder med den."

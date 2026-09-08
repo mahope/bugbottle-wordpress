@@ -6,6 +6,49 @@ repository directly; keep the two in step.
 
 ## Unreleased
 
+### Changed
+
+<!-- sync-library: replaced on every run; the prose around it is not -->
+- **`assets/bugbottle.js` is bugbottle 0.15.0**, 66,440 bytes (md5
+  `9f41d7ea9a01ac567f2738a114a26ebf`), copied verbatim from that release's `dist/bugbottle.js`.
+  `LIB_VERSION` is `0.15.0`, which is what busts the cache on both
+  enqueued files.
+- **`assets/bugbottle-screenshot.js` was rebuilt** against
+  `bugbottle@0.15.0` with `bin/build-screenshot-bundle.sh`, whose
+  `LIB_VERSION` is pinned to match: 15,000 bytes, md5 `69e9fab0313dd32796ffc7fd1b864f3c`.
+<!-- /sync-library -->
+
+  Both lines above were written by `bin/sync-library.sh`, which is the point of
+  it. Two library releases, and **neither needs anything from the script tag**.
+  0.14.0 is `trustProxy`, `fileStore` retention and a privacy checklist — all
+  of it in `handleReport`, the library's own server, which this plugin does not
+  use: the REST route and `includes/class-validator.php` are the plugin's own.
+  0.15.0 is `onDecision` and an OpenMetrics endpoint in an example, server-side
+  for the same reason. What does reach a WordPress page is two CSS blocks in
+  the panel, and both are free:
+- **The panel survives Windows High Contrast** (bugbottle 0.14.0, #91). Under
+  `forced-colors: active` the browser replaces every used colour, so `--bb-*`
+  stops being read and anything that was only a colour vanished — the floating
+  button and the send button lost the background that was their whole shape,
+  and the selected report type, the active drawing tool and the armed element
+  picker lost the accent that said which one they were. The bundled stylesheet
+  now redraws those in system colours. Nothing to configure; a site that
+  updates gets it.
+- **`prefers-reduced-motion: reduce` is honoured more completely** (bugbottle
+  0.15.0, #96). The rule named `*`, which matches neither the shadow host nor a
+  pseudo-element, and said nothing about `scroll-behavior`. All three are named
+  now. Every state change still happens; none of them takes time.
+- `src/report-core.ts` and `src/markdown.ts` are byte for byte identical at
+  0.15.0 and at 0.13.0, so the expectations in `tests/test-report-parity.php`
+  still describe the bundled library and were not regenerated. Fifty-one
+  checks, none failing, unchanged.
+- Every function the mount script calls — `mount`, `initConsoleBuffer`,
+  `initBreadcrumbs`, `initNetwork`, `initPerf`, `createQueue`, `resolveLocale`,
+  `scrubReport`, `createSigner`, `onShake` — is still on `window.bugbottle` in
+  0.15.0, and `createQueue`'s options are unchanged, `fetch` included. No
+  setting changed, so the settings screenshot in `.wordpress-org/` is
+  unchanged.
+
 ### Fixed
 
 - **A queued report is signed when it is delivered** (#7). The mount script
@@ -40,6 +83,23 @@ repository directly; keep the two in step.
   this fix it fails four of them — no header, a 401, and nothing stored — which
   is the bug in the issue, reproduced. It stops only the two processes it
   started.
+- **`bin/sync-library.sh <tag>`: follow a library release in one command**
+  (#6). It reads `dist/bugbottle.js` from the library at that tag — a local
+  checkout or a git URL — copies it over `assets/bugbottle.js`, writes the
+  version into `bugbottle.php` and into `bin/build-screenshot-bundle.sh`,
+  rebuilds `assets/bugbottle-screenshot.js` against `bugbottle@<version>` so
+  the two bundles cannot come from different releases, and writes both md5s
+  into a `CHANGELOG.md` stub, the line in `readme.txt` and the version
+  `README.md` names. It refuses on a dirty tree and is idempotent: the stub
+  lives between two markers and is replaced rather than appended, so a second
+  run against the same tag leaves a byte-identical tree — checked against
+  v0.13.0, where the only thing that changed was the stub itself. Then it
+  prints every `## x.y.z` section of the library's changelog between the
+  bundled version and the new one, and stops. Whether a library release needs a
+  setting, a validator, a meta key or nothing at all is a judgement about this
+  plugin, and the script has no business making it; it prints a checklist of
+  the questions instead. The 0.15.0 sync above is the first run in earnest.
+  `README.md` has a "Following a library release" section.
 
 ## 0.6.0 — 2026-09-08
 

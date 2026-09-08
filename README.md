@@ -331,7 +331,7 @@ yourself when you mean it.
 
 `assets/bugbottle.js` is the official one-script-tag build,
 `dist/bugbottle.js`, copied verbatim from the
-[bugbottle](https://github.com/mahope/bugbottle) package — **bugbottle 0.13.0**
+[bugbottle](https://github.com/mahope/bugbottle) package — **bugbottle 0.15.0**
 at the time of writing. It is not modified here and it is not built here.
 
 Since 0.8.0 the library also publishes `dist/bugbottle.slim.js`, the same panel
@@ -471,10 +471,11 @@ bin/build-screenshot-bundle.sh   # writes assets/bugbottle-screenshot.js, prints
 `tests/test-report-parity.php` is what pins the PHP port to the library: it
 holds one report carrying every section, including the contact line and the
 notes, and the Markdown and the validated JSON that the library's own
-`src/markdown.ts` and `src/report-core.ts` produce from it — v0.13.0 as of this
-release. When either side moves, regenerate the two expectations by running
-the fixture through the TypeScript with `node --experimental-strip-types` and
-diffing the output.
+`src/markdown.ts` and `src/report-core.ts` produce from it. They were generated
+from v0.13.0 and both files are byte for byte the same at v0.15.0, which is the
+bundled version, so they still describe it. When either side moves, regenerate
+the two expectations by running the fixture through the TypeScript with `node
+--experimental-strip-types` and diffing the output.
 
 `vendor/` is not committed and never ships in the zip. Tagging `vX.Y.Z` builds
 `bugbottle.zip` and attaches it to a GitHub release. See `SUBMIT.md` for how a

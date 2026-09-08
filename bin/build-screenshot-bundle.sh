@@ -27,7 +27,7 @@
 # Needs: node and npm on PATH, and network access to the npm registry.
 set -euo pipefail
 
-LIB_VERSION="0.13.0"
+LIB_VERSION="0.15.0"
 HTML_TO_IMAGE_VERSION="1.11.13"
 ESBUILD_VERSION="0.28.2"
 

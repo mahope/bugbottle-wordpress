@@ -87,6 +87,31 @@ final class Validator {
 	/** How many recorded requests a report may carry. Oldest are dropped first. */
 	public const MAX_NETWORK_ENTRIES = 30;
 
+	/** How many keys of one web storage a report may carry. */
+	public const MAX_STORAGE_KEYS = 50;
+
+	/** How many cookie names a report may carry. Names only, never values. */
+	public const MAX_COOKIE_NAMES = 100;
+
+	/** Longest a storage key or a cookie name may be before it is clipped. */
+	public const MAX_STORAGE_KEY_LENGTH = 100;
+
+	/**
+	 * Longest an allow-listed storage value may be. Short on purpose: the
+	 * point is to see the shape of a value, not to copy the contents of a
+	 * store into a bug report.
+	 */
+	public const MAX_STORAGE_VALUE_LENGTH = 200;
+
+	/** How many allow-listed values a report may carry. */
+	public const MAX_STORAGE_VALUES = 20;
+
+	/**
+	 * The largest duration any performance figure may claim, in milliseconds.
+	 * An hour: anything longer is a broken clock rather than a slow page.
+	 */
+	public const MAX_PERF_MS = 3600000;
+
 	private const PNG_DATA_URL_PREFIX = 'data:image/png;base64,';
 
 	private const PNG_SIGNATURE = "\x89PNG\r\n\x1a\n";
@@ -466,6 +491,209 @@ final class Validator {
 			return (int) $value;
 		}
 		return 0;
+	}
+
+
+	/**
+	 * Whether the array is a JSON array rather than a JSON object — the
+	 * distinction `json_decode($json, true)` throws away and every validator
+	 * here needs, because upstream refuses an array where an object belongs.
+	 *
+	 * `array_is_list()` says the same thing and has done since PHP 8.0, but
+	 * the WordPress Plugin Check measures it against WordPress' own polyfill,
+	 * which arrived in 6.5, and this plugin supports 6.4. Four lines are
+	 * cheaper than raising the floor.
+	 *
+	 * @param array<mixed> $value A decoded JSON value.
+	 */
+	private static function is_list( array $value ): bool {
+		$expected = 0;
+		foreach ( $value as $key => $unused ) {
+			if ( $key !== $expected ) {
+				return false;
+			}
+			++$expected;
+		}
+		return true;
+	}
+
+	/**
+	 * Validates the performance snapshot a report arrived with.
+	 *
+	 * Every field is optional and every field is a number, so the rule is the
+	 * same throughout: a finite number in range is kept and rounded, anything
+	 * else is left out. A snapshot with nothing usable in it is not a
+	 * snapshot, and null says so — a report carrying `perf: {}` claims a
+	 * measurement it does not have. Never throws: a malformed section means
+	 * "not measured", not a failed report.
+	 *
+	 * The keys are written in the order the TypeScript normaliser writes them,
+	 * so the JSON stored here is byte-identical to the library's.
+	 *
+	 * @param mixed $raw Anything from the request body.
+	 * @return array<string, mixed>|null
+	 */
+	public static function perf( $raw ): ?array {
+		if ( ! is_array( $raw ) || self::is_list( $raw ) ) {
+			return null;
+		}
+		$out = array();
+		foreach ( array( 'lcp', 'inp', 'ttfb', 'domContentLoaded', 'load' ) as $key ) {
+			$value = self::whole( $raw[ $key ] ?? null, self::MAX_PERF_MS );
+			if ( null !== $value ) {
+				$out[ $key ] = $value;
+			}
+		}
+		// Layout shift is a unitless score, and three decimals is what the Web
+		// Vitals reports print. It is folded back to an integer when it lands
+		// on one, because JavaScript has no other kind of number and a stored
+		// `2.0` would not match the library's `2`.
+		$cls = $raw['cls'] ?? null;
+		if ( is_numeric( $cls ) && ! is_string( $cls ) && is_finite( (float) $cls ) && (float) $cls >= 0 ) {
+			$rounded    = min( round( (float) $cls * 1000 ) / 1000, 1000 );
+			$out['cls'] = $rounded === floor( $rounded ) ? (int) $rounded : $rounded;
+		}
+		if ( is_array( $raw['longTasks'] ?? null ) ) {
+			$count    = self::whole( $raw['longTasks']['count'] ?? null, 100000 );
+			$total_ms = self::whole( $raw['longTasks']['totalMs'] ?? null, self::MAX_PERF_MS );
+			if ( null !== $count || null !== $total_ms ) {
+				$out['longTasks'] = array(
+					'count'   => $count ?? 0,
+					'totalMs' => $total_ms ?? 0,
+				);
+			}
+		}
+		if ( is_array( $raw['memory'] ?? null ) ) {
+			$used  = self::whole( $raw['memory']['usedMB'] ?? null, 1000000 );
+			$limit = self::whole( $raw['memory']['limitMB'] ?? null, 1000000 );
+			if ( null !== $used || null !== $limit ) {
+				$out['memory'] = array(
+					'usedMB'  => $used ?? 0,
+					'limitMB' => $limit ?? 0,
+				);
+			}
+		}
+		return count( $out ) > 0 ? $out : null;
+	}
+
+	/**
+	 * A whole number, never negative, never past `max`. Null for anything that
+	 * is not a finite number, which is how a field is left out rather than
+	 * stored as a zero somebody would read as "instant".
+	 *
+	 * @param mixed $value Anything from the request body.
+	 */
+	private static function whole( $value, int $max ): ?int {
+		if ( is_bool( $value ) || ! is_numeric( $value ) || is_string( $value ) ) {
+			return null;
+		}
+		$number = (float) $value;
+		if ( ! is_finite( $number ) || $number < 0 ) {
+			return null;
+		}
+		return (int) min( round( $number ), $max );
+	}
+
+	/**
+	 * Validates the storage snapshot a report arrived with.
+	 *
+	 * The caps are the point of this one: a browser can hold megabytes in
+	 * `localStorage`, and a report that carried all of it would be a denial of
+	 * service with a bug attached. Keys are clipped, the lists are cut to
+	 * `MAX_STORAGE_KEYS` and `MAX_COOKIE_NAMES`, and the allow-listed values
+	 * are clipped hard. Empty sections are left out rather than stored as
+	 * empty arrays, so a reader can tell "nothing stored" from "not measured".
+	 * Never throws.
+	 *
+	 * Cookie values are never accepted, allow-list or not, and a value is only
+	 * here at all because the integrator named that key.
+	 *
+	 * @param mixed $raw Anything from the request body.
+	 * @return array<string, mixed>|null
+	 */
+	public static function storage( $raw ): ?array {
+		if ( ! is_array( $raw ) || self::is_list( $raw ) ) {
+			return null;
+		}
+		$out = array();
+
+		foreach ( array( 'local', 'session' ) as $which ) {
+			$list = self::storage_keys( $raw[ $which ] ?? null );
+			if ( count( $list ) > 0 ) {
+				$out[ $which ] = $list;
+			}
+		}
+
+		if ( is_array( $raw['cookies'] ?? null ) ) {
+			$cookies = array();
+			foreach ( $raw['cookies'] as $name ) {
+				if ( count( $cookies ) >= self::MAX_COOKIE_NAMES ) {
+					break;
+				}
+				if ( ! is_string( $name ) ) {
+					continue;
+				}
+				$cookies[] = self::str( $name, self::MAX_STORAGE_KEY_LENGTH );
+			}
+			if ( count( $cookies ) > 0 ) {
+				$out['cookies'] = $cookies;
+			}
+		}
+
+		$raw_values = $raw['values'] ?? null;
+		if ( is_array( $raw_values ) && ! self::is_list( $raw_values ) ) {
+			$values = array();
+			foreach ( $raw_values as $key => $value ) {
+				if ( count( $values ) >= self::MAX_STORAGE_VALUES ) {
+					break;
+				}
+				if ( ! is_string( $value ) ) {
+					continue;
+				}
+				$values[ self::str( (string) $key, self::MAX_STORAGE_KEY_LENGTH ) ] =
+					self::str( $value, self::MAX_STORAGE_VALUE_LENGTH );
+			}
+			if ( count( $values ) > 0 ) {
+				$out['values'] = $values;
+			}
+		}
+
+		return count( $out ) > 0 ? $out : null;
+	}
+
+	/**
+	 * One storage's keys: the name and how long the value was, never the
+	 * value. An entry without a string `key` is not a key and is dropped; a
+	 * length that is not a positive number becomes zero rather than failing
+	 * the entry, because the name is the part a reader wants.
+	 *
+	 * @param mixed $value Anything from the request body.
+	 * @return array<int, array<string, string|int>>
+	 */
+	private static function storage_keys( $value ): array {
+		if ( ! is_array( $value ) ) {
+			return array();
+		}
+		$list = array();
+		foreach ( $value as $item ) {
+			if ( count( $list ) >= self::MAX_STORAGE_KEYS ) {
+				break;
+			}
+			if ( ! is_array( $item ) || ! isset( $item['key'] ) || ! is_string( $item['key'] ) ) {
+				continue;
+			}
+			$raw_length = $item['length'] ?? null;
+			$length     = 0;
+			if ( ! is_bool( $raw_length ) && is_numeric( $raw_length ) && ! is_string( $raw_length )
+				&& is_finite( (float) $raw_length ) && (float) $raw_length > 0 ) {
+				$length = (int) min( round( (float) $raw_length ), 100000000 );
+			}
+			$list[] = array(
+				'key'    => self::str( $item['key'], self::MAX_STORAGE_KEY_LENGTH ),
+				'length' => $length,
+			);
+		}
+		return $list;
 	}
 
 	/**

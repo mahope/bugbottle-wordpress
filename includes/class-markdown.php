@@ -48,7 +48,8 @@ final class Markdown {
 	 *
 	 * @param array<string, mixed> $raw     The report.
 	 * @param array<string, mixed> $options heading_level, type_in_title, max_title_length,
-	 *                                      max_console_entries, facts, screenshot_url, collapse_console.
+	 *                                      max_console_entries, facts, screenshot_url, collapse_console,
+	 *                                      collapse_storage.
 	 */
 	public static function render( array $raw, array $options = array() ): string {
 		$type    = Validator::is_report_type( $raw['type'] ?? null ) ? (string) $raw['type'] : 'other';
@@ -57,6 +58,8 @@ final class Markdown {
 		$elements    = Validator::elements( $raw['elements'] ?? null );
 		$breadcrumbs = Validator::breadcrumbs( $raw['breadcrumbs'] ?? null );
 		$network     = Validator::network( $raw['network'] ?? null );
+		$perf        = Validator::perf( $raw['perf'] ?? null );
+		$storage     = Validator::storage( $raw['storage'] ?? null );
 		$console     = Validator::console( $raw['console'] ?? null );
 
 		$max_console = $options['max_console_entries'] ?? null;
@@ -158,6 +161,43 @@ final class Markdown {
 			$out[] = '';
 		}
 
+		if ( null !== $perf ) {
+			$rows = self::perf_rows( $perf );
+			if ( count( $rows ) > 0 ) {
+				$out[] = '### Performance';
+				$out[] = '';
+				$out[] = '| | |';
+				$out[] = '|---|---|';
+				foreach ( $rows as $row ) {
+					$out[] = '| ' . self::cell( $row[0] ) . ' | ' . self::cell( $row[1] ) . ' |';
+				}
+				$out[] = '';
+			}
+		}
+
+		if ( null !== $storage ) {
+			$lines = self::storage_lines( $storage );
+			if ( count( $lines ) > 0 ) {
+				$body = array();
+				foreach ( $lines as $line ) {
+					$body[] = '- ' . $line;
+				}
+				if ( $options['collapse_storage'] ?? true ) {
+					$out[] = '<details><summary>Storage</summary>';
+					$out[] = '';
+					$out   = array_merge( $out, $body );
+					$out[] = '';
+					$out[] = '</details>';
+					$out[] = '';
+				} else {
+					$out[] = '### Storage';
+					$out[] = '';
+					$out   = array_merge( $out, $body );
+					$out[] = '';
+				}
+			}
+		}
+
 		if ( count( $console ) > 0 ) {
 			$lines = array();
 			foreach ( $console as $entry ) {
@@ -254,6 +294,90 @@ final class Markdown {
 		$rect   = $element['rect'];
 		$bits[] = sprintf( 'at %d,%d %d×%d', $rect['x'], $rect['y'], $rect['width'], $rect['height'] );
 		return '- ' . implode( ' ', $bits );
+	}
+
+
+	/**
+	 * The performance facts that are present, in the order a reader wants
+	 * them: what the page felt like first, then what it cost. A figure the
+	 * browser never measured is left out rather than printed as a zero, which
+	 * would read as "instant" instead of "unknown".
+	 *
+	 * @param array<string, mixed> $perf A validated performance snapshot.
+	 * @return array<int, array{0: string, 1: string}>
+	 */
+	private static function perf_rows( array $perf ): array {
+		$rows = array();
+		$ms   = array(
+			'lcp'              => 'Largest contentful paint',
+			'inp'              => 'Interaction to next paint',
+			'ttfb'             => 'Time to first byte',
+			'domContentLoaded' => 'DOM content loaded',
+			'load'             => 'Load',
+		);
+		if ( isset( $perf['lcp'] ) ) {
+			$rows[] = array( $ms['lcp'], $perf['lcp'] . ' ms' );
+		}
+		if ( isset( $perf['cls'] ) ) {
+			// A float that landed on a whole number prints without a trailing
+			// `.0`, the way JavaScript's `String()` does.
+			$rows[] = array( 'Cumulative layout shift', (string) $perf['cls'] );
+		}
+		foreach ( array( 'inp', 'ttfb', 'domContentLoaded', 'load' ) as $key ) {
+			if ( isset( $perf[ $key ] ) ) {
+				$rows[] = array( $ms[ $key ], $perf[ $key ] . ' ms' );
+			}
+		}
+		if ( isset( $perf['longTasks'] ) && is_array( $perf['longTasks'] ) ) {
+			$rows[] = array(
+				'Long tasks',
+				$perf['longTasks']['count'] . ' (' . $perf['longTasks']['totalMs'] . ' ms total)',
+			);
+		}
+		if ( isset( $perf['memory'] ) && is_array( $perf['memory'] ) ) {
+			$rows[] = array(
+				'JS heap',
+				$perf['memory']['usedMB'] . ' MB of ' . $perf['memory']['limitMB'] . ' MB',
+			);
+		}
+		return $rows;
+	}
+
+	/**
+	 * The storage snapshot as lines. Key names with their value lengths,
+	 * cookie names, and the allow-listed values — which are the only values
+	 * here, and are only ever the ones an integrator named.
+	 *
+	 * @param array<string, mixed> $storage A validated storage snapshot.
+	 * @return array<int, string>
+	 */
+	private static function storage_lines( array $storage ): array {
+		$lines = array();
+		foreach ( array(
+			'local'   => 'localStorage',
+			'session' => 'sessionStorage',
+		) as $key => $label ) {
+			if ( ! isset( $storage[ $key ] ) || ! is_array( $storage[ $key ] ) || 0 === count( $storage[ $key ] ) ) {
+				continue;
+			}
+			$parts = array();
+			foreach ( $storage[ $key ] as $entry ) {
+				$parts[] = '`' . $entry['key'] . '` (' . $entry['length'] . ')';
+			}
+			$lines[] = $label . ': ' . implode( ', ', $parts );
+		}
+		if ( isset( $storage['cookies'] ) && is_array( $storage['cookies'] ) && count( $storage['cookies'] ) > 0 ) {
+			$names = array();
+			foreach ( $storage['cookies'] as $name ) {
+				$names[] = '`' . $name . '`';
+			}
+			$lines[] = 'Cookies: ' . implode( ', ', $names );
+		}
+		$values = isset( $storage['values'] ) && is_array( $storage['values'] ) ? $storage['values'] : array();
+		foreach ( $values as $key => $value ) {
+			$lines[] = '`' . $key . '` = ' . $value;
+		}
+		return $lines;
 	}
 
 	/**

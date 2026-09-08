@@ -111,6 +111,10 @@ md5of() {
 	fi
 }
 
+# `65942` reads as `65,942` in the changelog, which is how every entry before
+# this script wrote it.
+grouped() { echo "$1" | sed -E ':a;s/([0-9])([0-9]{3})($|,)/\1,\2\3/;ta'; }
+
 # ---- the panel bundle, copied verbatim
 
 git -C "$lib" show "$tag:dist/bugbottle.js" > "$work/bugbottle.js" ||
@@ -162,13 +166,13 @@ find "$root" -maxdepth 2 -name '*.bak' -delete
 stub="$work/stub.md"
 {
 	echo "<!-- sync-library: replaced on every run; the prose around it is not -->"
-	echo "- **\`assets/bugbottle.js\` is bugbottle $version**, $panel_bytes bytes (md5"
+	echo "- **\`assets/bugbottle.js\` is bugbottle $version**, $(grouped "$panel_bytes") bytes (md5"
 	echo "  \`$panel_md5\`), copied verbatim from that release's \`dist/bugbottle.js\`."
 	echo "  \`LIB_VERSION\` is \`$version\`, which is what busts the cache on both"
 	echo "  enqueued files."
 	echo "- **\`assets/bugbottle-screenshot.js\` was rebuilt** against"
 	echo "  \`bugbottle@$version\` with \`bin/build-screenshot-bundle.sh\`, whose"
-	echo "  \`LIB_VERSION\` is pinned to match: $shot_bytes bytes, md5 \`$shot_md5\`."
+	echo "  \`LIB_VERSION\` is pinned to match: $(grouped "$shot_bytes") bytes, md5 \`$shot_md5\`."
 	echo "<!-- /sync-library -->"
 } > "$stub"
 
@@ -238,7 +242,7 @@ bounds = [(start, heads[i + 1][0] if i + 1 < len(heads) else len(text), v)
 
 wanted = [b for b in bounds if key(previous) < key(b[2]) <= key(version)]
 if not wanted:
-    print("(no changelog sections between those two tags — nothing to read)")
+    print("(no changelog sections between those two tags - nothing to read)")
 else:
     for start, end, v in wanted:
         print(text[start:end].strip())

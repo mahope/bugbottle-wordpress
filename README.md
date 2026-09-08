@@ -58,7 +58,7 @@ database, not in the plugin directory.
 | Contact field | Whether the panel asks how the reporter can be reached: not at all, an optional field, or one it refuses to send without. **Off by default.** Nothing checks what is typed — "ring me on 12345678" is a good answer — and the line is stored with the report, shown on the report screen and rendered as a `Contact` row. It is personal data you asked for; read [The contact field](#the-contact-field). |
 | Evidence | Breadcrumbs (clicks, navigations, submits) and the network log (requests that failed or were slow — method, URL, status and duration, never a body or a header). Both on. |
 | Screenshots | Lets the reporter attach a picture of the page, and mark it before sending: a rectangle, an arrow, and a blur that really destroys what it covers. **Off by default**, and it is the setting to think hardest about — read [Please read this part](#please-read-this-part). Turning it on loads a second script, `assets/bugbottle-screenshot.js`, about 15 kB (6 kB over the wire), on every page the panel is on. |
-| Offline queue | Keeps a report the browser could not send and delivers it when the connection is back. Reports wait in the browser for up to seven days. On by default. |
+| Offline queue | Keeps a report the browser could not send and delivers it when the connection is back. Reports wait in the browser for up to seven days. The queue signs what it delivers, with a signature computed at delivery rather than at the moment the report was written, so a site with signing keys accepts it. On by default. |
 | Scrubbing | Redacts email addresses, bearer tokens, JWTs, card numbers, IBANs and query values before the report is sent. On by default. |
 | Timings and storage snapshot | Records what the page cost — largest contentful paint, layout shift, interaction to next paint, time to first byte, the load events, long tasks, and the JS heap in Chrome — and lists the key names in `localStorage` and `sessionStorage` with the length of each value, plus the cookie names. **Names only, never values**, and never a cookie value at all. Off by default. |
 | Shake to report | Opens the panel when the phone is shaken: three shakes inside a second, then a three-second pause. Off by default. On iPhone and iPad it also needs the visitor's permission, which only Safari can ask for and only from a button they pressed — see [Shake to report](#shake-to-report). |
@@ -131,10 +131,19 @@ first line is the key the panel is given; every line is a key the route
 accepts.
 
 The bundled panel signs what it sends: the mount script hands the first
-configured key to `createSigner` from `bugbottle/sign`, which is in the 0.13.0
-bundle this plugin ships. Filling the setting in is the whole of it. Anything
+configured key to `createSigner` from `bugbottle/sign`, which is in the bundle
+this plugin ships. Filling the setting in is the whole of it. Anything
 else that posts to the route — your own form, a script, a mobile app — has to
 compute the same digest, or it will be refused along with the spam.
+
+**The offline queue signs too**, which takes a little wiring the library does
+not do for you. `createQueue` delivers a stored report with a `fetch` of its
+own and knows nothing about the signer, so the mount script gives it one: a
+`fetch` that signs the bytes on their way out. That the signature is computed
+*then*, and not when the report was written, is the whole point — a report that
+sat through an hour of outage would otherwise carry a timestamp an hour outside
+the five-minute skew window and be refused as certainly as if it were unsigned.
+`tests/browser-queue-signature.mjs` is the round trip that pins this.
 
 ## The contact field
 
@@ -402,6 +411,22 @@ wp eval-file tests/test-rest-signature.php   # the REST route, from a scratch in
 
 The last writes settings and stores reports, so point it at a scratch install
 and never at a live site. All six exit non-zero on a failure.
+
+One thing none of them can see is what happens in a browser across two page
+loads, which is where the offline queue lives:
+
+```bash
+node tests/browser-queue-signature.mjs --wp-path /path/to/scratch/wp
+```
+
+It configures that install (panel on, anonymous allowed, queue on, one signing
+key), serves it with a `php -S` of its own, drives a real Chrome through
+`puppeteer-core`, takes the endpoint down, writes a report, brings the endpoint
+back, reloads, and then verifies the signature on the delivered request itself
+before checking that the route answered `201` and the site stored the report.
+It kills only the server and the browser it started. `--wp` sets the wp-cli
+command, `--chrome` the browser binary, `--port` the port. It writes settings
+and stores a report, so it too belongs on a scratch install and nowhere else.
 
 Rebuilding the screenshot renderer needs node and npm, and nothing else:
 

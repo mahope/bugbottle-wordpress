@@ -117,6 +117,8 @@ One key per line is how a key is rotated: add the new one, wait for cached pages
 
 The bundled panel signs what it sends, so filling the setting in is all there is to it. Anything else that posts to the route - your own form, a script - has to compute the same digest or it is refused too.
 
+The offline queue signs too. A report it kept through an outage is signed at the moment it is delivered rather than at the moment it was written, so its timestamp is inside the five-minute window the route allows and it is accepted rather than refused.
+
 = What is the "Timings and storage snapshot" setting? =
 
 Two things a report can carry, both off by default. The timings are the ones a Web Vitals report shows: largest contentful paint, cumulative layout shift, interaction to next paint, time to first byte, the load events, long tasks and, on Chrome, the JavaScript heap. Two of them are simplifications and the library says so: the layout shift is the sum of the shifts, and the interaction figure is the worst interaction rather than a percentile.

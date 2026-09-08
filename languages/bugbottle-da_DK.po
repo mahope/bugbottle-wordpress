@@ -229,79 +229,79 @@ msgstr "Selector til din egen knap"
 msgid "A CSS selector for your own button. Leave empty for the floating button."
 msgstr "En CSS-selector til din egen knap. Lad feltet stå tomt for at bruge den svævende knap."
 
-#: includes/class-settings.php:416
+#: includes/class-settings.php:417
 msgid "Scrubbing"
 msgstr "Rensning"
 
-#: includes/class-settings.php:420
+#: includes/class-settings.php:421
 msgid "Redact email addresses, tokens, card numbers and query values before the report is sent"
 msgstr "Sløre e-mailadresser, tokens, kortnumre og værdier i adresselinjen før rapporten sendes"
 
-#: includes/class-settings.php:434
+#: includes/class-settings.php:435
 msgid "Email recipient"
 msgstr "Modtager af e-mail"
 
-#: includes/class-settings.php:437
+#: includes/class-settings.php:438
 msgid "Leave empty to only store reports in wp-admin."
 msgstr "Lad feltet stå tomt for kun at gemme rapporter i wp-admin."
 
-#: includes/class-settings.php:441
+#: includes/class-settings.php:442
 msgid "Email on submit"
 msgstr "Send e-mail med det samme"
 
-#: includes/class-settings.php:445
+#: includes/class-settings.php:446
 msgid "Send the email as soon as a report arrives"
 msgstr "Send e-mailen så snart en rapport kommer ind"
 
-#: includes/class-settings.php:458
+#: includes/class-settings.php:459
 msgid "Auto (site language)"
 msgstr "Auto (sidens sprog)"
 
-#: includes/class-settings.php:459
+#: includes/class-settings.php:460
 msgid "Danish"
 msgstr "Dansk"
 
-#: includes/class-settings.php:460
+#: includes/class-settings.php:461
 msgid "English"
 msgstr "Engelsk"
 
-#: includes/class-settings.php:461
+#: includes/class-settings.php:462
 msgid "Swedish"
 msgstr "Svensk"
 
-#: includes/class-settings.php:462
+#: includes/class-settings.php:463
 msgid "Norwegian"
 msgstr "Norsk"
 
-#: includes/class-settings.php:463
+#: includes/class-settings.php:464
 msgid "German"
 msgstr "Tysk"
 
-#: includes/class-settings.php:464
+#: includes/class-settings.php:465
 msgid "Dutch"
 msgstr "Hollandsk"
 
-#: includes/class-settings.php:465
+#: includes/class-settings.php:466
 msgid "French"
 msgstr "Fransk"
 
-#: includes/class-settings.php:466
+#: includes/class-settings.php:467
 msgid "Spanish"
 msgstr "Spansk"
 
-#: includes/class-settings.php:482
+#: includes/class-settings.php:483
 msgid "Bottom right"
 msgstr "Nederst til højre"
 
-#: includes/class-settings.php:483
+#: includes/class-settings.php:484
 msgid "Bottom left"
 msgstr "Nederst til venstre"
 
-#: includes/class-settings.php:484
+#: includes/class-settings.php:485
 msgid "Top right"
 msgstr "Øverst til højre"
 
-#: includes/class-settings.php:485
+#: includes/class-settings.php:486
 msgid "Top left"
 msgstr "Øverst til venstre"
 
@@ -405,19 +405,19 @@ msgstr "Gem en rapport, som browseren ikke kunne sende, og aflevér den når for
 msgid "Reports wait in the browser, for up to seven days."
 msgstr "Rapporter venter i browseren i op til syv dage."
 
-#: includes/class-settings.php:425
+#: includes/class-settings.php:426
 msgid "Signing key(s)"
 msgstr "Signeringsnøgle(r)"
 
-#: includes/class-settings.php:428
+#: includes/class-settings.php:429
 msgid "One key per line. A report must then arrive signed with any one of them, and a report signed with a key that is not here is refused. Several lines is how a key is rotated: add the new one, wait for cached pages carrying the old one to expire, then delete the old one. Empty means no signature is asked for."
 msgstr "Én nøgle pr. linje. En rapport skal så ankomme signeret med en af dem, og en rapport signeret med en nøgle, der ikke står her, bliver afvist. Flere linjer er måden, en nøgle udskiftes på: tilføj den nye, vent på at cachede sider med den gamle udløber, og slet så den gamle. Tom betyder, at der ikke bliver bedt om en signatur."
 
-#: includes/class-settings.php:429
+#: includes/class-settings.php:430
 msgid "A key that is sent to the browser is public."
 msgstr "En nøgle, der sendes til browseren, er offentlig."
 
-#: includes/class-settings.php:429
+#: includes/class-settings.php:430
 msgid "It is in the page source, so anyone who wants it has it. Signing raises the cost of sending junk to the endpoint from a script that has not read your page — it is spam deterrence beside the rate limit, and it is not authentication. Do not treat it as securing the endpoint."
 msgstr "Den står i sidens kildekode, så enhver, der vil have den, har den. Signering gør det dyrere at sende skrald til endpointet fra et script, der ikke har læst din side — det er spamafskrækkelse ved siden af hastighedsgrænsen, og det er ikke autentificering. Behandl det ikke som noget, der sikrer endpointet."
 
@@ -515,41 +515,41 @@ msgstr "Nøglenavne og hvor lange deres værdier var, samt navnene på cookies. 
 msgid "[%1$s] %2$s"
 msgstr ""
 
-#: includes/class-settings.php:386
+#: includes/class-settings.php:387
 msgid "Timings and storage snapshot"
 msgstr "Tider og øjebliksbillede af lageret"
 
-#: includes/class-settings.php:390
+#: includes/class-settings.php:391
 msgid "Record how the page performed, and which keys the browser had stored"
 msgstr "Registrér hvordan siden præsterede, og hvilke nøgler browseren havde gemt"
 
-#: includes/class-settings.php:392
+#: includes/class-settings.php:393
 msgid "Off by default. The timings are the ones a web vitals report shows: largest contentful paint, layout shift, interaction to next paint, time to first byte, the load events, long tasks and — in Chrome — the JavaScript heap."
 msgstr "Slået fra som standard. Tiderne er dem, en web vitals-rapport viser: største indholdsvisning, layoutforskydning, interaktion til næste optegning, tid til første byte, indlæsningshændelserne, lange opgaver og — i Chrome — JavaScript-heapen."
 
-#: includes/class-settings.php:393
+#: includes/class-settings.php:394
 msgid "The storage snapshot lists the key names in localStorage and sessionStorage with the length of each value, and the names of the cookies. It never records a value, and never a cookie value at all. A key name can still say something — \"impersonating_user\" is a fact about the visit — so read the report screen before you forward one."
 msgstr "Øjebliksbilledet af lageret viser nøglenavnene i localStorage og sessionStorage med længden af hver værdi, samt navnene på cookies. Det registrerer aldrig en værdi, og aldrig en cookieværdi overhovedet. Et nøglenavn kan stadig sige noget — \"impersonating_user\" er en oplysning om besøget — så læs rapportskærmen, før du sender en videre."
 
-#: includes/class-settings.php:397
+#: includes/class-settings.php:398
 msgid "Shake to report"
 msgstr "Ryst for at rapportere"
 
-#: includes/class-settings.php:401
+#: includes/class-settings.php:402
 msgid "Open the panel when the phone is shaken"
 msgstr "Åbn panelet når telefonen rystes"
 
-#: includes/class-settings.php:403
+#: includes/class-settings.php:404
 msgid "Off by default. It is the gesture a phone has instead of a keyboard shortcut: three shakes inside a second, with a three-second pause afterwards so one gesture opens one panel."
 msgstr "Slået fra som standard. Det er den gestus, en telefon har i stedet for en tastaturgenvej: tre ryk inden for ét sekund og derefter tre sekunders pause, så én gestus åbner ét panel."
 
 #. translators: %s: the JavaScript call a theme has to make, already wrapped in <code>
-#: includes/class-settings.php:408
+#: includes/class-settings.php:409
 #, php-format
 msgid "On iPhone and iPad, Safari only reports motion after the visitor has agreed to it, and it will only ask from a button the visitor pressed. This plugin never puts up that prompt for you. If you want the gesture there, call %s from a button of your own; everywhere else it works as soon as you tick this box."
 msgstr "På iPhone og iPad rapporterer Safari først bevægelse, når den besøgende har sagt ja, og den spørger kun fra en knap, den besøgende har trykket på. Dette plugin viser aldrig den dialog for dig. Vil du have gestussen der, så kald %s fra din egen knap; alle andre steder virker den, så snart du sætter dette flueben."
 
-#: includes/class-settings.php:430
+#: includes/class-settings.php:431
 msgid "The bundled panel signs what it sends, so filling this in is all there is to it. A report sent by anything else — your own form, a script — has to sign the same way."
 msgstr "Det medfølgende panel signerer det, det sender, så det er alt, der skal til at udfylde feltet her. En rapport sendt af noget andet — din egen formular, et script — skal signere på samme måde."
 
@@ -621,15 +621,15 @@ msgstr "Behandl dem derefter: de gemmes samme sted som resten af rapporten, de f
 msgid "When the line looks like an email address, the notification email is sent with it as Reply-To, so replying answers the reporter."
 msgstr "Når linjen ligner en e-mailadresse, sendes notifikationsmailen med den som Reply-To, så et svar på mailen går til rapportøren."
 
-#: includes/class-settings.php:473
+#: includes/class-settings.php:474
 msgid "Do not ask"
 msgstr "Spørg ikke"
 
-#: includes/class-settings.php:474
+#: includes/class-settings.php:475
 msgid "Ask, but let them send without it"
 msgstr "Spørg, men lad dem sende uden"
 
-#: includes/class-settings.php:475
+#: includes/class-settings.php:476
 msgid "Ask, and refuse to send without it"
 msgstr "Spørg, og afvis at sende uden"
 
@@ -640,3 +640,7 @@ msgstr "Noter"
 #: includes/class-admin.php:215
 msgid "Written by the reporting library about the report itself, not by the reporter. A report that could not be kept in full while the browser was offline says so here."
 msgstr "Skrevet af rapporteringsbiblioteket om selve rapporten, ikke af den der sendte den. En rapport, der ikke kunne gemmes i sin helhed, mens browseren var offline, siger det her."
+
+#: includes/class-settings.php:383
+msgid "A queued report is signed as it is delivered, not as it is written, so a site with signing keys accepts one that waited out a long outage."
+msgstr "En rapport i køen bliver signeret, når den leveres, ikke når den skrives, så et website med signeringsnøgler accepterer en rapport, der har ventet på, at et længere udfald var forbi."

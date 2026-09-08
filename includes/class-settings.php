@@ -380,6 +380,7 @@ final class Settings {
 								<?php esc_html_e( 'Keep a report the browser could not send and deliver it when the connection is back', 'bugbottle' ); ?>
 							</label>
 							<p class="description"><?php esc_html_e( 'Reports wait in the browser, for up to seven days.', 'bugbottle' ); ?></p>
+							<p class="description"><?php esc_html_e( 'A queued report is signed as it is delivered, not as it is written, so a site with signing keys accepts one that waited out a long outage.', 'bugbottle' ); ?></p>
 						</td>
 					</tr>
 					<tr>

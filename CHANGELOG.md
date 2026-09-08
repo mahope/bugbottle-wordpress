@@ -6,6 +6,41 @@ repository directly; keep the two in step.
 
 ## Unreleased
 
+### Fixed
+
+- **A queued report is signed when it is delivered** (#7). The mount script
+  handed the offline queue only `X-WP-Nonce`, so on a site with signing keys a
+  report the queue had kept through an outage was delivered without
+  `X-Bugbottle-Signature` and `Signature::check()` refused it with 401 — and,
+  because the queue treats a 4xx as final, threw it away. Exactly the reports
+  the queue exists to save were the ones it lost. Pre-existing since signing
+  landed in 0.4.0.
+
+  The library does not fix this for you: `createQueue` has no `sign` seam at
+  0.13.0 or at 0.15.0, and its own script tag (`src/global-shared.ts`) hands
+  the queue nothing but an endpoint, so the library's auto-mount has the same
+  gap. What it does have is `fetch`, the replacement request function the queue
+  uses for delivery. The mount script now builds one signer and gives it to
+  both the panel and the queue: the panel signs what it sends now, and the
+  queue's `fetch` signs the bytes as they go on the wire. Computing it there
+  rather than at enqueue is the point — a report that waited an hour would
+  otherwise carry an hour-old timestamp, and `Signature::is_fresh()` allows
+  five minutes in either direction.
+
+### Added
+
+- `tests/browser-queue-signature.mjs`, the round trip nothing else can see. It
+  configures a scratch WordPress, serves it with a `php -S` of its own, drives
+  a real Chrome through `puppeteer-core`, aborts every POST to the endpoint,
+  writes a report through the panel's own shadow DOM, checks it was kept in
+  `localStorage` rather than lost, puts the endpoint back, reloads, and then
+  recomputes the HMAC over the exact bytes the queue delivered before checking
+  the timestamp is from the delivery, the route answered `201` and the site
+  stored one report. Fourteen checks. Against the mount script as it was before
+  this fix it fails four of them — no header, a 401, and nothing stored — which
+  is the bug in the issue, reproduced. It stops only the two processes it
+  started.
+
 ## 0.6.0 — 2026-09-08
 
 Follows the library from **bugbottle 0.9.0 to 0.13.0**. Four library releases,

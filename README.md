@@ -55,6 +55,7 @@ database, not in the plugin directory.
 | Trigger selector | A CSS selector for your own button, e.g. `#report-a-bug`. Empty means the floating button. |
 | Keyboard shortcut | The combination that opens the panel. `mod` is Command on a Mac and Ctrl everywhere else; `mod+shift+b` by default. Empty means no shortcut. |
 | Open on error | Opens the panel by itself when the page throws an uncaught error. Off by default — it shows the panel to whoever is on the page, customers included. |
+| Contact field | Whether the panel asks how the reporter can be reached: not at all, an optional field, or one it refuses to send without. **Off by default.** Nothing checks what is typed — "ring me on 12345678" is a good answer — and the line is stored with the report, shown on the report screen and rendered as a `Contact` row. It is personal data you asked for; read [The contact field](#the-contact-field). |
 | Evidence | Breadcrumbs (clicks, navigations, submits) and the network log (requests that failed or were slow — method, URL, status and duration, never a body or a header). Both on. |
 | Screenshots | Lets the reporter attach a picture of the page, and mark it before sending: a rectangle, an arrow, and a blur that really destroys what it covers. **Off by default**, and it is the setting to think hardest about — read [Please read this part](#please-read-this-part). Turning it on loads a second script, `assets/bugbottle-screenshot.js`, about 15 kB (6 kB over the wire), on every page the panel is on. |
 | Offline queue | Keeps a report the browser could not send and delivers it when the connection is back. Reports wait in the browser for up to seven days. On by default. |
@@ -62,7 +63,7 @@ database, not in the plugin directory.
 | Timings and storage snapshot | Records what the page cost — largest contentful paint, layout shift, interaction to next paint, time to first byte, the load events, long tasks, and the JS heap in Chrome — and lists the key names in `localStorage` and `sessionStorage` with the length of each value, plus the cookie names. **Names only, never values**, and never a cookie value at all. Off by default. |
 | Shake to report | Opens the panel when the phone is shaken: three shakes inside a second, then a three-second pause. Off by default. On iPhone and iPad it also needs the visitor's permission, which only Safari can ask for and only from a button they pressed — see [Shake to report](#shake-to-report). |
 | Signing key(s) | One key per line. With a key set, a report must arrive signed with one of them or it is refused, and the bundled panel signs what it sends. Empty by default. Read [Signing requests](#signing-requests) before you fill it in — a key that ships to the browser is public. |
-| Email recipient | Where reports are emailed, through `wp_mail` — so an SMTP plugin handles delivery. The body is the report as Markdown, with a link to it in wp-admin; it never links the screenshot itself, because that route wants an administrator's session and would only answer 401 from an inbox. Empty means reports are only stored. |
+| Email recipient | Where reports are emailed, through `wp_mail` — so an SMTP plugin handles delivery. The body is the report as Markdown, with a link to it in wp-admin; it never links the screenshot itself, because that route wants an administrator's session and would only answer 401 from an inbox. When the report carries a contact line that looks like an email address, the mail is sent with it as `Reply-To`. Empty means reports are only stored. |
 | Email on submit | Send the email as soon as a report arrives. |
 
 ### For developers
@@ -130,10 +131,39 @@ first line is the key the panel is given; every line is a key the route
 accepts.
 
 The bundled panel signs what it sends: the mount script hands the first
-configured key to `createSigner` from `bugbottle/sign`, which is in the 0.7.0
+configured key to `createSigner` from `bugbottle/sign`, which is in the 0.9.0
 bundle this plugin ships. Filling the setting in is the whole of it. Anything
 else that posts to the route — your own form, a script, a mobile app — has to
 compute the same digest, or it will be refused along with the spam.
+
+## The contact field
+
+**Contact field** is off by default, and that is a decision rather than
+caution: asking somebody for an address is a promise to answer, and that
+promise is the site's to make.
+
+With it on, the panel puts one field under the message — "How can we reach
+you?" — and nothing validates what goes in it. A phone number, a name in your
+own chat, a typo: all of them are perfectly good answers to that question, and
+all of them arrive as `contact` on the report, trimmed, with null bytes
+stripped and clipped at 200 characters. Set to *ask, and refuse to send without
+it* and the panel will not send an empty one, through the same inline error an
+empty message gets; the field is a text input with `inputmode="email"` rather
+than `type="email"`, so a phone number is not announced as invalid.
+
+Where it goes: a `Contact` row in the Markdown summary, directly under the
+type, which is where the library's `toMarkdown` puts it; a section of its own
+on the report detail screen, a `mailto:` link when the line looks like an
+address; and `Reply-To` on the notification email, again only when it looks
+like an address. That test is deliberately permissive — a line is only refused
+when it plainly is not an address — because the cost of getting it wrong one
+way is a reply nobody can send, and the other way one bounced mail. A line
+that is not an address is left in the body and never becomes a header.
+
+**It is personal data you asked for.** Store it like one: it is kept where the
+rest of the report is kept, it goes when the report goes, and everyone who can
+read a report can read it. If reports leave wp-admin for somewhere more
+public, the contact line goes with them.
 
 ## Timings and storage
 
@@ -205,6 +235,22 @@ A picture of the page is there only when **Screenshots** is on, the report is
 one the box was ticked for, and the reporter left it ticked. Before 0.4.1 there
 was never one at all: the plugin shipped no renderer, so the panel hid the row.
 
+Since 0.5.0 a report may also carry `contact`, the line the reporter typed when
+**Contact field** asked for one — see [The contact field](#the-contact-field).
+It is never there unless the setting asked for it: a report that arrives with a
+contact line the settings never asked for is stored without it.
+
+One field the library can send is deliberately not kept. bugbottle 0.8.0 added
+`replay`, up to a megabyte of rrweb events recording the last seconds before
+the report. `wp_postmeta` is the wrong place for a megabyte of nested JSON —
+every read of the row would carry it, and nothing in wp-admin can play a
+recording back — so the route names the field and keeps none of it. The report
+is stored without it and is never refused for carrying one. The bundled panel
+never sends one either: rrweb is the application's own dependency and the
+plugin ships no adapter for it. The one visible consequence is a `Replay` row
+the library renders and this port does not, which
+`tests/test-report-parity.php` pins.
+
 None of that says more about the person than the user agent already does, and
 nothing beyond that list is collected: no canvas fingerprint, no font
 enumeration, no device enumeration.
@@ -251,6 +297,11 @@ Requiring people to be signed in is worth considering too. An anonymous
 screenshot is one nobody can be asked about later, and nobody can be told has
 been deleted.
 
+The optional contact field is the other thing here that is personal data, and
+it is personal data you asked for. Store it like one: it is kept where the rest
+of the report is kept, it goes when the report goes, and everyone who can read
+a report can read it. See [The contact field](#the-contact-field).
+
 Deleting a report deletes its row. The screenshot file is left on disk on
 purpose: an accidental delete is recoverable, and a directory nobody can reach
 over HTTP is a smaller problem than an unrecoverable one. Clear the directory
@@ -260,8 +311,14 @@ yourself when you mean it.
 
 `assets/bugbottle.js` is the official one-script-tag build,
 `dist/bugbottle.js`, copied verbatim from the
-[bugbottle](https://github.com/mahope/bugbottle) package — **bugbottle 0.7.0**
+[bugbottle](https://github.com/mahope/bugbottle) package — **bugbottle 0.9.0**
 at the time of writing. It is not modified here and it is not built here.
+
+Since 0.8.0 the library also publishes `dist/bugbottle.slim.js`, the same panel
+without the annotator, the timings snapshot, the shake gesture and the network
+log. The plugin keeps the full build on purpose: three of those four are
+settings on this screen, and a site that ticks one should not need a different
+file than a site that does not.
 
 When bugbottle publishes a new release, updating the panel is two lines:
 
@@ -341,9 +398,9 @@ bin/build-screenshot-bundle.sh   # writes assets/bugbottle-screenshot.js, prints
 ```
 
 `tests/test-report-parity.php` is what pins the PHP port to the library: it
-holds one report carrying every section, and the Markdown and the validated
-JSON that the library's own `src/markdown.ts` and `src/report-core.ts` produce
-from it. When either side moves, regenerate the two expectations by running
+holds one report carrying every section, including the contact line, and the
+Markdown and the validated JSON that the library's own `src/markdown.ts` and
+`src/report-core.ts` produce from it — v0.9.0 as of this release. When either side moves, regenerate the two expectations by running
 the fixture through the TypeScript with `node --experimental-strip-types` and
 diffing the output.
 

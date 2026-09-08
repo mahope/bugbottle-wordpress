@@ -4,7 +4,7 @@ Tags: bug report, feedback, screenshot, support, qa
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.4.1
+Stable tag: 0.5.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -32,9 +32,12 @@ The panel speaks Danish, English, Swedish, Norwegian, German, Dutch, French and 
 * Optionally, what the page cost - largest contentful paint, layout shift, interaction to next paint, time to first byte, the load events, long tasks and, in Chrome, the JavaScript heap.
 * Optionally, the key names in localStorage and sessionStorage with the length of each value, and the names of the cookies. Names only, never values, and never a cookie value at all. Off unless you turn it on.
 * The reporter's own description, and their name and email if they gave them.
+* Optionally a contact line - how the reporter says you can reach them. Off unless you turn it on, and it is personal data you asked for: it is kept where the rest of the report is kept and it goes when the report goes.
 * Optionally a picture of the page, when you have turned Screenshots on and the reporter leaves the box ticked. They see it first and can mark it before it is sent. Off unless you turn it on, and before version 0.4.1 the plugin could not take one at all.
 
 None of the context facts says more about the person than the user agent already does, and nothing beyond that list is collected: no canvas fingerprint, no font enumeration, no device enumeration.
+
+One thing the library can send is deliberately not kept: the session replay, an rrweb recording of the last seconds before the report. Post meta is the wrong place for a megabyte of nested JSON and nothing in wp-admin can play one back, so a report that arrives with one is stored without it and is never refused for carrying it.
 
 = Screenshots and privacy =
 
@@ -89,6 +92,14 @@ The first answer is that they are off until you turn them on: with the setting o
 3. **What was typed is hidden before the picture is taken.** Fields, textareas and `contenteditable` regions are bulleted for the length of one render and put straight back. Mark anything else with `data-bugbottle-mask` or `data-bugbottle-block`. Nothing else is hidden.
 4. **Say so before the picture is taken.** The panel says it, in the note next to the checkbox, not in a policy nobody opens. If you reword that text, keep it saying it.
 
+= Can the reporter tell me how to reach them? =
+
+Yes, if you ask. **Contact field** under **Bug reports -> Settings** has three states: do not ask, ask, and ask but refuse to send without an answer. On, the panel puts one field under the message. Nothing checks what is typed - "ring me on 12345678" is a good answer to "how do we reach you" - and the line is stored with the report, shown on the report screen, and rendered as a Contact row in the Markdown summary.
+
+When the line looks like an email address, the notification email is sent with it as `Reply-To`, so hitting reply answers the reporter. When it does not, the line is in the body and no header is set: `Reply-To` takes an address or nothing.
+
+It is off by default for two reasons. Asking somebody for an address is a promise to answer, and that promise is yours to make; and what they type is personal data you asked for. It is kept where the rest of the report is kept, it goes when you delete the report, and everyone who can read a report can read it.
+
 = What happens when I delete a report? =
 
 The row is deleted. The screenshot file is left on disk on purpose: an accidental delete is recoverable, and a directory nobody can reach over HTTP is a smaller problem than an unrecoverable one. Clear the directory yourself when you mean it.
@@ -134,9 +145,18 @@ No. Composer is used only to run PHPStan while developing; the shipped plugin is
 1. The report panel on the front end, open, with the console errors and the element the reporter pointed at already collected.
 2. The reports list in wp-admin, filtered by status.
 3. A single report: the summary, the environment, the console errors and the screenshot.
-4. The settings screen: language, colour, position, branding, the keyboard shortcut, the evidence switches, screenshots, the timings and storage snapshot, shake to report, signing keys and the email recipient.
+4. The settings screen: language, colour, position, branding, the keyboard shortcut, the contact field, the evidence switches, screenshots, the timings and storage snapshot, shake to report, signing keys and the email recipient.
 
 == Changelog ==
+
+= 0.5.0 =
+* **New "Contact field" setting, off by default.** Three states rather than a checkbox: do not ask, ask, or ask and refuse to send without an answer. On, the panel puts one field under the message asking how the reporter can be reached. Nothing checks what they type - a phone number or a name in your own chat is a good answer.
+* The contact line is stored with the report, shown on the report screen (as a mailto link when it looks like an address), and rendered as a Contact row in the Markdown summary, directly under the type.
+* **The notification email sets `Reply-To`** when the contact line looks like an email address, so replying answers the reporter rather than the site. A line that is not an address is left in the body and never becomes a header.
+* The contact field is personal data you asked for, and the settings screen says so: it is kept where the rest of the report is kept, it goes when you delete the report, and everyone who can read a report sees it. Asking for an address is also a promise to answer, which is why the default is off.
+* **Fixed: the notification email's link to the screenshot always answered 401.** It pointed at a route that wants an administrator's session plus a REST nonce, neither of which an inbox has, so the link was broken for every recipient and had been since 0.1.0. The email no longer carries it; a report with a picture says "attached, in admin" and the "In admin" link, which has always worked, is how it is reached.
+* Both bundled JavaScript files follow the library to bugbottle 0.9.0. `assets/bugbottle.js` is 65,103 bytes (md5 `d081721b55b18de4b473ef40c4152820`) and `assets/bugbottle-screenshot.js` 14,999 bytes (md5 `9affad9a82bded0f0bddb5b5773f5a7a`).
+* A session replay - the rrweb recording bugbottle 0.8.0 added - is dropped rather than stored: post meta is the wrong place for a megabyte of nested JSON, and nothing in wp-admin can play one back. A report that arrives with one is stored without it and is never refused for it.
 
 = 0.4.1 =
 * **The panel takes a screenshot now.** Versions 0.1.0 to 0.4.0 never did. The bundled one-script-tag build carries no renderer on purpose, and without one the panel hides the screenshot row, so every report arrived without a picture no matter what the settings screen and the readme said.
@@ -173,6 +193,9 @@ No. Composer is used only to run PHPStan while developing; the shipped plugin is
 * First release. REST endpoint, private `bugbottle_report` post type, admin list and detail screens, settings, email via `wp_mail`, screenshots behind an admin-only route, Danish and English.
 
 == Upgrade Notice ==
+
+= 0.5.0 =
+Updates the bundled panel to bugbottle 0.9.0 and adds an optional contact field, off by default, so a report can say how to reach the person who wrote it - and the notification email can reply to them. It is personal data you asked for; read what the setting says beside the box before you turn it on. Also fixes the notification email's screenshot link, which always answered 401. Existing reports are untouched.
 
 = 0.4.1 =
 The panel can take a screenshot for the first time. Versions 0.1.0 to 0.4.0 never took one, whatever the readme said. Turn on the new "Screenshots" setting - off by default - and read what it says beside the box first. Existing reports are untouched.

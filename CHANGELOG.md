@@ -6,6 +6,91 @@ repository directly; keep the two in step.
 
 ## Unreleased
 
+## 0.5.0 — 2026-09-08
+
+Follows the library to **bugbottle 0.9.0**, and the one thing that release
+brings a WordPress site is a way of answering the person who wrote the report.
+"The save button does nothing" is worth a reply, and until now there was
+nobody to send it to.
+
+Also here: the email fix that was sitting unreleased since 0.4.1, and a
+decision written down — the plugin drops the session replay bugbottle 0.8.0
+added rather than storing it.
+
+### Added
+
+- **A Contact field setting**, off by default, with three states rather than a
+  checkbox because that is the shape the library's option has: *Do not ask*,
+  *Ask, but let them send without it*, and *Ask, and refuse to send without
+  it*. On, the panel puts one field under the message; required, it refuses to
+  send an empty one through the same inline error an empty message gets.
+  Nothing checks what is typed — "ring me on 12345678" is a good answer to
+  "how do we reach you" — and the line arrives as `contact` on the report,
+  trimmed, null bytes stripped, clipped at 200 characters, exactly as
+  `normaliseContact` does it in the library. The setting says plainly that the
+  contact field is personal data you asked for: it is kept where the rest of
+  the report is kept, it goes when the report goes, and everyone who can read
+  a report sees it.
+- The contact line is a `Contact` row in the Markdown summary, directly under
+  the type, which is where `toMarkdown` puts it — so an issue pasted from the
+  email looks like every other bugbottle report. It is also a section of its
+  own on the report detail screen, as a `mailto:` link when it looks like an
+  address and as plain text when it does not, with a note saying nobody
+  checked it.
+- **The notification email sets `Reply-To`** when the contact line looks like
+  an email address, so replying to the mail answers the reporter rather than
+  the site. The test is the permissive one the library uses — a line is only
+  refused when it plainly is not an address — ported as
+  `Validator::looks_like_email()` rather than delegated to `is_email()`, so
+  both sides agree. A phone number is left in the body and never becomes a
+  header: `Reply-To: ring me on 12345678` is a malformed header, and Resend,
+  which the library sends through, refuses one outright.
+- `tests/test-report-parity.php` grew nineteen checks: the contact line rule by
+  rule, `looks_like_email` against eight inputs, and the replay divergence
+  below. `tests/test-email.php` grew eleven, pinning the `Reply-To`, the `Contact`
+  row, and the reason a contact line carrying a CR or an LF cannot become a
+  second header — `looks_like_email` excludes whitespace in every character
+  class, so such a line never matches. `Validator::contact` deliberately does
+  not strip newlines, because it is a byte-for-byte port of `normaliseContact`
+  and the library does not either; the defence is where the address is chosen,
+  and it is now a test rather than a property somebody has to notice. The parity fixture now carries a contact line and was
+  regenerated against bugbottle v0.9.0's `src/markdown.ts` and
+  `src/report-core.ts` with `node --experimental-strip-types`; `diff -u`
+  against the PHP output is empty for both the Markdown and the validated JSON.
+
+### Changed
+
+- A contact line of exactly `"0"` is kept. `empty( '0' )` is true in PHP, so
+  `Storage::insert` skipped the meta write for a line that is one character
+  long and a real answer — an extension, a room number — and the report then
+  lost its `Contact` row and its `Reply-To` as well, because the email re-reads
+  what was stored. Found in review before the release and pinned in
+  `tests/test-email.php`.
+
+- **`assets/bugbottle.js` is bugbottle 0.9.0**, 65,103 bytes (md5
+  `d081721b55b18de4b473ef40c4152820`), copied verbatim from that release's
+  `dist/bugbottle.js`. `LIB_VERSION` is `0.9.0`, which is what busts the cache
+  on both enqueued files.
+- **`assets/bugbottle-screenshot.js` was rebuilt** against `bugbottle@0.9.0`
+  with `bin/build-screenshot-bundle.sh`, whose `LIB_VERSION` is pinned to match:
+  14,999 bytes, md5 `9affad9a82bded0f0bddb5b5773f5a7a`. The only byte that
+  changed is the version in the licence notice — the library's
+  `bugbottle/html-to-image` entry is one expression and has not moved since
+  0.7.0 — but the two bundles are enqueued with one version string and must
+  come from one release, so it is rebuilt rather than left.
+- 0.8.0 added a second script-tag build, `dist/bugbottle.slim.js`, without the
+  annotator, the timings snapshot, the shake gesture and the network log. The
+  plugin keeps the full build: three of those four are settings here, and a
+  site that turns one on should not need a different file. `bin/build-zip.sh`
+  ships one bundle, and it is the one that can do everything the settings
+  screen offers.
+- The 0.9.0 renames — `onError` for `onFailure`, `maxEntries` for `maxItems`,
+  `store` for the three store names — touch nothing in the mount script, which
+  passes none of the three. The names the mount call does use (`endpoint`,
+  `headers`, `queue`, `shortcut`, `openOnError`, `scrub`, `sign`, `shake`,
+  `screenshot`, `extra`) are unchanged in 0.9.0, and `contact` is new beside
+  them.
+
 ### Fixed
 
 - **The notification email's link to the screenshot always answered `401`.**
@@ -21,6 +106,22 @@ repository directly; keep the two in step.
   so it needs that text beside the box. (Issue #5.)
 - `tests/test-email.php` is new and pins this: the body carries no REST URL,
   and the admin link resolves to that report's own detail screen.
+  (Both landed after 0.4.1 was tagged and ship here.)
+
+### Not stored
+
+- **The session replay bugbottle 0.8.0 added is dropped at the door.**
+  `bugbottle/rrweb` lets an application attach the last thirty seconds of an
+  rrweb recording as `replay`, capped at a megabyte. Post meta is the wrong
+  place for a megabyte of nested JSON: every read of the row would carry it,
+  `wp_postmeta` is not a blob store, and nothing in wp-admin can play a
+  recording back. So `Rest::receive_report()` names `replay` as a known field
+  and keeps none of it — the report is stored without it and is never refused
+  for carrying one. The bundled panel never sends one either: the plugin ships
+  no rrweb adapter, and rrweb is the application's own dependency. The
+  consequence for the Markdown is one row the library renders and this port
+  does not, which `tests/test-report-parity.php` pins rather than leaves to be
+  rediscovered.
 
 ## 0.4.1 — 2026-09-08
 

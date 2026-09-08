@@ -3,7 +3,7 @@
  * Plugin Name:       Bugbottle
  * Plugin URI:        https://bugbottle.dev
  * Description:       In-app bug reports that arrive with the evidence attached. Adds the bugbottle panel to the front end and receives the reports as a private post type in wp-admin.
- * Version:           0.4.0
+ * Version:           0.4.1
  * Requires at least: 6.4
  * Requires PHP:      8.1
  * Author:            Mads Holst Jensen
@@ -19,7 +19,9 @@
  * any later version.
  *
  * The bundled `assets/bugbottle.js` is the unmodified MIT-licensed build of
- * the bugbottle library; see `assets/LICENSE-bugbottle.txt`. MIT is
+ * the bugbottle library, and `assets/bugbottle-screenshot.js` is that library's
+ * screenshot renderer bundled with the MIT-licensed html-to-image by
+ * `bin/build-screenshot-bundle.sh`; see `assets/LICENSE-bugbottle.txt`. MIT is
  * GPL-compatible, so the combined work is distributable under the GPL.
  *
  * @package Bugbottle
@@ -33,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-const VERSION = '0.4.0';
+const VERSION = '0.4.1';
 
 /**
  * The bugbottle release `assets/bugbottle.js` was copied from. Bump it in the

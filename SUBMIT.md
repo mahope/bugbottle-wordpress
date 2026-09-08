@@ -82,11 +82,17 @@ develop — do not hand-edit files inside an SVN checkout.
 1. Bump `Version:` in `bugbottle.php`, `const VERSION` in `bugbottle.php`,
    `Stable tag:` in `readme.txt`, and add a changelog entry to both
    `readme.txt` (`== Changelog ==`) and `CHANGELOG.md`.
-2. `composer install && vendor/bin/phpstan analyse` — clean.
-3. Re-sync a local WordPress install and re-run Plugin Check
+2. If the bundled library moved, replace **both** bundles from the same
+   release: copy `dist/bugbottle.js` over `assets/bugbottle.js`, run
+   `bin/build-screenshot-bundle.sh` with `LIB_VERSION` in it bumped to match,
+   and put both md5s in `CHANGELOG.md`. They are enqueued with one version
+   string, so they cannot come from different releases.
+3. `composer install && vendor/bin/phpstan analyse` — clean, and the four test
+   files in `tests/` green.
+4. Re-sync a local WordPress install and re-run Plugin Check
    (`wp plugin install plugin-check --activate` once, then
    `wp plugin check bugbottle --format=table` every time) — no errors.
-4. Commit, then tag and push:
+5. Commit, then tag and push:
    ```bash
    git tag vX.Y.Z
    git push origin main --tags
@@ -94,7 +100,7 @@ develop — do not hand-edit files inside an SVN checkout.
    Pushing the tag triggers `.github/workflows/release.yml`: it builds
    `bugbottle.zip` with `bin/build-zip.sh` and attaches it to a GitHub
    release.
-5. Ship the same version to wordpress.org, either:
+6. Ship the same version to wordpress.org, either:
    - **Automatically** — once `SVN_USERNAME` and `SVN_PASSWORD` exist as
      repository secrets (Settings → Secrets and variables → Actions), the
      same tag push also runs `.github/workflows/deploy-wporg.yml`, which
@@ -104,7 +110,7 @@ develop — do not hand-edit files inside an SVN checkout.
      fails, it is just a no-op.
    - **By hand** — `bin/deploy-wporg.sh X.Y.Z`, with `SVN_USERNAME` and
      `SVN_PASSWORD` set as environment variables. Needs `svn` on `PATH`.
-6. Check `https://wordpress.org/plugins/bugbottle/` shows the new version
+7. Check `https://wordpress.org/plugins/bugbottle/` shows the new version
    (this can take a few minutes to a couple of hours to refresh) and that
    updating a real site's existing install offers it.
 

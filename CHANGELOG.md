@@ -6,6 +6,84 @@ repository directly; keep the two in step.
 
 ## Unreleased
 
+## 0.4.1 — 2026-09-08
+
+**The panel had never taken a screenshot.** Not in 0.1.0, not in 0.4.0. The
+bundled `assets/bugbottle.js` is the library's one-script-tag build, and that
+build carries no renderer on purpose — a picture means `html-to-image`, which
+is larger than the rest of the panel put together. Without a renderer the panel
+hides the screenshot row, so no report the panel sent ever had a picture on it,
+however plainly the readme, the intro and the privacy section said otherwise.
+The route accepted and stored one all along, which is why nothing looked
+broken: a picture only ever arrived from a form somebody wrote themselves.
+
+This release ships the renderer and makes it a setting, so the plugin does what
+it says. (Reported as issue #4.)
+
+### Added
+
+- **`assets/bugbottle-screenshot.js`**, 14,999 bytes (md5
+  `7f729536c46c40e2c7f95b356ddc01f8`), about 6 kB over the wire. It is the
+  library's `bugbottle/html-to-image` entry — one expression, `toPng` with the
+  mask filter and pixel ratio the panel passes — bundled together with
+  `html-to-image` 1.11.13 by esbuild 0.28.2 as an IIFE that sets
+  `window.bugbottleScreenshot`. `bin/build-screenshot-bundle.sh` is the exact
+  command, with all three versions pinned; running it twice gives the same
+  bytes, so the md5 above is checkable. Both bundled files are MIT, and the
+  notice is now in the file header, in `assets/LICENSE-bugbottle.txt` and in
+  `readme.txt`'s source-and-licence section.
+- **Screenshots**, a setting, **off by default**. The renderer is enqueued only
+  when it is on, with the panel bundle as its dependency, so a site that leaves
+  it off downloads nothing extra and no report can carry a picture at all —
+  which is a complete answer to the privacy question, and the reason the
+  default is off. When it is on, `Assets::config_script()` passes
+  `window.bugbottleScreenshot.htmlToImage` as `screenshot`, the panel shows the
+  row, and because the bundled `mount()` already hands `createAnnotator` in,
+  "Edit picture" — rectangle, arrow, and a blur that reads the region back out
+  of the canvas so the original pixels leave with it — appears under the
+  preview by itself. Verified end to end in a real Chrome against a real
+  WordPress served by `php -S`: with the setting on the report carried a
+  1280×1358 PNG that `getimagesize` accepts, stored under a random name in the
+  uploads directory; with it off there was no second script tag, no
+  `window.bugbottleScreenshot`, no screenshot row and no picture on the report.
+- The settings text says what a picture of the page contains, that everyone who
+  can read a report sees it, that field values are bulleted before the render,
+  and that `data-bugbottle-mask` and `data-bugbottle-block` are how anything
+  else is kept out of it. That text is load-bearing; do not soften it.
+- `.gitattributes`, marking both bundles `-text` and the compiled catalogue
+  binary. Without it a checkout on Windows rewrites the line endings of a file
+  whose md5 this changelog asks you to verify.
+- `tests/test-screenshot.php`: fifteen checks over `decode_screenshot()` and
+  the setting. The decoder was already correct — it reads the PNG signature out
+  of the **decoded bytes** rather than trusting the `data:` label, exactly as
+  the library's TypeScript does, so nothing needed porting — but nothing pinned
+  it. A JPEG wearing a PNG label, an HTML login page returned in a renderer's
+  place, a buffer shorter than the signature, and a data URL past the ceiling
+  are all refused, and screenshots stay off through a form that does not
+  mention them.
+
+### Fixed
+
+- **The screenshot on the report detail screen never loaded.** An `<img>` is
+  fetched by the browser and carries no `X-WP-Nonce` header, and
+  `rest_cookie_check_errors()` treats a cookie request with no nonce as
+  anonymous — so `may_read_screenshot()` refused an administrator looking at
+  their own report, and the picture came back `401`. `Rest::screenshot_src()`
+  puts a REST nonce in the query string, where WordPress looks second. The
+  `manage_options` check is untouched: the nonce authorises nothing, it only
+  keeps the request from being thrown away before the check runs.
+- The picture on that screen has alt text now, naming the report it belongs to,
+  rather than `alt=""`.
+
+### Changed
+
+- The prose that described a picture the plugin could not take: the README
+  intro, its "Please read this part" (which grew a fourth rule — what is hidden
+  before the render — and now opens with the setting being off), "What a report
+  carries", "The bundled panel", `readme.txt`'s intro, its screenshot list, its
+  privacy section and the FAQ. The 0.4.0 annotator line in both changelogs now
+  points here rather than implying there was ever a picture to mark.
+
 ## 0.4.0 — 2026-09-08
 
 Follows the library to bugbottle 0.7.0. That is the release signing arrives
@@ -13,7 +91,7 @@ in, so the signing key setting below — written and tested against the server
 side first — works from this version on: the bundled panel signs what it
 sends. Two more things 0.7.0 added are settings here, both off by default, and
 one of them — marking the screenshot before it is sent — needed nothing here at
-all.
+all, though there was no picture to mark until 0.4.1.
 
 ### Added
 
@@ -101,9 +179,9 @@ all.
   `mount()` is the wrapper that hands it in. Calling it is what puts "Edit
   picture" — rectangle, arrow, and a blur that reads the region back out of the
   canvas so the original pixels leave with it — in the panel wherever there is a
-  picture to mark, with nothing added here. There is not one yet: the
-  one-script-tag build carries no `html-to-image`, so the panel hides the
-  screenshot row, and a stored picture still comes from a form of your own.
+  picture to mark, with nothing added here. There was none in this release: the
+  one-script-tag build carries no `html-to-image`, so the panel hid the
+  screenshot row. 0.4.1 is where the renderer arrives.
 - The panel's Escape handling and its annotator fixes came with the bundle and
   needed no change in the plugin.
 

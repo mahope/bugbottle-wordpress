@@ -5,8 +5,9 @@ The [bugbottle](https://github.com/mahope/bugbottle) panel — see it at
 endpoint, in one activation. Reports land as a private post type in wp-admin —
 with the page, the viewport, the recent console errors and their stack frames,
 the requests that failed, the element the reporter pointed at, what they did
-just before, and optionally a picture of what they were looking at — and are
-emailed on if you give it a recipient.
+just before, and — when you turn screenshots on — a picture of what they were
+looking at, which they can mark up first. Reports are emailed on if you give it
+a recipient.
 
 Error trackers catch what throws. They cannot catch what merely looks wrong,
 and they never tell you what the person was doing when it did. *"The save
@@ -18,7 +19,8 @@ button does nothing"* is not a report anyone can act on.
   your uploads directory. There is no vendor in the middle.
 - **Your language, your brand.** Eight locales, following the site language by
   default; colour, position, name and logo on the settings screen.
-- **No build step, no Composer.** The plugin is PHP and one JavaScript file.
+- **No build step, no Composer.** The plugin is PHP and two JavaScript files,
+  the second of which is only loaded when screenshots are on.
 
 Requires WordPress 6.4 and PHP 8.1.
 
@@ -54,6 +56,7 @@ database, not in the plugin directory.
 | Keyboard shortcut | The combination that opens the panel. `mod` is Command on a Mac and Ctrl everywhere else; `mod+shift+b` by default. Empty means no shortcut. |
 | Open on error | Opens the panel by itself when the page throws an uncaught error. Off by default — it shows the panel to whoever is on the page, customers included. |
 | Evidence | Breadcrumbs (clicks, navigations, submits) and the network log (requests that failed or were slow — method, URL, status and duration, never a body or a header). Both on. |
+| Screenshots | Lets the reporter attach a picture of the page, and mark it before sending: a rectangle, an arrow, and a blur that really destroys what it covers. **Off by default**, and it is the setting to think hardest about — read [Please read this part](#please-read-this-part). Turning it on loads a second script, `assets/bugbottle-screenshot.js`, about 15 kB (6 kB over the wire), on every page the panel is on. |
 | Offline queue | Keeps a report the browser could not send and delivers it when the connection is back. Reports wait in the browser for up to seven days. On by default. |
 | Scrubbing | Redacts email addresses, bearer tokens, JWTs, card numbers, IBANs and query values before the report is sent. On by default. |
 | Timings and storage snapshot | Records what the page cost — largest contentful paint, layout shift, interaction to next paint, time to first byte, the load events, long tasks, and the JS heap in Chrome — and lists the key names in `localStorage` and `sessionStorage` with the length of each value, plus the cookie names. **Names only, never values**, and never a cookie value at all. Off by default. |
@@ -198,6 +201,10 @@ are capped on the way in: fifty keys per store, a hundred cookie names, a
 hundred characters per name, and an hour as the longest duration any figure
 may claim.
 
+A picture of the page is there only when **Screenshots** is on, the report is
+one the box was ticked for, and the reporter left it ticked. Before 0.4.1 there
+was never one at all: the plugin shipped no renderer, so the panel hid the row.
+
 None of that says more about the person than the user agent already does, and
 nothing beyond that list is collected: no canvas fingerprint, no font
 enumeration, no device enumeration.
@@ -209,8 +216,12 @@ clinical system that can mean a patient photograph; in a payroll tool, a
 salary; in yours, perhaps somebody's inbox or a half-written message they had
 not sent yet.
 
-Three things follow. The plugin does the first two for you; the third it
-cannot:
+That is why **Screenshots is off until you turn it on**. Leaving it off is a
+complete answer: no renderer is loaded, the panel does not offer a picture, and
+no report can carry one.
+
+Four things follow if you do turn it on. The plugin does the first three for
+you; the fourth it cannot:
 
 1. **Screenshots are kept out of the media library.** They are written to
    `wp-content/uploads/bugbottle/` under a random name, never registered as
@@ -225,7 +236,14 @@ cannot:
    `GET /wp-json/bugbottle/v1/screenshot/<id>` requires `manage_options`. The
    `<id>` is the report, and the file name is looked up from that row rather
    than taken from the request, so an id cannot be used to walk the directory.
-3. **Say so before the picture is taken.** The panel says it, in the note next
+3. **What was typed is hidden before the picture is taken.** Every `input`,
+   `textarea` and `contenteditable` is replaced with bullets for the length of
+   one render and put straight back, so the picture shows a filled-in form of
+   the right shape without the values. Mark anything else that must not be in
+   it with `data-bugbottle-mask` (its text is bulleted) or
+   `data-bugbottle-block` (it is covered entirely). Nothing else is hidden: a
+   name printed in a heading is a name in the picture.
+4. **Say so before the picture is taken.** The panel says it, in the note next
    to the checkbox — not in a policy nobody opens. If you reword it, keep it
    saying it.
 
@@ -269,32 +287,57 @@ that hands it in. Calling it is what puts "Edit picture" — the rectangle, the
 arrow and the blur that really destroys what it covers — in the panel wherever
 there is a picture to mark, with nothing added here.
 
-There is not one yet. A picture means `html-to-image`, which is larger than
-everything else in the bundle put together, so the one-script-tag build ships
-no renderer and the panel hides the screenshot row without one. The REST route
-accepts and stores a picture all the same, from a form of your own or from a
-page that mounts the panel itself with a renderer — which is what "Please read
-this part" above is about.
+### The renderer
+
+Taking a picture needs a renderer, and the one-script-tag build deliberately
+carries none: a picture means `html-to-image`, which is larger than everything
+else in the bundle put together, and a page that only wants the panel should
+not download it. Versions 0.1.0 to 0.4.0 shipped no renderer at all, so the
+panel hid the screenshot row and the plugin never took a picture — whatever the
+prose said.
+
+Since 0.4.1 there is a second file for it. `assets/bugbottle-screenshot.js` is
+the library's `bugbottle/html-to-image` entry bundled together with
+`html-to-image` as an IIFE that sets `window.bugbottleScreenshot`, and it is
+enqueued only when **Screenshots** is on, with the panel bundle as its
+dependency. The mount script then passes
+`window.bugbottleScreenshot.htmlToImage` as `screenshot`, which is what makes
+the panel show the row — and, because `mount()` has already handed the
+annotator in, what puts "Edit picture" under the preview.
+
+`bin/build-screenshot-bundle.sh` builds that file and is the only thing that
+should: it pins bugbottle, `html-to-image` and esbuild by exact version, writes
+the MIT notice into the header, and prints the md5 that `CHANGELOG.md` records.
+Both bundles are enqueued with the same `LIB_VERSION`, so they must come from
+the same library release.
 
 ## Development
 
 ```bash
 composer install                 # dev only: PHPStan and the WordPress stubs
 vendor/bin/phpstan analyse       # level 5, clean
-wp i18n make-pot . languages/bugbottle.pot --domain=bugbottle --exclude=assets,vendor,tests
-wp i18n make-mo languages/
+wp i18n make-pot . languages/bugbottle.pot --slug=bugbottle --exclude=vendor,tests,bin,.wordpress-org,assets
+wp i18n update-po languages/bugbottle.pot languages/bugbottle-da_DK.po
+wp i18n make-mo languages/bugbottle-da_DK.po languages/
 ```
 
-There are three test files, none of which needs a framework:
+There are four test files, none of which needs a framework:
 
 ```bash
 php tests/test-report-parity.php      # the validators and the Markdown, against the library
+php tests/test-screenshot.php         # the PNG decoder and the Screenshots setting
 php tests/test-signature.php          # the signature rules, no WordPress needed
 wp eval-file tests/test-rest-signature.php   # the REST route, from a scratch install
 ```
 
 The last writes settings and stores reports, so point it at a scratch install
-and never at a live site. All three exit non-zero on a failure.
+and never at a live site. All four exit non-zero on a failure.
+
+Rebuilding the screenshot renderer needs node and npm, and nothing else:
+
+```bash
+bin/build-screenshot-bundle.sh   # writes assets/bugbottle-screenshot.js, prints its md5
+```
 
 `tests/test-report-parity.php` is what pins the PHP port to the library: it
 holds one report carrying every section, and the Markdown and the validated
@@ -309,5 +352,8 @@ tagged release also ships to the wordpress.org SVN repository.
 
 ## Licence
 
-GPL-2.0-or-later. The bundled `assets/bugbottle.js` stays MIT-licensed; see
+GPL-2.0-or-later. The two bundled JavaScript files stay MIT-licensed —
+`assets/bugbottle.js` is the bugbottle library, `assets/bugbottle-screenshot.js`
+is that library's renderer together with
+[html-to-image](https://github.com/bubkoo/html-to-image); see
 `assets/LICENSE-bugbottle.txt`.

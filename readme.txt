@@ -4,7 +4,7 @@ Tags: bug report, feedback, screenshot, support, qa
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.4.0
+Stable tag: 0.4.1
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -32,17 +32,21 @@ The panel speaks Danish, English, Swedish, Norwegian, German, Dutch, French and 
 * Optionally, what the page cost - largest contentful paint, layout shift, interaction to next paint, time to first byte, the load events, long tasks and, in Chrome, the JavaScript heap.
 * Optionally, the key names in localStorage and sessionStorage with the length of each value, and the names of the cookies. Names only, never values, and never a cookie value at all. Off unless you turn it on.
 * The reporter's own description, and their name and email if they gave them.
-* Optionally a screenshot, only when the reporter ticks the box.
+* Optionally a picture of the page, when you have turned Screenshots on and the reporter leaves the box ticked. They see it first and can mark it before it is sent. Off unless you turn it on, and before version 0.4.1 the plugin could not take one at all.
 
 None of the context facts says more about the person than the user agent already does, and nothing beyond that list is collected: no canvas fingerprint, no font enumeration, no device enumeration.
 
 = Screenshots and privacy =
 
-A screenshot of your site contains whatever the reporter could see. The plugin keeps screenshots out of the media library, writes them under a random name in `wp-content/uploads/bugbottle/` with an `.htaccess` deny rule, and serves them back only through a route that requires the `manage_options` capability.
+A screenshot of your site contains whatever the reporter could see: somebody else's name, an order, a half-written message. That is why Screenshots is off until you turn it on - leaving it off is a complete answer, because the renderer is not even loaded and the panel does not offer a picture.
+
+If you do turn it on: the plugin keeps screenshots out of the media library, writes them under a random name in `wp-content/uploads/bugbottle/` with an `.htaccess` deny rule, and serves them back only through a route that requires the `manage_options` capability.
 
 The `.htaccess` rule only works on Apache. On nginx, add the deny yourself:
 
 `location ~* /wp-content/uploads/bugbottle/ { deny all; }`
+
+What was typed into a field is replaced with bullets before the picture is taken and put straight back afterwards. Mark anything else that must stay out of it with `data-bugbottle-mask` to bullet its text, or `data-bugbottle-block` to cover it entirely. Nothing else is hidden.
 
 The panel tells the reporter what the picture may contain, next to the checkbox. If you reword it, keep it saying so.
 
@@ -54,7 +58,7 @@ Two filters, `bugbottle_show_panel` and `bugbottle_panel_config`, and one action
 
 This plugin is developed on GitHub at https://github.com/mahope/bugbottle-wordpress and is licensed GPL-2.0-or-later. See the panel itself at https://bugbottle.dev.
 
-It bundles the official build of the bugbottle library (https://github.com/mahope/bugbottle), unmodified, as `assets/bugbottle.js`. That file is MIT-licensed; the notice is in `assets/LICENSE-bugbottle.txt`. MIT is GPL-compatible, so the plugin as a whole is distributable under the GPL.
+It bundles the official build of the bugbottle library (https://github.com/mahope/bugbottle), unmodified, as `assets/bugbottle.js`. It also bundles `assets/bugbottle-screenshot.js`, which is that library's `bugbottle/html-to-image` entry built together with html-to-image (https://github.com/bubkoo/html-to-image, MIT, copyright W.Y.) by `bin/build-screenshot-bundle.sh`; it is loaded only when the Screenshots setting is on. Both files are MIT-licensed; the notice is in `assets/LICENSE-bugbottle.txt`. MIT is GPL-compatible, so the plugin as a whole is distributable under the GPL.
 
 == Installation ==
 
@@ -62,7 +66,7 @@ It bundles the official build of the bugbottle library (https://github.com/mahop
 2. Or upload the zip: **Plugins -> Add New -> Upload Plugin**, choose the file, install and activate.
 3. Go to **Bug reports -> Settings** and set an email recipient, or plan to read the reports in wp-admin instead.
 
-There is no build step and no Composer requirement. The plugin is PHP and one JavaScript file.
+There is no build step and no Composer requirement. The plugin is PHP and two JavaScript files, the second of which is only loaded when Screenshots is on.
 
 Updating replaces the plugin directory. Reports and settings live in the database and survive it.
 
@@ -70,13 +74,20 @@ Updating replaces the plugin directory. Reports and settings live in the databas
 
 = Does the plugin send anything to a third party? =
 
-No. There is no outbound HTTP request anywhere in the plugin, no analytics, no telemetry, no phone-home and no account. The bundled `assets/bugbottle.js` posts reports to your own site's REST route and contacts nothing else. Reports are rows in your database; screenshots are files in your uploads directory.
+No. There is no outbound HTTP request anywhere in the plugin, no analytics, no telemetry, no phone-home and no account. The bundled `assets/bugbottle.js` posts reports to your own site's REST route and contacts nothing else, and `assets/bugbottle-screenshot.js` draws the page into a canvas in the browser and contacts nothing at all. Reports are rows in your database; screenshots are files in your uploads directory.
 
-= What are the three privacy rules for screenshots? =
+= Does the panel actually take a screenshot? =
+
+Since 0.4.1, yes - if you turn it on. Tick **Screenshots** under **Bug reports -> Settings**. Versions 0.1.0 to 0.4.0 could not: the bundled panel build carries no renderer, so it hid the screenshot row and every report arrived without a picture, whatever the settings screen implied. Turning the setting on loads a second script, `assets/bugbottle-screenshot.js`, about 15 kB (6 kB over the wire), on every page the panel is on; leaving it off loads nothing extra.
+
+= What are the four privacy rules for screenshots? =
+
+The first answer is that they are off until you turn them on: with the setting off, the renderer is not loaded and no report can carry a picture at all. If you do turn them on, four things follow.
 
 1. **Screenshots are kept out of the media library.** They are written to `wp-content/uploads/bugbottle/` under a random name, never registered as attachments, and the directory ships with an `.htaccess` deny rule. That rule only works on Apache; on nginx, add `location ~* /wp-content/uploads/bugbottle/ { deny all; }` yourself.
 2. **They are served back only through an authenticated route.** `GET /wp-json/bugbottle/v1/screenshot/<id>` requires `manage_options`. The `<id>` is the report, and the file name is looked up from that row rather than taken from the request, so an id cannot be used to walk the directory.
-3. **Say so before the picture is taken.** The panel says it, in the note next to the checkbox, not in a policy nobody opens. If you reword that text, keep it saying it.
+3. **What was typed is hidden before the picture is taken.** Fields, textareas and `contenteditable` regions are bulleted for the length of one render and put straight back. Mark anything else with `data-bugbottle-mask` or `data-bugbottle-block`. Nothing else is hidden.
+4. **Say so before the picture is taken.** The panel says it, in the note next to the checkbox, not in a policy nobody opens. If you reword that text, keep it saying it.
 
 = What happens when I delete a report? =
 
@@ -116,16 +127,25 @@ Yes. Put a CSS selector for it in "Trigger selector" on the settings screen. Lea
 
 = Does it need Composer or a build step? =
 
-No. Composer is used only to run PHPStan while developing; the shipped plugin is PHP and one JavaScript file.
+No. Composer is used only to run PHPStan while developing; the shipped plugin is PHP and two JavaScript files.
 
 == Screenshots ==
 
 1. The report panel on the front end, open, with the console errors and the element the reporter pointed at already collected.
 2. The reports list in wp-admin, filtered by status.
 3. A single report: the summary, the environment, the console errors and the screenshot.
-4. The settings screen: language, colour, position, branding, the keyboard shortcut, the evidence switches, the timings and storage snapshot, shake to report, signing keys and the email recipient.
+4. The settings screen: language, colour, position, branding, the keyboard shortcut, the evidence switches, screenshots, the timings and storage snapshot, shake to report, signing keys and the email recipient.
 
 == Changelog ==
+
+= 0.4.1 =
+* **The panel takes a screenshot now.** Versions 0.1.0 to 0.4.0 never did. The bundled one-script-tag build carries no renderer on purpose, and without one the panel hides the screenshot row, so every report arrived without a picture no matter what the settings screen and the readme said.
+* New "Screenshots" setting, off by default. With it on, the plugin loads a second script - `assets/bugbottle-screenshot.js`, the library's renderer bundled with html-to-image, about 15 kB (6 kB over the wire) - only on the pages the panel is on, and the panel offers the picture. With it off nothing extra is loaded.
+* The reporter can mark the picture before sending it: a rectangle, an arrow, and a blur that reads the region back out of the canvas so the original pixels leave with it. That came with the 0.4.0 bundle; there was simply never a picture to mark.
+* Fixed: the screenshot on the report detail screen never loaded. An `<img>` carries no REST nonce, and WordPress treats a cookie request without one as anonymous, so the route refused it. The image URL now carries the nonce; the `manage_options` check is unchanged.
+* The screenshot on the report detail screen has alt text.
+* Corrected the readme and the settings screen, which described a picture the plugin could not take.
+* Danish for every new string.
 
 = 0.4.0 =
 * Updated the bundled panel to bugbottle 0.7.0.
@@ -134,7 +154,7 @@ No. Composer is used only to run PHPStan while developing; the shipped plugin is
 * New "Timings and storage snapshot" setting, off by default. Records what the page cost, and lists the key names in localStorage and sessionStorage with the length of each value, plus the cookie names - names only, never values, and never a cookie value at all.
 * New "Shake to report" setting, off by default: shaking the phone opens the panel. On iPhone and iPad the visitor has to agree first, and only a button on your own page can ask; the plugin enables the gesture and explains it, and never puts up the prompt itself.
 * The report detail screen shows the timings and the storage snapshot as tables of their own, and both are stored with the report.
-* The bundled panel carries the screenshot annotator - rectangle, arrow and a blur that really destroys what it covers - wherever there is a picture to mark, and it needed nothing here.
+* The bundled panel carries the screenshot annotator - rectangle, arrow and a blur that really destroys what it covers - wherever there is a picture to mark. There was none until 0.4.1; see that entry.
 * Danish for every new setting, label and screen.
 
 = 0.3.0 =
@@ -153,6 +173,9 @@ No. Composer is used only to run PHPStan while developing; the shipped plugin is
 * First release. REST endpoint, private `bugbottle_report` post type, admin list and detail screens, settings, email via `wp_mail`, screenshots behind an admin-only route, Danish and English.
 
 == Upgrade Notice ==
+
+= 0.4.1 =
+The panel can take a screenshot for the first time. Versions 0.1.0 to 0.4.0 never took one, whatever the readme said. Turn on the new "Screenshots" setting - off by default - and read what it says beside the box first. Existing reports are untouched.
 
 = 0.4.0 =
 Updates the bundled panel to bugbottle 0.7.0. Signing works now, so the "Signing key(s)" setting can be used in earnest; two new settings, both off by default, add the page timings with a storage snapshot and shake-to-report. Existing reports are untouched.

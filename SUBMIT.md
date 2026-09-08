@@ -87,7 +87,7 @@ develop — do not hand-edit files inside an SVN checkout.
    `bin/build-screenshot-bundle.sh` with `LIB_VERSION` in it bumped to match,
    and put both md5s in `CHANGELOG.md`. They are enqueued with one version
    string, so they cannot come from different releases.
-3. `composer install && vendor/bin/phpstan analyse` — clean, and the four test
+3. `composer install && vendor/bin/phpstan analyse` — clean, and the five test
    files in `tests/` green.
 4. Re-sync a local WordPress install and re-run Plugin Check
    (`wp plugin install plugin-check --activate` once, then

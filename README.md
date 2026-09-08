@@ -62,7 +62,7 @@ database, not in the plugin directory.
 | Timings and storage snapshot | Records what the page cost — largest contentful paint, layout shift, interaction to next paint, time to first byte, the load events, long tasks, and the JS heap in Chrome — and lists the key names in `localStorage` and `sessionStorage` with the length of each value, plus the cookie names. **Names only, never values**, and never a cookie value at all. Off by default. |
 | Shake to report | Opens the panel when the phone is shaken: three shakes inside a second, then a three-second pause. Off by default. On iPhone and iPad it also needs the visitor's permission, which only Safari can ask for and only from a button they pressed — see [Shake to report](#shake-to-report). |
 | Signing key(s) | One key per line. With a key set, a report must arrive signed with one of them or it is refused, and the bundled panel signs what it sends. Empty by default. Read [Signing requests](#signing-requests) before you fill it in — a key that ships to the browser is public. |
-| Email recipient | Where reports are emailed, through `wp_mail` — so an SMTP plugin handles delivery. Empty means reports are only stored. |
+| Email recipient | Where reports are emailed, through `wp_mail` — so an SMTP plugin handles delivery. The body is the report as Markdown, with a link to it in wp-admin; it never links the screenshot itself, because that route wants an administrator's session and would only answer 401 from an inbox. Empty means reports are only stored. |
 | Email on submit | Send the email as soon as a report arrives. |
 
 ### For developers
@@ -321,17 +321,18 @@ wp i18n update-po languages/bugbottle.pot languages/bugbottle-da_DK.po
 wp i18n make-mo languages/bugbottle-da_DK.po languages/
 ```
 
-There are four test files, none of which needs a framework:
+There are five test files, none of which needs a framework:
 
 ```bash
 php tests/test-report-parity.php      # the validators and the Markdown, against the library
 php tests/test-screenshot.php         # the PNG decoder and the Screenshots setting
 php tests/test-signature.php          # the signature rules, no WordPress needed
+php tests/test-email.php              # the notification body: no screenshot link, an admin link that works
 wp eval-file tests/test-rest-signature.php   # the REST route, from a scratch install
 ```
 
 The last writes settings and stores reports, so point it at a scratch install
-and never at a live site. All four exit non-zero on a failure.
+and never at a live site. All five exit non-zero on a failure.
 
 Rebuilding the screenshot renderer needs node and npm, and nothing else:
 

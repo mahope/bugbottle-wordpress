@@ -46,14 +46,22 @@ final class Email {
 		$facts = array(
 			'Site'     => get_bloginfo( 'name' ),
 			'Reporter' => self::reporter_name( (int) $report['reporter'] ),
-			'In admin' => admin_url( 'admin.php?page=bugbottle&report=' . $post_id ),
 		);
+
+		// The email deliberately carries no link to the picture itself. The
+		// screenshot route requires `manage_options` through a cookie session
+		// plus a REST nonce, so a raw URL sitting in an inbox answers 401 for
+		// every recipient, signed in or not. The picture is one click behind
+		// the admin link below, under the same capability that guards it.
+		if ( '' !== $report['screenshot'] ) {
+			$facts['Screenshot'] = 'attached, in admin';
+		}
+		$facts['In admin'] = admin_url( 'admin.php?page=bugbottle&report=' . $post_id );
 
 		$body = Markdown::render(
 			$report,
 			array(
 				'facts'            => $facts,
-				'screenshot_url'   => '' !== $report['screenshot'] ? Rest::screenshot_url( $post_id ) : null,
 				'collapse_console' => false,
 				'heading_level'    => 0,
 			)

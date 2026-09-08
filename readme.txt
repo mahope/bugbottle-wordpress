@@ -119,7 +119,7 @@ On iPhone and iPad, Safari reports no motion until the visitor has agreed to it,
 
 = Where do the emails come from? =
 
-`wp_mail`, so whatever SMTP plugin the site already has handles delivery. The body is the report rendered as Markdown, ready to paste into an issue.
+`wp_mail`, so whatever SMTP plugin the site already has handles delivery. The body is the report rendered as Markdown, ready to paste into an issue, with a link to the report in wp-admin. It never links the screenshot itself: that route wants an administrator's session, so a link to it in an inbox would only answer 401.
 
 = Can I use my own button instead of the floating one? =
 

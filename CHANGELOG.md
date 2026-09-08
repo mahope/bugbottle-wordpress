@@ -6,6 +6,22 @@ repository directly; keep the two in step.
 
 ## Unreleased
 
+### Fixed
+
+- **The notification email's link to the screenshot always answered `401`.**
+  It pointed straight at `GET /wp-json/bugbottle/v1/screenshot/<id>`, which
+  wants `manage_options` through a cookie session plus a REST nonce — neither
+  of which an inbox has, so the link was broken for every recipient, signed in
+  or not, and had been since 0.1.0. The email no longer carries it. A report
+  that has a picture says so as a fact ("attached, in admin") and the "In
+  admin" link, which has always worked, is how the picture is reached: the
+  same capability guards both. Attaching the PNG to the email is a possible
+  setting later, but the picture would then leave the site, which is exactly
+  what [Please read this part](README.md#please-read-this-part) warns about,
+  so it needs that text beside the box. (Issue #5.)
+- `tests/test-email.php` is new and pins this: the body carries no REST URL,
+  and the admin link resolves to that report's own detail screen.
+
 ## 0.4.1 — 2026-09-08
 
 **The panel had never taken a screenshot.** Not in 0.1.0, not in 0.4.0. The

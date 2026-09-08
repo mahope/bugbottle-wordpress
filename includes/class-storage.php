@@ -191,8 +191,15 @@ final class Storage {
 		// Absent rather than stored empty: a reader can then tell "the form
 		// never asked" from "asked and left blank", and there is no empty
 		// personal-data row sitting in the meta table of every report.
-		if ( ! empty( $report['contact'] ) ) {
-			update_post_meta( $post_id, self::META_CONTACT, (string) $report['contact'] );
+		//
+		// Emptiness is tested against the string and not with `empty()`,
+		// because `empty( '0' )` is true in PHP and "0" is a contact line
+		// somebody can type — an extension, a room number. `Validator::contact`
+		// hands back null or a non-empty trimmed string, so the cast makes both
+		// answers comparable.
+		$contact = isset( $report['contact'] ) ? (string) $report['contact'] : '';
+		if ( '' !== $contact ) {
+			update_post_meta( $post_id, self::META_CONTACT, $contact );
 		}
 		update_post_meta( $post_id, self::META_CONTEXT, wp_json_encode( $report['context'] ) );
 		update_post_meta( $post_id, self::META_CONSOLE, wp_json_encode( $report['console'] ) );

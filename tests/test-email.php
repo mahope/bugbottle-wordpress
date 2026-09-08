@@ -215,6 +215,14 @@ check(
 	str_contains( $injected, '| Contact | anna@example.test Bcc: eve@example.test |' )
 );
 
+// A contact line of exactly "0" — an extension, a room number — is a real
+// answer and must not be treated as no answer. `empty( '0' )` is true in PHP,
+// so this is a trap the whole feature has to step around, and `Storage::insert`
+// once fell into it.
+$zero = send( false, '0' );
+check( 'a contact line of "0" is still a fact', true, str_contains( $zero, '| Contact | 0 |' ) );
+check( 'and it is not an address, so no Reply-To', array(), sent_headers() );
+
 $none = send( false );
 check( 'no contact line, no Contact row', false, str_contains( $none, '| Contact |' ) );
 check( 'no contact line, no Reply-To', array(), sent_headers() );

@@ -13,6 +13,12 @@
  * translated: it mirrors the library's rendering so an issue body pasted from
  * an email looks like every other bugbottle report.
  *
+ * One row of the library's rendering is deliberately missing: `Replay`. The
+ * plugin drops a session replay at the door rather than storing it — see
+ * `Rest::receive_report()` — so no stored report can carry one, and a row
+ * saying how many events are attached would be a row about something that is
+ * not there. Every other fact is rendered in the library's order.
+ *
  * @package Bugbottle
  */
 
@@ -82,6 +88,12 @@ final class Markdown {
 		}
 
 		$facts = array( array( 'Type', $type_label ) );
+		// Directly under the type, because a reader deciding what to do with a
+		// report wants to know whether they can answer it before anything else.
+		$contact = Validator::contact( $raw['contact'] ?? null );
+		if ( null !== $contact ) {
+			$facts[] = array( 'Contact', $contact );
+		}
 		if ( '' !== $context['url'] ) {
 			$facts[] = array( 'Page', '`' . $context['url'] . '`' );
 		}

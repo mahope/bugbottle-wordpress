@@ -33,6 +33,7 @@ final class Storage {
 	public const POST_TYPE = 'bugbottle_report';
 
 	public const META_TYPE        = '_bugbottle_type';
+	public const META_CONTACT     = '_bugbottle_contact';
 	public const META_CONTEXT     = '_bugbottle_context';
 	public const META_CONSOLE     = '_bugbottle_console';
 	public const META_ELEMENTS    = '_bugbottle_elements';
@@ -187,6 +188,12 @@ final class Storage {
 		}
 
 		update_post_meta( $post_id, self::META_TYPE, $type );
+		// Absent rather than stored empty: a reader can then tell "the form
+		// never asked" from "asked and left blank", and there is no empty
+		// personal-data row sitting in the meta table of every report.
+		if ( ! empty( $report['contact'] ) ) {
+			update_post_meta( $post_id, self::META_CONTACT, (string) $report['contact'] );
+		}
 		update_post_meta( $post_id, self::META_CONTEXT, wp_json_encode( $report['context'] ) );
 		update_post_meta( $post_id, self::META_CONSOLE, wp_json_encode( $report['console'] ) );
 		update_post_meta( $post_id, self::META_ELEMENTS, wp_json_encode( $report['elements'] ) );
@@ -222,6 +229,7 @@ final class Storage {
 		return array(
 			'type'        => (string) get_post_meta( $post->ID, self::META_TYPE, true ),
 			'message'     => $post->post_content,
+			'contact'     => (string) get_post_meta( $post->ID, self::META_CONTACT, true ),
 			'context'     => self::json_meta( $post->ID, self::META_CONTEXT ),
 			'console'     => self::json_meta( $post->ID, self::META_CONSOLE ),
 			'elements'    => self::json_meta( $post->ID, self::META_ELEMENTS ),

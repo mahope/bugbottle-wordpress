@@ -9,6 +9,11 @@
  * recipient. What is left is the "In admin" link, which has always worked, and
  * which must resolve to the report's own detail screen rather than to the list.
  *
+ * Since 0.5.0 the same file also pins the `Reply-To`: a report whose contact
+ * line looks like an email address is sent with it as the reply address, and
+ * one whose contact line is a phone number is not, because Reply-To takes an
+ * address or nothing.
+ *
  * Usage: php tests/test-email.php
  *
  * @package Bugbottle
@@ -74,11 +79,12 @@ function __( string $text, string $domain = 'default' ): string {
 /**
  * @param string|string[] $to Recipient.
  */
-function wp_mail( $to, string $subject, string $message ): bool {
+function wp_mail( $to, string $subject, string $message, $headers = array() ): bool {
 	$GLOBALS['bb_mail'] = array(
 		'to'      => $to,
 		'subject' => $subject,
 		'body'    => $message,
+		'headers' => $headers,
 	);
 	return true;
 }
@@ -112,18 +118,28 @@ function check( string $name, $expected, $actual ): void {
 	echo '        actual:   ' . var_export( $actual, true ) . "\n";
 }
 
-/** Sends report 42, with or without a stored screenshot, and returns the body. */
-function send( bool $with_screenshot ): string {
+/**
+ * Sends report 42, with or without a stored screenshot and with whatever
+ * contact line the case wants, and returns the body.
+ */
+function send( bool $with_screenshot, string $contact = '' ): string {
 	$GLOBALS['bb_meta'] = array(
 		Storage::META_TYPE       => 'bug',
 		Storage::META_CONTEXT    => '{"url":"/checkout","viewport":"1280x720","userAgent":"Mozilla/5.0"}',
 		Storage::META_REPORTER   => '0',
+		Storage::META_CONTACT    => $contact,
 		Storage::META_SCREENSHOT => $with_screenshot ? 'a3f9c1d2e4b5.png' : '',
 	);
 	$GLOBALS['bb_mail'] = null;
 	Email::send_report( 42 );
 	$mail = $GLOBALS['bb_mail'];
 	return is_array( $mail ) ? (string) $mail['body'] : '';
+}
+
+/** The headers the last `send()` produced. */
+function sent_headers(): array {
+	$mail = $GLOBALS['bb_mail'];
+	return is_array( $mail ) && is_array( $mail['headers'] ) ? $mail['headers'] : array();
 }
 
 $with = send( true );
@@ -168,6 +184,23 @@ check(
 	is_array( $mail ) ? (string) $mail['subject'] : ''
 );
 check( 'and it went to the configured recipient', 'dev@example.test', is_array( $mail ) ? $mail['to'] : '' );
+
+// The contact line, and the Reply-To that follows from it. A reply to the
+// notification should reach the person who wrote the report — but only when
+// what they typed is plausibly an address, because a malformed Reply-To is a
+// broken header and the line is in the body either way.
+$reachable = send( false, '  anna@example.test  ' );
+check( 'the contact line is a fact in the body', true, str_contains( $reachable, '| Contact | anna@example.test |' ) );
+check( 'and it is the row under the type', true, str_contains( $reachable, "| Type | Bug |\n| Contact | anna@example.test |" ) );
+check( 'an address becomes the Reply-To', array( 'Reply-To: anna@example.test' ), sent_headers() );
+
+$phone = send( false, 'ring me on 12345678' );
+check( 'a phone number is still a fact in the body', true, str_contains( $phone, '| Contact | ring me on 12345678 |' ) );
+check( 'but it is never a Reply-To', array(), sent_headers() );
+
+$none = send( false );
+check( 'no contact line, no Contact row', false, str_contains( $none, '| Contact |' ) );
+check( 'no contact line, no Reply-To', array(), sent_headers() );
 
 echo "\n$total checks, $failures failed\n";
 exit( $failures > 0 ? 1 : 0 );

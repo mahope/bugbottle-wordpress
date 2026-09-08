@@ -8,6 +8,11 @@
  * well as text, and it pastes straight into a GitHub issue, which is where
  * most of these end up.
  *
+ * When the report carries a contact line that looks like an email address, the
+ * mail is sent with it as `Reply-To`, so hitting reply answers the reporter
+ * rather than the site. That is the same rule the library's Resend sink
+ * follows, with the same permissive test.
+ *
  * @package Bugbottle
  */
 
@@ -74,7 +79,17 @@ final class Email {
 			Markdown::title_for( $type, (string) $report['message'] )
 		);
 
-		return wp_mail( $recipient, $subject, $body );
+		// A reply to the notification should reach the person who wrote the
+		// report, not whoever the site sends mail as. Only when the line is
+		// plausibly an address: a `Reply-To` of "ring me on 12345678" is a
+		// malformed header, and the line is in the body either way.
+		$headers = array();
+		$contact = Validator::contact( $report['contact'] ?? null );
+		if ( null !== $contact && Validator::looks_like_email( $contact ) ) {
+			$headers[] = 'Reply-To: ' . trim( $contact );
+		}
+
+		return wp_mail( $recipient, $subject, $body, $headers );
 	}
 
 	/**

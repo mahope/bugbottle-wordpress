@@ -125,6 +125,10 @@ final class Assets {
 			// and `false` is how the library is told so.
 			'shortcut'    => '' !== $settings['shortcut'] ? $settings['shortcut'] : false,
 			'openOnError' => (bool) $settings['open_on_error'],
+			// false, true or "required" — the three shapes the library's
+			// `contact` option takes, which is why the setting is a tri-state
+			// and not a checkbox.
+			'contact'     => self::contact_option(),
 			'scrub'       => (bool) $settings['scrub'],
 			'queue'       => (bool) $settings['queue'],
 			'network'     => (bool) $settings['network_log'],
@@ -189,6 +193,9 @@ final class Assets {
 				'	// false is meaningful here, so the option is always set.',
 				'	options.shortcut = config.shortcut;',
 				'	if (config.openOnError) options.openOnError = true;',
+				'	// How to reach the reporter, when the site asked for it. false is the',
+				'	// default in the library, so the option is only set when it is wanted.',
+				'	if (config.contact) options.contact = config.contact;',
 				'	if (config.scrub) options.scrub = api.scrubReport;',
 				'	// The key is in the page source for anyone who looks. That is the honest',
 				'	// shape of signing from a browser: it raises the cost of posting junk to',
@@ -218,6 +225,24 @@ final class Assets {
 		);
 
 		return sprintf( $template, (string) $json );
+	}
+
+	/**
+	 * The `contact` value handed to `mount()`: `false` when the site does not
+	 * ask, `true` for an optional field, `"required"` for one the panel will
+	 * not send without.
+	 *
+	 * @return bool|string
+	 */
+	private static function contact_option() {
+		switch ( Settings::contact_mode() ) {
+			case Settings::CONTACT_REQUIRED:
+				return 'required';
+			case Settings::CONTACT_OPTIONAL:
+				return true;
+			default:
+				return false;
+		}
 	}
 
 	/**

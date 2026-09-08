@@ -15,6 +15,14 @@
  * `GET /bugbottle/v1/screenshot/<id>` is the only way a screenshot comes back
  * out. The file name is read from the row, never from the request.
  *
+ * One field of the library's report is accepted and thrown away: `replay`, the
+ * rrweb recording bugbottle 0.8.0 added. It is a megabyte of nested JSON, and
+ * post meta is the wrong place for a megabyte of nested JSON — every read of
+ * the row would carry it, and nothing in wp-admin can play it back. The plugin
+ * ships no rrweb adapter either, so the bundled panel never sends one; a report
+ * posted by hand that carries one is stored without it and is not refused for
+ * it. See README, "What a report carries".
+ *
  * @package Bugbottle
  */
 
@@ -178,6 +186,13 @@ final class Rest {
 		$report = array(
 			'type'        => (string) $body['type'],
 			'message'     => $message,
+			// Only kept when the panel was told to ask for it. A field the
+			// site switched off cannot be filled in by a hand-written POST
+			// either: a report that arrives with a contact line the settings
+			// never asked for is stored without it.
+			'contact'     => Settings::contact_mode() !== Settings::CONTACT_OFF
+				? Validator::contact( $body['contact'] ?? null )
+				: null,
 			'context'     => Validator::context( $body['context'] ?? null ),
 			'console'     => Validator::console( $body['console'] ?? null ),
 			'elements'    => Validator::elements( $body['elements'] ?? null ),
@@ -222,7 +237,12 @@ final class Rest {
 	 * @return array<string, string>
 	 */
 	private static function extra( array $body ): array {
-		$known = array( 'type', 'message', 'context', 'console', 'elements', 'breadcrumbs', 'network', 'perf', 'storage', 'screenshotDataUrl' );
+		// `replay` is here so a session replay is dropped rather than being
+		// swept into `extra` as an unknown field — see the class docblock for
+		// why the plugin does not store one at all. It never gets that far in
+		// practice, because `extra` only keeps scalars and a replay is an
+		// object, but naming it says the omission is a decision.
+		$known = array( 'type', 'message', 'contact', 'context', 'console', 'elements', 'breadcrumbs', 'network', 'perf', 'storage', 'replay', 'screenshotDataUrl' );
 		$out   = array();
 		foreach ( $body as $key => $value ) {
 			if ( count( $out ) >= 20 ) {

@@ -4,14 +4,21 @@
  * port, must come out byte for byte the way `bugbottle` itself renders it.
  *
  * The fixture below carries every section a report can have, including the
- * `perf` and `storage` blocks bugbottle 0.7.0 added, and several entries that
- * are meant to be dropped or clipped — a stack frame past the third, a
- * `length` that is not a number, a cookie name that is not a string, a
- * negative duration. The expected Markdown and the expected validated JSON
- * are not written by hand: they came out of `src/markdown.ts` and
- * `src/report-core.ts` of bugbottle v0.7.0, run over this same fixture with
- * `node --experimental-strip-types`, and `diff -u` against the PHP output was
- * empty. Regenerate them the same way whenever either side moves.
+ * `perf` and `storage` blocks bugbottle 0.7.0 added and the `contact` line
+ * 0.8.0 added, and several entries that are meant to be dropped or clipped — a
+ * stack frame past the third, a `length` that is not a number, a cookie name
+ * that is not a string, a negative duration. The expected Markdown and the
+ * expected validated JSON are not written by hand: they came out of
+ * `src/markdown.ts` and `src/report-core.ts` of bugbottle v0.9.0, run over this
+ * same fixture with `node --experimental-strip-types`, and `diff -u` against
+ * the PHP output was empty. Regenerate them the same way whenever either side
+ * moves.
+ *
+ * One field is deliberately absent from the fixture: `replay`. The plugin
+ * drops a session replay at the door rather than storing a megabyte of nested
+ * JSON in post meta, so the library would render a `Replay` row here that the
+ * PHP port never can. That divergence is pinned by the last three checks in
+ * this file rather than left to be rediscovered.
  *
  * The JSON is compared with the flags JavaScript's `JSON.stringify` uses —
  * slashes unescaped, UTF-8 left alone — because what is under test is the
@@ -66,6 +73,7 @@ const FIXTURE_JSON = <<<'JSON'
 {
   "type": "bug",
   "message": "The save button does nothing\nI clicked it three times.",
+  "contact": "  anna@example.test  ",
   "context": {
     "url": "/checkout/step-2?coupon=SPRING",
     "viewport": "1280x720",
@@ -147,6 +155,7 @@ I clicked it three times.
 | | |
 |---|---|
 | Type | Bug |
+| Contact | anna@example.test |
 | Page | `/checkout/step-2?coupon=SPRING` |
 | Viewport | 1280x720 |
 | Screen | 2560x1440@2x |
@@ -215,7 +224,7 @@ MARKDOWN;
 
 /** The validated sections, as `JSON.stringify` writes them. */
 const EXPECTED_JSON = <<<'JSON'
-{"context":{"url":"/checkout/step-2?coupon=SPRING","viewport":"1280x720","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36","language":"da-DK","timezone":"Europe/Copenhagen","screen":"2560x1440@2x","colorScheme":"dark","online":false,"connection":"4g"},"console":[{"ts":"2026-09-08T09:12:00.000Z","level":"warn","message":"Deprecated API in use"},{"ts":"2026-09-08T09:12:03.500Z","level":"error","message":"TypeError: cannot read properties of undefined (reading 'total')","stack":[{"file":"https://example.test/app.js","line":42,"col":9,"fn":"submitOrder"},{"file":"https://example.test/app.js","line":118,"col":3},{"file":"https://example.test/vendor.js","line":9001,"col":17,"fn":"dispatch"},{"file":"https://example.test/vendor.js","line":9100,"col":1,"fn":"notPrinted"}]}],"elements":[{"selector":"#checkout > button.primary","tag":"button","text":"Gem ordre","rect":{"x":220,"y":640,"width":160,"height":44},"attributes":{"id":"save","class":"primary","data-testid":"save-order"}}],"breadcrumbs":[{"ts":"2026-09-08T09:11:40.000Z","kind":"navigation","from":"/checkout/step-1","to":"/checkout/step-2"},{"ts":"2026-09-08T09:11:55.000Z","kind":"click","target":"#checkout > button.primary","text":"Gem ordre"},{"ts":"2026-09-08T09:12:01.000Z","kind":"submit","target":"form#checkout"},{"ts":"2026-09-08T09:12:02.000Z","kind":"visibility","to":"hidden"}],"network":[{"ts":"2026-09-08T09:12:02.100Z","method":"POST","url":"/api/orders","status":500,"ms":1240},{"ts":"2026-09-08T09:12:03.000Z","method":"GET","url":"/api/orders/42","status":0,"ms":30000,"error":true}],"perf":{"lcp":2432,"inp":312,"ttfb":180,"domContentLoaded":940,"load":1812,"cls":0.123,"longTasks":{"count":7,"totalMs":614},"memory":{"usedMB":85,"limitMB":4096}},"storage":{"local":[{"key":"cart","length":1842},{"key":"impersonating_user","length":6},{"key":"no-length","length":0}],"session":[{"key":"step","length":1}],"cookies":["wordpress_logged_in_abc","woocommerce_cart_hash"],"values":{"step":"2","cart":"dropped-not-allowlisted-server-side-is-fine"}}}
+{"contact":"anna@example.test","context":{"url":"/checkout/step-2?coupon=SPRING","viewport":"1280x720","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36","language":"da-DK","timezone":"Europe/Copenhagen","screen":"2560x1440@2x","colorScheme":"dark","online":false,"connection":"4g"},"console":[{"ts":"2026-09-08T09:12:00.000Z","level":"warn","message":"Deprecated API in use"},{"ts":"2026-09-08T09:12:03.500Z","level":"error","message":"TypeError: cannot read properties of undefined (reading 'total')","stack":[{"file":"https://example.test/app.js","line":42,"col":9,"fn":"submitOrder"},{"file":"https://example.test/app.js","line":118,"col":3},{"file":"https://example.test/vendor.js","line":9001,"col":17,"fn":"dispatch"},{"file":"https://example.test/vendor.js","line":9100,"col":1,"fn":"notPrinted"}]}],"elements":[{"selector":"#checkout > button.primary","tag":"button","text":"Gem ordre","rect":{"x":220,"y":640,"width":160,"height":44},"attributes":{"id":"save","class":"primary","data-testid":"save-order"}}],"breadcrumbs":[{"ts":"2026-09-08T09:11:40.000Z","kind":"navigation","from":"/checkout/step-1","to":"/checkout/step-2"},{"ts":"2026-09-08T09:11:55.000Z","kind":"click","target":"#checkout > button.primary","text":"Gem ordre"},{"ts":"2026-09-08T09:12:01.000Z","kind":"submit","target":"form#checkout"},{"ts":"2026-09-08T09:12:02.000Z","kind":"visibility","to":"hidden"}],"network":[{"ts":"2026-09-08T09:12:02.100Z","method":"POST","url":"/api/orders","status":500,"ms":1240},{"ts":"2026-09-08T09:12:03.000Z","method":"GET","url":"/api/orders/42","status":0,"ms":30000,"error":true}],"perf":{"lcp":2432,"inp":312,"ttfb":180,"domContentLoaded":940,"load":1812,"cls":0.123,"longTasks":{"count":7,"totalMs":614},"memory":{"usedMB":85,"limitMB":4096}},"storage":{"local":[{"key":"cart","length":1842},{"key":"impersonating_user","length":6},{"key":"no-length","length":0}],"session":[{"key":"step","length":1}],"cookies":["wordpress_logged_in_abc","woocommerce_cart_hash"],"values":{"step":"2","cart":"dropped-not-allowlisted-server-side-is-fine"}}}
 JSON;
 
 $raw = json_decode( FIXTURE_JSON, true );
@@ -233,6 +242,7 @@ check(
 	EXPECTED_JSON,
 	encode_like_js(
 		array(
+			'contact'     => Validator::contact( $raw['contact'] ?? null ),
 			'context'     => Validator::context( $raw['context'] ?? null ),
 			'console'     => Validator::console( $raw['console'] ?? null ),
 			'elements'    => Validator::elements( $raw['elements'] ?? null ),
@@ -285,6 +295,58 @@ check(
 	Validator::storage( array( 'cookies' => array( 'a' . chr( 0 ) . 'b' ) ) )['cookies'][0]
 );
 check( 'a cookie value is never accepted, because none is ever sent', null, Validator::storage( array( 'cookies' => array( array( 'name' => 'a', 'value' => 'b' ) ) ) ) );
+
+// The contact line, rule by rule. It is treated exactly as the message is —
+// trimmed, null bytes gone, clipped at 200 — and nothing checks its format,
+// because "ring me on 12345678" is a good answer to "how do we reach you".
+check( 'the contact line is trimmed', 'anna@example.test', Validator::contact( '  anna@example.test  ' ) );
+check( 'an empty contact line is null', null, Validator::contact( '   ' ) );
+check( 'a contact line that is not a string is null', null, Validator::contact( array( 'a' ) ) );
+check( 'a missing contact line is null', null, Validator::contact( null ) );
+check( 'a contact line is clipped at 200 characters', 200, mb_strlen( (string) Validator::contact( str_repeat( 'k', 400 ) ) ) );
+check( 'a null byte never survives a contact line', 'ab', Validator::contact( 'a' . chr( 0 ) . 'b' ) );
+check( 'a phone number is a perfectly good contact line', 'ring me on 12345678', Validator::contact( 'ring me on 12345678' ) );
+check(
+	'no Contact row is rendered when there is no contact line',
+	false,
+	str_contains( Markdown::render( array( 'type' => 'bug', 'message' => 'x' ) ), '| Contact |' )
+);
+
+// `looks_like_email` is the permissive port of the library's `looksLikeEmail`,
+// and it is the only thing that decides whether the notification email gets a
+// Reply-To. It has to agree with the library rather than with `is_email()`.
+check( 'a plain address looks like an email', true, Validator::looks_like_email( 'anna@example.test' ) );
+check( 'surrounding whitespace does not stop it', true, Validator::looks_like_email( '  anna@example.test  ' ) );
+check( 'a subdomain address looks like an email', true, Validator::looks_like_email( 'a@b.co.uk' ) );
+check( 'a phone number does not look like an email', false, Validator::looks_like_email( 'ring me on 12345678' ) );
+check( 'a name beside an address does not look like an email', false, Validator::looks_like_email( 'Anna <anna@example.test>' ) );
+check( 'a bare hostname does not look like an email', false, Validator::looks_like_email( 'anna@localhost' ) );
+check( 'two addresses do not look like an email', false, Validator::looks_like_email( 'a@b.dk,c@d.dk' ) );
+check( 'something that is not a string never looks like an email', false, Validator::looks_like_email( null ) );
+
+// The one place the PHP port deliberately parts company with the library: a
+// session replay is dropped rather than stored, so no `Replay` row is ever
+// rendered. The library prints one for exactly this report.
+$with_replay = array(
+	'type'    => 'bug',
+	'message' => 'x',
+	'replay'  => array(
+		'events'  => array(
+			array(
+				'type'      => 2,
+				'timestamp' => 1757326320000,
+			),
+			array(
+				'type'      => 3,
+				'timestamp' => 1757326350000,
+			),
+		),
+		'seconds' => 30,
+	),
+);
+check( 'a replay renders no row', false, str_contains( Markdown::render( $with_replay ), 'Replay' ) );
+check( 'a replay is not smuggled in as a fact', false, str_contains( Markdown::render( $with_replay ), '30 s' ) );
+check( 'a report carrying a replay still renders', true, str_contains( Markdown::render( $with_replay ), '| Type | Bug |' ) );
 
 echo "\n$total checks, $failures failed\n";
 exit( $failures > 0 ? 1 : 0 );

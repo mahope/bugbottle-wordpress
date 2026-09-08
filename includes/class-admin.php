@@ -105,6 +105,7 @@ final class Admin {
 		}
 
 		$report      = Storage::to_report( $post );
+		$contact     = Validator::contact( $report['contact'] ?? null );
 		$has_shot    = '' !== $report['screenshot'];
 		$status      = Storage::status( $report_id );
 		$next_status = Storage::STATUS_DONE === $status ? Storage::STATUS_OPEN : Storage::STATUS_DONE;
@@ -141,6 +142,20 @@ final class Admin {
 					?>
 				</button>
 			</form>
+
+			<?php if ( null !== $contact ) : ?>
+				<h2><?php esc_html_e( 'Contact', 'bugbottle' ); ?></h2>
+				<p class="description">
+					<?php esc_html_e( 'How the reporter said they can be reached. They typed it themselves and nothing checked it, so it may be a phone number, a name in a chat, or a typo.', 'bugbottle' ); ?>
+				</p>
+				<p>
+					<?php if ( Validator::looks_like_email( $contact ) ) : ?>
+						<a href="<?php echo esc_url( 'mailto:' . $contact ); ?>"><?php echo esc_html( $contact ); ?></a>
+					<?php else : ?>
+						<?php echo esc_html( $contact ); ?>
+					<?php endif; ?>
+				</p>
+			<?php endif; ?>
 
 			<?php if ( $has_shot ) : ?>
 				<h2><?php esc_html_e( 'Screenshot', 'bugbottle' ); ?></h2>

@@ -43,6 +43,14 @@ final class Validator {
 
 	public const MAX_MESSAGE_LENGTH = 4000;
 
+	/**
+	 * Longest the optional contact line may be. It is a way of reaching one
+	 * person — an address, a phone number, a handle — not a paragraph, so 200
+	 * characters is generous and still short enough that nobody can hide prose
+	 * in a field a reader trusts to be short.
+	 */
+	public const MAX_CONTACT_LENGTH = 200;
+
 	/** How many console entries a report may carry. Oldest are dropped first. */
 	public const MAX_CONSOLE_ENTRIES = 50;
 
@@ -160,6 +168,45 @@ final class Validator {
 			return null;
 		}
 		return mb_substr( $text, 0, $max_length );
+	}
+
+	/**
+	 * Trims and length-checks the optional contact line, exactly as the
+	 * message is treated. Null when there is nothing worth storing.
+	 *
+	 * There is deliberately no format check: the reporter is answering "how do
+	 * we reach you", and "ring me on 12345678" is a perfectly good answer.
+	 * Only the notification email, which needs a real address for its
+	 * `Reply-To`, asks whether the line looks like one — with
+	 * `looks_like_email()` below.
+	 *
+	 * @param mixed $raw Anything from the request body.
+	 */
+	public static function contact( $raw, int $max_length = self::MAX_CONTACT_LENGTH ): ?string {
+		if ( ! is_string( $raw ) ) {
+			return null;
+		}
+		$text = trim( self::strip_null_bytes( $raw ) );
+		if ( '' === $text ) {
+			return null;
+		}
+		return mb_substr( $text, 0, $max_length );
+	}
+
+	/**
+	 * Whether a contact line can be used as an email address.
+	 *
+	 * The same permissive pattern the library's `looksLikeEmail` uses, rather
+	 * than `is_email()`: a line is only refused when it plainly is not an
+	 * address, because the cost of a false negative is a reply nobody can send
+	 * and the cost of a false positive is one bounced mail. The two sides have
+	 * to agree, so this is a port and not a WordPress equivalent.
+	 *
+	 * @param mixed $value Anything from the request body.
+	 */
+	public static function looks_like_email( $value ): bool {
+		return is_string( $value )
+			&& 1 === preg_match( '/^[^\s@,;]+@[^\s@,;.]+(?:\.[^\s@,;.]+)+$/', trim( $value ) );
 	}
 
 	/**

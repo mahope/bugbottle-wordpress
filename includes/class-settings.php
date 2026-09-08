@@ -30,6 +30,17 @@ final class Settings {
 	public const POSITIONS = array( 'bottom-right', 'bottom-left', 'top-right', 'top-left' );
 
 	/**
+	 * The contact field is off, optional, or required — the three the library's
+	 * `contact: false | true | "required"` option has. It is a tri-state rather
+	 * than two checkboxes because "required but not shown" is not a thing.
+	 */
+	public const CONTACT_OFF      = 'off';
+	public const CONTACT_OPTIONAL = 'optional';
+	public const CONTACT_REQUIRED = 'required';
+
+	public const CONTACT_MODES = array( self::CONTACT_OFF, self::CONTACT_OPTIONAL, self::CONTACT_REQUIRED );
+
+	/**
 	 * The combination the library opens the panel on by default. `mod` is
 	 * Command on a Mac and Control everywhere else, which is why it is written
 	 * once rather than as two settings. An empty setting means no shortcut.
@@ -52,6 +63,7 @@ final class Settings {
 			'trigger_selector' => '',
 			'shortcut'         => self::DEFAULT_SHORTCUT,
 			'open_on_error'    => false,
+			'contact'          => self::CONTACT_OFF,
 			'scrub'            => true,
 			'queue'            => true,
 			'network_log'      => true,
@@ -88,6 +100,17 @@ final class Settings {
 	public static function string( string $key ): string {
 		$value = self::get( $key );
 		return is_string( $value ) ? $value : '';
+	}
+
+	/**
+	 * How the panel asks for a way of reaching the reporter: not at all, as an
+	 * optional field, or as one that refuses to send empty. Anything the option
+	 * does not recognise is "off", because off is the safe answer for a field
+	 * that collects personal data.
+	 */
+	public static function contact_mode(): string {
+		$mode = self::string( 'contact' );
+		return in_array( $mode, self::CONTACT_MODES, true ) ? $mode : self::CONTACT_OFF;
 	}
 
 	/**
@@ -134,6 +157,9 @@ final class Settings {
 
 		$locale = isset( $input['locale'] ) ? (string) $input['locale'] : 'auto';
 		$out['locale'] = in_array( $locale, self::LOCALES, true ) ? $locale : 'auto';
+
+		$contact = isset( $input['contact'] ) ? (string) $input['contact'] : self::CONTACT_OFF;
+		$out['contact'] = in_array( $contact, self::CONTACT_MODES, true ) ? $contact : self::CONTACT_OFF;
 
 		$position = isset( $input['position'] ) ? (string) $input['position'] : 'bottom-right';
 		$out['position'] = in_array( $position, self::POSITIONS, true ) ? $position : 'bottom-right';
@@ -295,6 +321,23 @@ final class Settings {
 						</td>
 					</tr>
 					<tr>
+						<th scope="row"><?php esc_html_e( 'Contact field', 'bugbottle' ); ?></th>
+						<td>
+							<fieldset>
+								<legend class="screen-reader-text"><?php esc_html_e( 'Ask the reporter how to reach them', 'bugbottle' ); ?></legend>
+								<?php foreach ( self::CONTACT_MODES as $mode ) : ?>
+									<label>
+										<input type="radio" name="bugbottle_settings[contact]" value="<?php echo esc_attr( $mode ); ?>" <?php checked( self::contact_mode(), $mode ); ?>>
+										<?php echo esc_html( self::contact_label( $mode ) ); ?>
+									</label><br>
+								<?php endforeach; ?>
+							</fieldset>
+							<p class="description"><?php esc_html_e( 'Off by default. It adds one field under the message asking how the reporter can be reached, because "the save button does nothing" is worth a reply. Nothing checks what they type: a phone number or a name in your own chat is a good answer, and required only means the panel will not send an empty field.', 'bugbottle' ); ?></p>
+							<p class="description"><strong><?php esc_html_e( 'The contact field is personal data you asked for.', 'bugbottle' ); ?></strong> <?php esc_html_e( 'Store it like one: it is kept where the rest of the report is kept, it goes when you delete the report, and it is shown to everyone who can read reports. Asking for an address is also a promise to answer, and that promise is yours to make.', 'bugbottle' ); ?></p>
+							<p class="description"><?php esc_html_e( 'When the line looks like an email address, the notification email is sent with it as Reply-To, so replying answers the reporter.', 'bugbottle' ); ?></p>
+						</td>
+					</tr>
+					<tr>
 						<th scope="row"><?php esc_html_e( 'Evidence', 'bugbottle' ); ?></th>
 						<td>
 							<label>
@@ -423,6 +466,15 @@ final class Settings {
 			'es'   => __( 'Spanish', 'bugbottle' ),
 		);
 		return $labels[ $code ] ?? $code;
+	}
+
+	private static function contact_label( string $mode ): string {
+		$labels = array(
+			self::CONTACT_OFF      => __( 'Do not ask', 'bugbottle' ),
+			self::CONTACT_OPTIONAL => __( 'Ask, but let them send without it', 'bugbottle' ),
+			self::CONTACT_REQUIRED => __( 'Ask, and refuse to send without it', 'bugbottle' ),
+		);
+		return $labels[ $mode ] ?? $mode;
 	}
 
 	private static function position_label( string $position ): string {

@@ -136,14 +136,17 @@ this plugin ships. Filling the setting in is the whole of it. Anything
 else that posts to the route — your own form, a script, a mobile app — has to
 compute the same digest, or it will be refused along with the spam.
 
-**The offline queue signs too**, which takes a little wiring the library does
-not do for you. `createQueue` delivers a stored report with a `fetch` of its
-own and knows nothing about the signer, so the mount script gives it one: a
-`fetch` that signs the bytes on their way out. That the signature is computed
-*then*, and not when the report was written, is the whole point — a report that
-sat through an hour of outage would otherwise carry a timestamp an hour outside
-the five-minute skew window and be refused as certainly as if it were unsigned.
-`tests/browser-queue-signature.mjs` is the round trip that pins this.
+**The offline queue signs too.** It delivers a stored report with a `fetch` of
+its own, on a later page load, so the mount script hands the same signer to
+`createQueue` as to the panel and the queue signs each delivery attempt's bytes
+as it makes them. That the signature is computed *then*, and not when the
+report was written, is the whole point — a report that sat through an hour of
+outage would otherwise carry a timestamp an hour outside the five-minute skew
+window and be refused as certainly as if it were unsigned.
+`tests/browser-queue-signature.mjs` is the round trip that pins this. Until
+bugbottle 1.0.0 `createQueue` had no `sign` option and the plugin did this by
+replacing the queue's request function; the library does it since, and 1.0.0
+of this plugin passes `sign`.
 
 ## The contact field
 
@@ -286,6 +289,11 @@ That is why **Screenshots is off until you turn it on**. Leaving it off is a
 complete answer: no renderer is loaded, the panel does not offer a picture, and
 no report can carry one.
 
+The library's privacy checklist is the longer version of this section, written
+for anyone who receives bugbottle reports:
+[in English](https://bugbottle.dev/docs/privacy-checklist/),
+[på dansk](https://bugbottle.dev/da/privatliv/).
+
 Four things follow if you do turn it on. The plugin does the first three for
 you; the fourth it cannot:
 
@@ -331,7 +339,7 @@ yourself when you mean it.
 
 `assets/bugbottle.js` is the official one-script-tag build,
 `dist/bugbottle.js`, copied verbatim from the
-[bugbottle](https://github.com/mahope/bugbottle) package — **bugbottle 0.15.0**
+[bugbottle](https://github.com/mahope/bugbottle) package — **bugbottle 1.0.0**
 at the time of writing. It is not modified here and it is not built here.
 
 Since 0.8.0 the library also publishes `dist/bugbottle.slim.js`, the same panel

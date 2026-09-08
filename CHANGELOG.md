@@ -6,6 +6,76 @@ repository directly; keep the two in step.
 
 ## Unreleased
 
+## 1.0.0 — 2026-09-08
+
+The library reached **1.0.0** today, and this plugin goes with it. From here
+both follow semantic versioning as a promise rather than an intention: a
+setting, a filter, an action, the REST route's shape or a stored meta key can
+only be removed or renamed in a major version, a new one of any of them is a
+minor version, and a patch changes behaviour only where the behaviour was a
+bug. Nothing in this release changes what a site sees. It is the version
+number saying what the next version number will mean.
+
+Nothing was removed here and no setting moved. A site updating from 0.6.1 gets
+the same screen, the same reports and the same database.
+
+### Changed
+
+<!-- sync-library: replaced on every run; the prose around it is not -->
+- **`assets/bugbottle.js` is bugbottle 1.0.0**, 66,496 bytes (md5
+  `151824ddf1b75ac8079adcb26619b306`), copied verbatim from that release's `dist/bugbottle.js`.
+  `LIB_VERSION` is `1.0.0`, which is what busts the cache on both
+  enqueued files.
+- **`assets/bugbottle-screenshot.js` was rebuilt** against
+  `bugbottle@1.0.0` with `bin/build-screenshot-bundle.sh`, whose
+  `LIB_VERSION` is pinned to match: 14,999 bytes, md5 `476f29c3791e20b0e3b69b34ef4310b5`.
+<!-- /sync-library -->
+
+  Both lines were written by `bin/sync-library.sh v1.0.0`. What the library's
+  1.0 removed is seven aliases on its **server** half — `onFailure`,
+  `maxItems`, thirteen `SLACK_MAX_*`/`DISCORD_MAX_*` constants, three
+  `*Store` option keys, `SendReportWebhookOptions.url`, and the server
+  validators and `toMarkdown` leaving the browser entry. This plugin uses none
+  of them: the receiving end here is `includes/class-rest.php` and
+  `includes/class-validator.php`, its own PHP, and the browser half of the
+  library is all it loads. The wire format is unchanged, so a page still
+  holding a cached 0.15 bundle posts something this version stores.
+- **The offline queue is handed the signer rather than a `fetch` wrapper**
+  (library #98). 0.6.1 fixed a queued report arriving unsigned by replacing
+  the queue's request function with one that signed the body on its way out —
+  the only seam `createQueue` had. bugbottle 1.0.0 gives it a real one:
+  `createQueue({ endpoint, headers, sign })` takes the same signer
+  `sendReport` takes and signs each delivery attempt's bytes as it makes them.
+  The mount script now passes `sign` and the wrapper is gone, which is fourteen
+  lines of the plugin's JavaScript deleted and the same behaviour: the
+  signature is still computed at delivery, so its timestamp is inside the
+  five minutes `Signature::is_fresh()` allows, and a retry after a backoff
+  signs afresh. `tests/browser-queue-signature.mjs` is unchanged and still
+  passes — it verifies the HMAC over the bytes that actually arrived, so it
+  cannot tell which of the two ways computed it, which is the point.
+- `src/report-core.ts` and `src/markdown.ts` are byte for byte identical at
+  1.0.0 and at 0.15.0, so the expectations in `tests/test-report-parity.php`
+  still describe the bundled library and were not regenerated. Fifty-one
+  checks, none failing, unchanged.
+- Every function the mount script calls — `mount`, `initConsoleBuffer`,
+  `initBreadcrumbs`, `initNetwork`, `initPerf`, `createQueue`,
+  `resolveLocale`, `scrubReport`, `createSigner`, `onShake` — is still on
+  `window.bugbottle`: `src/global.ts` is unchanged between the two tags. No
+  setting changed, so the settings screenshot in `.wordpress-org/` is
+  unchanged. No translatable string changed either: a fresh
+  `wp i18n make-pot` produces the same 151 `msgid`s the committed
+  `languages/bugbottle.pot` already has, so the Danish `.po` and `.mo` are
+  untouched.
+
+### Added
+
+- `README.md` links the library's **privacy checklist** —
+  [English](https://bugbottle.dev/docs/privacy-checklist/),
+  [dansk](https://bugbottle.dev/da/privatliv/) — beside the privacy section
+  that was already here (library #92). It is the questions to answer before
+  turning screenshots on, written once for everyone who receives bugbottle
+  reports rather than a second time for WordPress.
+
 ## 0.6.1 — 2026-09-08
 
 A bug fix worth having on any site that filled in **Signing key(s)**: reports

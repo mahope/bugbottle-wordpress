@@ -4,7 +4,7 @@ Tags: bug report, feedback, screenshot, support, qa
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.6.1
+Stable tag: 1.0.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,8 @@ What was typed into a field is replaced with bullets before the picture is taken
 
 The panel tells the reporter what the picture may contain, next to the checkbox. If you reword it, keep it saying so.
 
+The reporting library publishes a privacy checklist - the questions to answer before you turn screenshots on - at https://bugbottle.dev/docs/privacy-checklist/ and, in Danish, https://bugbottle.dev/da/privatliv/.
+
 = For developers =
 
 Two filters, `bugbottle_show_panel` and `bugbottle_panel_config`, and one action, `bugbottle_report_stored`, fired after a report is saved. The REST route is `POST /wp-json/bugbottle/v1/report`.
@@ -62,7 +64,7 @@ Two filters, `bugbottle_show_panel` and `bugbottle_panel_config`, and one action
 
 This plugin is developed on GitHub at https://github.com/mahope/bugbottle-wordpress and is licensed GPL-2.0-or-later. See the panel itself at https://bugbottle.dev.
 
-The bundled library is bugbottle 0.15.0.
+The bundled library is bugbottle 1.0.0.
 
 It bundles the official build of the bugbottle library (https://github.com/mahope/bugbottle), unmodified, as `assets/bugbottle.js`. It also bundles `assets/bugbottle-screenshot.js`, which is that library's `bugbottle/html-to-image` entry built together with html-to-image (https://github.com/bubkoo/html-to-image, MIT, copyright W.Y.) by `bin/build-screenshot-bundle.sh`; it is loaded only when the Screenshots setting is on. Both files are MIT-licensed; the notice is in `assets/LICENSE-bugbottle.txt`. MIT is GPL-compatible, so the plugin as a whole is distributable under the GPL.
 
@@ -154,6 +156,12 @@ No. Composer is used only to run PHPStan while developing; the shipped plugin is
 
 == Changelog ==
 
+= 1.0.0 =
+* **Version 1.0.** The reporting library reached 1.0.0 today and this plugin goes with it. From here both follow semantic versioning as a promise rather than an intention: a setting, a filter, an action, the REST route or a stored field can only be removed or renamed in a major version, a new one of any of them is a minor version, and a patch changes behaviour only where the behaviour was a bug. Nothing on your site changes in this release - it is the version number saying what the next version number will mean.
+* **Both bundled JavaScript files follow the library to bugbottle 1.0.0.** `assets/bugbottle.js` is 66,496 bytes (md5 `151824ddf1b75ac8079adcb26619b306`) and `assets/bugbottle-screenshot.js` 14,999 bytes (md5 `476f29c3791e20b0e3b69b34ef4310b5`). What the library's 1.0 removed is on its own server half, which this plugin does not use: the receiving end here is this plugin's own PHP.
+* The offline queue is now handed the signer directly, instead of the wrapper the plugin used in 0.6.1 to work around the library not having one. Same behaviour - a queued report is still signed at the moment it is delivered, so its timestamp is inside the window the route allows - with fourteen fewer lines of JavaScript in the page.
+* No setting changed and no report field changed. Existing reports are untouched.
+
 = 0.6.1 =
 * **Fixed: a report the offline queue kept through an outage was refused and thrown away**, on any site with "Signing key(s)" filled in. The queue delivers a stored report on a later page load with a request of its own, and it was not being given the signer, so the report arrived without the `X-Bugbottle-Signature` header, the route answered 401, and the queue - which treats a 4xx as final - deleted it. Exactly the reports the queue exists to save were the ones it lost. The queue now signs what it delivers, at the moment it delivers it, so the timestamp is inside the five-minute window the route allows. Present since signing arrived in 0.4.0.
 * **Both bundled JavaScript files follow the library to bugbottle 0.15.0.** `assets/bugbottle.js` is 66,440 bytes (md5 `9f41d7ea9a01ac567f2738a114a26ebf`) and `assets/bugbottle-screenshot.js` 15,000 bytes (md5 `69e9fab0313dd32796ffc7fd1b864f3c`). Two library releases, and what reaches a WordPress page is two style rules in the panel: it survives Windows High Contrast now, and a visitor who asked their system for less motion gets every state change at once rather than over time. Everything else in those releases is server-side and this plugin has its own server.
@@ -210,6 +218,9 @@ No. Composer is used only to run PHPStan while developing; the shipped plugin is
 * First release. REST endpoint, private `bugbottle_report` post type, admin list and detail screens, settings, email via `wp_mail`, screenshots behind an admin-only route, Danish and English.
 
 == Upgrade Notice ==
+
+= 1.0.0 =
+Version 1.0: the same plugin, now under a semantic-versioning promise, with the bundled panel following the library to bugbottle 1.0.0. Nothing on your site changes; existing reports are untouched.
 
 = 0.6.1 =
 Fixes a report the offline queue kept through an outage being refused and deleted, on sites with signing keys. Updates the bundled panel to bugbottle 0.15.0. No settings changed; existing reports are untouched.

@@ -225,7 +225,15 @@ echo
 
 if git -C "$lib" show "$tag:CHANGELOG.md" > "$work/lib-changelog.md" 2>/dev/null; then
 	PREVIOUS="$previous" VERSION="$version" LIBLOG="$work/lib-changelog.md" "$py" - <<'PY'
-import io, os, re
+import io, os, re, sys
+
+# The library's changelog is full of em dashes and arrows, and a Windows
+# console is cp1252 until told otherwise, where printing one is an exception
+# that would take the rest of the checklist down with it.
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
 
 previous = os.environ["PREVIOUS"]
 version = os.environ["VERSION"]

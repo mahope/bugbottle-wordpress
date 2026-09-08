@@ -98,9 +98,12 @@ all.
   `mountBugbottle()`, and that now matters for a second reason. In 0.7.0 the
   panel takes the annotator as a function you hand in, so an application that
   never marks a picture does not ship a canvas editor; the script-tag build's
-  `mount()` is the wrapper that hands it in. Calling it is what keeps "Edit
+  `mount()` is the wrapper that hands it in. Calling it is what puts "Edit
   picture" — rectangle, arrow, and a blur that reads the region back out of the
-  canvas so the original pixels leave with it — working with nothing added here.
+  canvas so the original pixels leave with it — in the panel wherever there is a
+  picture to mark, with nothing added here. There is not one yet: the
+  one-script-tag build carries no `html-to-image`, so the panel hides the
+  screenshot row, and a stored picture still comes from a form of your own.
 - The panel's Escape handling and its annotator fixes came with the bundle and
   needed no change in the plugin.
 

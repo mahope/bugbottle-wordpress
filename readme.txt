@@ -134,7 +134,7 @@ No. Composer is used only to run PHPStan while developing; the shipped plugin is
 * New "Timings and storage snapshot" setting, off by default. Records what the page cost, and lists the key names in localStorage and sessionStorage with the length of each value, plus the cookie names - names only, never values, and never a cookie value at all.
 * New "Shake to report" setting, off by default: shaking the phone opens the panel. On iPhone and iPad the visitor has to agree first, and only a button on your own page can ask; the plugin enables the gesture and explains it, and never puts up the prompt itself.
 * The report detail screen shows the timings and the storage snapshot as tables of their own, and both are stored with the report.
-* Marking the screenshot - rectangle, arrow and a blur that really destroys what it covers - is in the bundled panel and needs nothing here.
+* The bundled panel carries the screenshot annotator - rectangle, arrow and a blur that really destroys what it covers - wherever there is a picture to mark, and it needed nothing here.
 * Danish for every new setting, label and screen.
 
 = 0.3.0 =

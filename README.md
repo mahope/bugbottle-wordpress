@@ -265,9 +265,16 @@ would serve to the next visitor.
 `mount()` rather than the library's own `mountBugbottle()`: since 0.7.0 the
 panel takes the annotator as a function you hand in, so nobody pays for a
 canvas editor they never open, and `mount()` is the script-tag build's wrapper
-that hands it in. Calling it is what keeps "Edit picture" — the rectangle, the
-arrow and the blur that really destroys what it covers — working without the
-plugin needing to know anything about it.
+that hands it in. Calling it is what puts "Edit picture" — the rectangle, the
+arrow and the blur that really destroys what it covers — in the panel wherever
+there is a picture to mark, with nothing added here.
+
+There is not one yet. A picture means `html-to-image`, which is larger than
+everything else in the bundle put together, so the one-script-tag build ships
+no renderer and the panel hides the screenshot row without one. The REST route
+accepts and stores a picture all the same, from a form of your own or from a
+page that mounts the panel itself with a renderer — which is what "Please read
+this part" above is about.
 
 ## Development
 
